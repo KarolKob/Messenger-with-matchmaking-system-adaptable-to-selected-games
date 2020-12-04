@@ -747,7 +747,7 @@ namespace TalkaTIPSerwer
                     string message = string.Empty;
 
                     // 0111 login_1 status_1 IP_1 login_2 status_2 IP_2...login_n status_n IP_n)
-                    var friends = ctx.Friends.Where(x => x.UserID1 == userID);  // Returns all friends
+                    var friends = ctx.Friends.Where(x => x.UserID1 == userID);  // Returns all friends the user added
 
                     foreach (var item in friends)
                     {
@@ -769,6 +769,36 @@ namespace TalkaTIPSerwer
                         else
                         {
                             return Fail();
+                        }
+                    }
+
+                    friends = ctx.Friends.Where(x => x.UserID2 == userID);  // Returns all friends the user added
+
+                    foreach (var item in friends)
+                    {
+                        var friendLogin = ctx.Users.Where(x => x.UserID == item.UserID1).Select(x => x.Login).FirstOrDefault();
+
+                        var blck = ctx.Blocked.Where(x => x.UserID1 == userID && x.UserID2 == item.UserID1).FirstOrDefault();
+                        if (blck == null) // Skip if the user was blocked
+                        {
+                            if (friendLogin != null)
+                            {
+                                message += friendLogin + " ";
+                                if (Program.onlineUsers.ContainsKey(item.UserID1))
+                                {
+                                    message += "1 ";
+                                    message += Program.onlineUsers[item.UserID1].addressIP + " ";
+                                }
+                                else
+                                {
+                                    message += "0 ";
+                                    message += "0 ";
+                                }
+                            }
+                            else
+                            {
+                                return Fail();
+                            }
                         }
                     }
 

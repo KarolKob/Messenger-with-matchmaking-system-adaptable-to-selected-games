@@ -458,6 +458,11 @@ namespace TalkaTIPClientV2
                             AllMessages.Text += "\r\nMe " + DateTime.Now.ToString() + "\r\n" + InsertMessageText.Text + "\r\n";
                             InsertMessageText.Text = string.Empty;
                         }
+                        else
+                        {
+                            InsertMessageText.Text = string.Empty;
+                            MessageBox.Show("Sending the message failed or blocked by the user.", "Error");
+                        }
                     }
                     catch(Exception)
                     {
