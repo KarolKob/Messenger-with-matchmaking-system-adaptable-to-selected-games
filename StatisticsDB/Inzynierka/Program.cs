@@ -55,6 +55,22 @@ namespace Inzynierka
                 dbContext.SaveChanges();
             }
         }
+
+        public static void Find_Opponent(int id)
+        {
+            using (var dbContext = new StatContext())
+            {
+                var player_1 = dbContext.Players.First(p => p.PlayerId == id);
+                if(player_1.Rank == null)
+                {
+                   // find player from any rank 
+                }
+                else
+                {
+                    //find any player from the same rank
+                }
+            }
+        }
         static void Main(string[] args)
         {
             //string dbName = "Statistics.db";

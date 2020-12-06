@@ -30,6 +30,8 @@ namespace Inzynierka
         [Required]
         public double WinRate { get; set; }
 
+        public string Rank;
+
         private double Count_Probablity(double s)
         {
             double result = 1.0 / (1.0 + Math.Pow(10, (SkillRating - s) / 400));
