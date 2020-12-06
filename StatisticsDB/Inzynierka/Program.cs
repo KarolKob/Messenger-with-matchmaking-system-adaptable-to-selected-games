@@ -34,7 +34,7 @@ namespace Inzynierka
         {
             using (var dbContext = new StatContext())
             {
-                dbContext.Games.Add(new Game { GameId = 1, Player_1 = 1, Player_2 = 2, GameDate = DateTime.Today, Score_1 = 0, Score_2 = 0, RankedGame = false, Finished = false });
+                dbContext.Games.Add(new Game { Player_1 = 1, Player_2 = 2, GameDate = DateTime.Today, Score_1 = 0, Score_2 = 0, RankedGame = false, Finished = false });
                 dbContext.SaveChanges();
             }
         }
