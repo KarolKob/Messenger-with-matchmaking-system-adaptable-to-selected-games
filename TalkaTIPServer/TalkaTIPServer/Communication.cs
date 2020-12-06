@@ -666,7 +666,7 @@ namespace TalkaTIPSerwer
             }
         }
 
-        // Return in a format ready to display
+        // Return all chat messages with a user in a format ready to display
         public static string GetChatMessages(List<string> param)
         {
             string allChatMessages = string.Empty;
@@ -721,6 +721,73 @@ namespace TalkaTIPSerwer
                     return Fail();
                 }
             }
+        }
+
+
+        // TODO: Creating a group chat (also adds the user who created it)
+        public static string CreateGroupChat(List<string> param)
+        {
+            string chatName = param[0];
+            string chatCreatorUN = param[1];    // UN = user name
+
+            using (TalkaTipDB ctx = new TalkaTipDB())
+            {
+                long creatorID = ctx.Users.Where(x => x.Login == chatCreatorUN).Select(x => x.UserID).FirstOrDefault();
+                if(creatorID != 0)
+                {
+
+                }
+                else
+                {
+                    return Fail();
+                }
+            }
+
+            return Fail();
+        }
+
+        // TODO: Adding a user to group chat
+        public static string AddUserToGroupChat(List<string> param)
+        {
+            string chatName = param[0];
+            string userToAdd = param[1];
+
+            using (TalkaTipDB ctx = new TalkaTipDB())
+            {
+                long userID = ctx.Users.Where(x => x.Login == userToAdd).Select(x => x.UserID).FirstOrDefault();
+                if (userID != 0)
+                {
+
+                }
+                else
+                {
+                    return Fail();
+                }
+            }
+
+            return Fail();
+        }
+
+        // TODO: Leaving a group chat (deletes the chat if everyone leaves)
+        public static string LeaveGroupChat(List<string> param)
+        {
+            string chatName = param[0];
+            string userLeaving = param[1];
+
+            using (TalkaTipDB ctx = new TalkaTipDB())
+            {
+                long leavingID = ctx.Users.Where(x => x.Login == userLeaving).Select(x => x.UserID).FirstOrDefault();
+                if (leavingID != 0)
+                {
+
+                }
+                else
+                {
+                    return Fail();
+                }
+            }
+
+            return Fail();
         }
 
         // Outgoing messages

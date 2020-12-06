@@ -74,6 +74,27 @@ namespace TalkaTIPSerwer
             ExecuteCommand(sql, m_dbConnection);
         }
 
+        static void CreateGroupChatTable(SQLiteConnection m_dbConnection)
+        {
+            string sql = "CREATE TABLE IF NOT EXISTS GroupChat(" +
+                                            "GroupChatID INTEGER PRIMARY KEY AUTOINCREMENT," +
+                                            "GroupChatName VARCHAR(50) UNIQUE NOT NULL," +
+                                            "UserInChatID INTEGER NOT NULL REFERENCES Users(UserID)," +
+                                            "JoinTime DATETIME NOT NULL);";
+            ExecuteCommand(sql, m_dbConnection);
+        }
+
+        static void CreateGroupChatMessagesTable(SQLiteConnection m_dbConnection)
+        {
+            string sql = "CREATE TABLE IF NOT EXISTS GroupChatMessages(" +
+                                            "MessageID INTEGER PRIMARY KEY AUTOINCREMENT," +
+                                            "GroupChatID INTEGER FOREIGN KEY REFERENCES GroupChat(GroupChatID)," +
+                                            "UserSenderID INTEGER NOT NULL REFERENCES Users(UserID)," +
+                                            "SendTime DATETIME NOT NULL," +
+                                            "Message VARCHAR(200) NOT NULL);";
+            ExecuteCommand(sql, m_dbConnection);
+        }
+
         public static void CreateDataBase(SQLiteConnection m_dbConnection)
         {
             if (!File.Exists("TalkaTIP.sqlite"))
@@ -86,6 +107,8 @@ namespace TalkaTIPSerwer
             CreateHistoriesTable(m_dbConnection);
             CreateMessagesTable(m_dbConnection);
             CreateBlockedTable(m_dbConnection);
+            CreateGroupChatTable(m_dbConnection);
+            CreateGroupChatMessagesTable(m_dbConnection);
         }
     }
 }
