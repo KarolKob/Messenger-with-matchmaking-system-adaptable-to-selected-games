@@ -21,11 +21,11 @@ namespace Inzynierka
             Console.ReadLine();
         }
 
-        public static void Add_Player(int id, string nick)
+        public static void Add_Player(string nick)
         {
             using (var dbContext = new StatContext())
             {
-                dbContext.Players.Add(new Player { PlayerId = id, NickName = nick, SkillRating = 0.0, GamesPlayed = 0, GamesWon = 0, GamesLost = 0, GamesTied = 0, WinRate = 0.0 });
+                dbContext.Players.Add(new Player {NickName = nick, SkillRating = 0.0, GamesPlayed = 0, GamesWon = 0, GamesLost = 0, GamesTied = 0, WinRate = 0.0 });
                 dbContext.SaveChanges();
             }
         }
@@ -45,6 +45,7 @@ namespace Inzynierka
             {
                 var game = dbContext.Games.First(g => g.GameId == game_id);
                 game.Add_Result(1, 2);
+                
                 var player_1 = dbContext.Players.First(p => p.PlayerId == game.Player_1);
                 var player_2 = dbContext.Players.First(p => p.PlayerId == game.Player_2);
                 double skill_1 = player_1.SkillRating;

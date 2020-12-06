@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Inzynierka
 {
@@ -9,9 +10,9 @@ namespace Inzynierka
     {
         [Key]
         public int GameId { get; set; }
-        [Required]
+        [ForeignKey("Player")]
         public int Player_1 { get; set; }
-        [Required]
+        [ForeignKey("Player")]
         public int Player_2 { get; set; }
         [Required]
         public bool RankedGame { get; set; }
