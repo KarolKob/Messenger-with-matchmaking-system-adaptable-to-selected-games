@@ -30,5 +30,7 @@ namespace TalkaTIPServer
         public virtual DbSet<Users> Users { get; set; }
         public virtual DbSet<Blocked> Blocked { get; set; }
         public virtual DbSet<Messages> Messages { get; set; }
+        public virtual DbSet<GroupChat> GroupChat { get; set; }
+        public virtual DbSet<GroupChatMessages> GroupChatMessages { get; set; }
     }
 }

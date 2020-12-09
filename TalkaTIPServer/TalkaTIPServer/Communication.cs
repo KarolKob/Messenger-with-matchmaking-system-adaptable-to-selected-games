@@ -724,7 +724,7 @@ namespace TalkaTIPSerwer
         }
 
 
-        // TODO: Creating a group chat (also adds the user who created it)
+        // Creating a group chat (also adds the user who created it)
         public static string CreateGroupChat(List<string> param)
         {
             string chatName = param[0];
@@ -732,21 +732,42 @@ namespace TalkaTIPSerwer
 
             using (TalkaTipDB ctx = new TalkaTipDB())
             {
-                long creatorID = ctx.Users.Where(x => x.Login == chatCreatorUN).Select(x => x.UserID).FirstOrDefault();
-                if(creatorID != 0)
-                {
+                int nameUnique = ctx.GroupChat.Where(x => x.GroupChatName == chatName).Count(); // Check if the name is unique
 
+                if (nameUnique == 0)
+                {
+                    long creatorID = ctx.Users.Where(x => x.Login == chatCreatorUN).Select(x => x.UserID).FirstOrDefault();
+                    if (creatorID != 0)
+                    {
+                        GroupChat groupChat = new GroupChat();
+                        groupChat.JoinTime = DateTime.ParseExact(param[2], "yyyy-MM-dd-HH:mm:ss", CultureInfo.InvariantCulture);
+                        groupChat.GroupChatName = chatName;
+                        groupChat.UserInChatID = creatorID;
+
+                        try
+                        {
+                            ctx.GroupChat.Add(groupChat);
+                            ctx.SaveChanges();
+                            return OK();
+                        }
+                        catch (DbUpdateConcurrencyException)
+                        {
+                            return Fail();
+                        }
+                    }
+                    else
+                    {
+                        return Fail();
+                    }
                 }
                 else
                 {
                     return Fail();
                 }
             }
-
-            return Fail();
         }
 
-        // TODO: Adding a user to group chat
+        // Adding a user to group chat
         public static string AddUserToGroupChat(List<string> param)
         {
             string chatName = param[0];
@@ -757,6 +778,31 @@ namespace TalkaTIPSerwer
                 long userID = ctx.Users.Where(x => x.Login == userToAdd).Select(x => x.UserID).FirstOrDefault();
                 if (userID != 0)
                 {
+                    // Check if the user is already inside
+                    int isInChat = ctx.GroupChat.Where(x => x.UserInChatID == userID && x.GroupChatName == chatName).Count();
+
+                    if(isInChat == 0)
+                    {
+                        GroupChat groupChat = new GroupChat();
+                        groupChat.JoinTime = DateTime.ParseExact(param[2], "yyyy-MM-dd-HH:mm:ss", CultureInfo.InvariantCulture);
+                        groupChat.GroupChatName = chatName;
+                        groupChat.UserInChatID = userID;
+
+                        try
+                        {
+                            ctx.GroupChat.Add(groupChat);
+                            ctx.SaveChanges();
+                            return OK();
+                        }
+                        catch (DbUpdateConcurrencyException)
+                        {
+                            return Fail();
+                        }
+                    }
+                    else
+                    {
+                        return Fail();
+                    }
 
                 }
                 else
@@ -764,11 +810,9 @@ namespace TalkaTIPSerwer
                     return Fail();
                 }
             }
-
-            return Fail();
         }
 
-        // TODO: Leaving a group chat (deletes the chat if everyone leaves)
+        // Leaving a group chat (deletes the chat if everyone leaves)
         public static string LeaveGroupChat(List<string> param)
         {
             string chatName = param[0];
@@ -779,15 +823,25 @@ namespace TalkaTIPSerwer
                 long leavingID = ctx.Users.Where(x => x.Login == userLeaving).Select(x => x.UserID).FirstOrDefault();
                 if (leavingID != 0)
                 {
+                    GroupChat chatToDelete = ctx.GroupChat
+                        .Where(x => x.GroupChatName == chatName && x.UserInChatID == leavingID).FirstOrDefault();
 
+                    try
+                    {
+                        ctx.GroupChat.Remove(chatToDelete);
+                        ctx.SaveChanges();
+                        return OK();
+                    }
+                    catch (DbUpdateConcurrencyException)
+                    {
+                        return Fail();
+                    }
                 }
                 else
                 {
                     return Fail();
                 }
             }
-
-            return Fail();
         }
 
         // Outgoing messages

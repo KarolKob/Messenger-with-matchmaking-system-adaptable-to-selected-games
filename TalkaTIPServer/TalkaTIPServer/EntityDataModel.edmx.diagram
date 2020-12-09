@@ -4,7 +4,7 @@
   <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
     <!-- Diagram content (shape and connector positions) -->
     <edmx:Diagrams>
-      <Diagram DiagramId="c4cc5ced6a57487bb261f13b08a19ff5" Name="Diagram1">
+      <Diagram DiagramId="c4cc5ced6a57487bb261f13b08a19ff5" Name="Diagram1" ZoomLevel="111">
         <EntityTypeShape EntityType="TalkaTIPModel.Friends" Width="1.5" PointX="3" PointY="2.75" IsExpanded="true" />
         <EntityTypeShape EntityType="TalkaTIPModel.Histories" Width="1.5" PointX="5" PointY="3.875" IsExpanded="true" />
         <EntityTypeShape EntityType="TalkaTIPModel.Users" Width="1.5" PointX="0.5" PointY="4.625" IsExpanded="true" />
@@ -18,6 +18,11 @@
         <AssociationConnector Association="TalkaTIPModel.FK_Blocked_1_0" />
         <AssociationConnector Association="TalkaTIPModel.FK_Messages_0_0" />
         <AssociationConnector Association="TalkaTIPModel.FK_Messages_1_0" />
+        <EntityTypeShape EntityType="TalkaTIPModel.GroupChat" Width="1.5" PointX="2.625" PointY="11" />
+        <EntityTypeShape EntityType="TalkaTIPModel.GroupChatMessages" Width="1.5" PointX="5.5" PointY="9.5" />
+        <AssociationConnector Association="TalkaTIPModel.FK_GroupChat_0_0" />
+        <AssociationConnector Association="TalkaTIPModel.FK_GroupChatMessages_1_0" />
+        <AssociationConnector Association="TalkaTIPModel.FK_GroupChatMessages_0_0" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

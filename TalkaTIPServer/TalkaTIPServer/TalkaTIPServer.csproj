@@ -213,6 +213,12 @@
     <Compile Include="Friends.cs">
       <DependentUpon>EntityDataModel.tt</DependentUpon>
     </Compile>
+    <Compile Include="GroupChat.cs">
+      <DependentUpon>EntityDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="GroupChatMessages.cs">
+      <DependentUpon>EntityDataModel.tt</DependentUpon>
+    </Compile>
     <Compile Include="Histories.cs">
       <DependentUpon>EntityDataModel.tt</DependentUpon>
     </Compile>
