@@ -219,6 +219,9 @@
     <Compile Include="GroupChatMessages.cs">
       <DependentUpon>EntityDataModel.tt</DependentUpon>
     </Compile>
+    <Compile Include="GroupChatUsers.cs">
+      <DependentUpon>EntityDataModel.tt</DependentUpon>
+    </Compile>
     <Compile Include="Histories.cs">
       <DependentUpon>EntityDataModel.tt</DependentUpon>
     </Compile>

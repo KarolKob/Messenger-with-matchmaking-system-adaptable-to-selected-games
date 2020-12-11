@@ -18,15 +18,16 @@ namespace TalkaTIPServer
         public GroupChat()
         {
             this.GroupChatMessages = new HashSet<GroupChatMessages>();
+            this.GroupChatUsers = new HashSet<GroupChatUsers>();
         }
     
         public long GroupChatID { get; set; }
-        public long UserInChatID { get; set; }
         public string GroupChatName { get; set; }
-        public System.DateTime JoinTime { get; set; }
+        public long IsApiControlled { get; set; }
     
-        public virtual Users Users { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<GroupChatMessages> GroupChatMessages { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<GroupChatUsers> GroupChatUsers { get; set; }
     }
 }

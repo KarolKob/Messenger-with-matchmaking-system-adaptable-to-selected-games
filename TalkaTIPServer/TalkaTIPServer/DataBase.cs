@@ -78,8 +78,17 @@ namespace TalkaTIPSerwer
         {
             string sql = "CREATE TABLE IF NOT EXISTS GroupChat(" +
                                             "GroupChatID INTEGER PRIMARY KEY AUTOINCREMENT," +
-                                            "UserInChatID INTEGER NOT NULL REFERENCES Users(UserID)," +
                                             "GroupChatName VARCHAR(50) UNIQUE NOT NULL," +
+                                            "IsApiControlled INTEGER NOT NULL);";
+            ExecuteCommand(sql, m_dbConnection);
+        }
+
+        static void CreateGroupChatUsersTable(SQLiteConnection m_dbConnection)
+        {
+            string sql = "CREATE TABLE IF NOT EXISTS GroupChatUsers(" +
+                                            "GroupChatJoinID INTEGER PRIMARY KEY AUTOINCREMENT," +
+                                            "UserInChatID INTEGER NOT NULL REFERENCES Users(UserID)," +
+                                            "JoinedGroupChatID INTEGER NOT NULL REFERENCES GroupChat(GroupChatID)," +
                                             "JoinTime DATETIME NOT NULL);";
             ExecuteCommand(sql, m_dbConnection);
         }
@@ -110,6 +119,7 @@ namespace TalkaTIPSerwer
             CreateMessagesTable(m_dbConnection);
             CreateBlockedTable(m_dbConnection);
             CreateGroupChatTable(m_dbConnection);
+            CreateGroupChatUsersTable(m_dbConnection);
             CreateGroupChatMessagesTable(m_dbConnection);
         }
     }
