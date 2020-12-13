@@ -128,6 +128,17 @@ namespace TalkaTIPClientV2
             return Response(Program.client.Receive()[0]);
         }
 
+        public static bool GroupChatMessage(string senderLogin, string chatName, string chatMessage)
+        {
+            char comm = (char)27;
+            string dateString = DateTime.Now.ToString("yyyy-MM-dd-HH:mm:ss", CultureInfo.InvariantCulture);
+            string message = Convert.ToBase64String(Program.security.EncryptMessage(Program.sessionKeyWithServer,
+                senderLogin + " " + chatName + " " + dateString + " " + chatMessage));
+            message = comm + " " + message + " <EOF>";
+            Program.client.Send(message);
+            return Response(Program.client.Receive()[0]);
+        }
+
         public static byte[] KeyExchange()
         {
             var byteArray = Program.security.GetOwnerPublicKey().ToByteArray();
@@ -141,6 +152,16 @@ namespace TalkaTIPClientV2
         public static void GetAllChatMessages(string senderLogin, string receiverLogin)
         {
             char comm = (char)23;
+            string message = comm + " " + Convert.ToBase64String(Program.security.EncryptMessage(Program.sessionKeyWithServer,
+                senderLogin + " " + receiverLogin)) + " <EOF>";
+            Program.client.Send(message);
+            message = Program.client.Receive();
+            commFromServer(message.Substring(0, message.Length - 6));
+        }
+
+        public static void GetAllGroupChatMessages(string senderLogin, string receiverLogin)
+        {
+            char comm = (char)28;
             string message = comm + " " + Convert.ToBase64String(Program.security.EncryptMessage(Program.sessionKeyWithServer,
                 senderLogin + " " + receiverLogin)) + " <EOF>";
             Program.client.Send(message);

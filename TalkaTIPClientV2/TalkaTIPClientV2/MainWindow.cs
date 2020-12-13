@@ -29,6 +29,7 @@ namespace TalkaTIPClientV2
         private UdpClient receiveClient = new UdpClient();
         private UdpClient sendClient = new UdpClient();
         private IPEndPoint remoteEP = new IPEndPoint(IPAddress.Any, 1550);
+        private bool isOnGroupsTab = false;
 
         public MainWindow()
         {
@@ -449,26 +450,55 @@ namespace TalkaTIPClientV2
             {
                 if(InsertMessageText.Text.Length < 200)
                 {
-                    try
+                    if (!isOnGroupsTab && listView1.SelectedItems[0] != null)
                     {
-                        string recieverLogin = listView1.SelectedItems[0].Text;
-                        Program.client = new Client(Program.serverAddress);
-                        if(Communication.ChatMessage(Program.userLogin, recieverLogin, InsertMessageText.Text) == true)
+                        try
                         {
-                            AllMessages.Text += "\r\nMe " + DateTime.Now.ToString() + "\r\n" + InsertMessageText.Text + "\r\n";
-                            InsertMessageText.Text = string.Empty;
+                            string recieverLogin = listView1.SelectedItems[0].Text;
+                            Program.client = new Client(Program.serverAddress);
+                            if (Communication.ChatMessage(Program.userLogin, recieverLogin, InsertMessageText.Text) == true)
+                            {
+                                AllMessages.Text += "\r\nMe " + DateTime.Now.ToString() + "\r\n" + InsertMessageText.Text + "\r\n";
+                                InsertMessageText.Text = string.Empty;
+                            }
+                            else
+                            {
+                                InsertMessageText.Text = string.Empty;
+                                MessageBox.Show("Sending the message failed or blocked by the user.", "Error");
+                            }
                         }
-                        else
+                        catch (Exception)
                         {
-                            InsertMessageText.Text = string.Empty;
-                            MessageBox.Show("Sending the message failed or blocked by the user.", "Error");
+                            MessageBox.Show("Server connection error.", "Error");
+                        }
+                        Program.client.Disconnect();
+                    }
+                    else
+                    {
+                        if(listViewGroups.SelectedItems[0] != null)
+                        {
+                            try
+                            {
+                                string chatName = listViewGroups.SelectedItems[0].Text;
+                                Program.client = new Client(Program.serverAddress);
+                                if (Communication.GroupChatMessage(Program.userLogin, chatName, InsertMessageText.Text) == true)
+                                {
+                                    AllMessages.Text += "\r\nMe " + DateTime.Now.ToString() + "\r\n" + InsertMessageText.Text + "\r\n";
+                                    InsertMessageText.Text = string.Empty;
+                                }
+                                else
+                                {
+                                    InsertMessageText.Text = string.Empty;
+                                    MessageBox.Show("Sending the message failed.", "Error");
+                                }
+                            }
+                            catch (Exception)
+                            {
+                                MessageBox.Show("Server connection error.", "Error");
+                            }
+                            Program.client.Disconnect();
                         }
                     }
-                    catch(Exception)
-                    {
-                        MessageBox.Show("Server connection error.", "Error");
-                    }
-                    Program.client.Disconnect();
                 }
                 else
                 {
@@ -524,7 +554,7 @@ namespace TalkaTIPClientV2
 
         private void listView1_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (listView1.SelectedItems.Count == 0 || listView1.SelectedItems.Count > 1)
+            if (listView1.SelectedItems.Count == 0 || listView1.SelectedItems.Count > 1 || listView1.SelectedItems[0] == null)
             {
                 //MessageBox.Show("You need to select one user from the friends list.", "Error");
             }
@@ -536,6 +566,7 @@ namespace TalkaTIPClientV2
                     deleteFriendButton.Visible = true;
                     BlockButton.Visible = true;
                     UnblockButton.Visible = false;
+                    buttonLeaveChat.Visible = false;
 
                     if (listView1.SelectedItems[0].ForeColor == Color.Red)
                     {
@@ -580,6 +611,61 @@ namespace TalkaTIPClientV2
         {
             // TODO: Send a request to given API and get an answer
                 // TODO: Get an answer and proceed accordingly to what it is
+        }
+
+        private void listView1_ItemActivate(object sender, EventArgs e)
+        {
+            isOnGroupsTab = false;
+        }
+
+        private void listViewGroups_ItemActivate(object sender, EventArgs e)
+        {
+            isOnGroupsTab = true;
+        }
+
+        private void listViewGroups_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (listViewGroups.SelectedItems.Count == 0 || listViewGroups.SelectedItems.Count > 1 || listViewGroups.SelectedItems[0] == null)
+            {
+                //MessageBox.Show("You need to select one user from the friends list.", "Error");
+            }
+            else
+            {
+                try
+                {
+                    FriendButton.Visible = false;
+                    deleteFriendButton.Visible = false;
+                    BlockButton.Visible = false;
+                    UnblockButton.Visible = false;
+                    buttonLeaveChat.Visible = true;
+
+                    if (listViewGroups.SelectedItems[0].ForeColor == Color.Red)
+                    {
+                        listViewGroups.SelectedItems[0].ForeColor = Color.Black;
+                    }
+
+                    if (Program.chatNameAndMessage.ContainsKey(listViewGroups.SelectedItems[0].Text))
+                    {
+                        UpdateChatText(Program.chatNameAndMessage[listViewGroups.SelectedItems[0].Text]);
+                    }
+                    else
+                    {
+                        Program.client = new Client(Program.serverAddress);
+
+                        // Load the messages from server if available   
+                        Communication.GetAllGroupChatMessages(Program.userLogin, listViewGroups.SelectedItems[0].Text);
+
+                        Thread.Sleep(100);
+                        Program.client.Disconnect();
+                    }
+
+                    ContactName.Text = listViewGroups.SelectedItems[0].Text;
+                }
+                catch (Exception)
+                {
+                    MessageBox.Show("Server connection error.", "Error");
+                }
+            }
         }
     }
 }

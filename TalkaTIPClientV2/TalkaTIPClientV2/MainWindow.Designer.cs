@@ -40,10 +40,16 @@
             this.FriendButton = new System.Windows.Forms.Button();
             this.LogOutButton = new System.Windows.Forms.Button();
             this.listView1 = new System.Windows.Forms.ListView();
-            this.tabControl1 = new System.Windows.Forms.TabControl();
+            this.Groups = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.tabPage2 = new System.Windows.Forms.TabPage();
             this.listView2 = new System.Windows.Forms.ListView();
+            this.tabPage3 = new System.Windows.Forms.TabPage();
+            this.searchOpponentButton = new System.Windows.Forms.Button();
+            this.gameAPIList = new System.Windows.Forms.ListBox();
+            this.addAPIButton = new System.Windows.Forms.Button();
+            this.serverAddressLabel = new System.Windows.Forms.Label();
+            this.addGameAPIText = new System.Windows.Forms.TextBox();
             this.timerIAM = new System.Windows.Forms.Timer(this.components);
             this.gbCall = new System.Windows.Forms.GroupBox();
             this.cancelCallButton = new System.Windows.Forms.Button();
@@ -57,19 +63,18 @@
             this.disconnectButton = new System.Windows.Forms.Button();
             this.deleteFriendButton = new System.Windows.Forms.Button();
             this.UnblockButton = new System.Windows.Forms.Button();
-            this.tabPage3 = new System.Windows.Forms.TabPage();
-            this.addGameAPIText = new System.Windows.Forms.TextBox();
-            this.serverAddressLabel = new System.Windows.Forms.Label();
-            this.addAPIButton = new System.Windows.Forms.Button();
-            this.gameAPIList = new System.Windows.Forms.ListBox();
-            this.searchOpponentButton = new System.Windows.Forms.Button();
-            this.tabControl1.SuspendLayout();
+            this.tabPage4 = new System.Windows.Forms.TabPage();
+            this.listViewGroups = new System.Windows.Forms.ListView();
+            this.buttonCreateChat = new System.Windows.Forms.Button();
+            this.buttonLeaveChat = new System.Windows.Forms.Button();
+            this.Groups.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.tabPage2.SuspendLayout();
+            this.tabPage3.SuspendLayout();
             this.gbCall.SuspendLayout();
             this.gbAnswerCall.SuspendLayout();
             this.gbInCall.SuspendLayout();
-            this.tabPage3.SuspendLayout();
+            this.tabPage4.SuspendLayout();
             this.SuspendLayout();
             // 
             // AllMessages
@@ -117,7 +122,7 @@
             // ContactName
             // 
             this.ContactName.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
-            this.ContactName.Location = new System.Drawing.Point(432, 386);
+            this.ContactName.Location = new System.Drawing.Point(418, 386);
             this.ContactName.Name = "ContactName";
             this.ContactName.ReadOnly = true;
             this.ContactName.Size = new System.Drawing.Size(218, 26);
@@ -178,22 +183,25 @@
             // 
             this.listView1.HideSelection = false;
             this.listView1.Location = new System.Drawing.Point(0, 0);
+            this.listView1.MultiSelect = false;
             this.listView1.Name = "listView1";
             this.listView1.Size = new System.Drawing.Size(187, 385);
             this.listView1.TabIndex = 11;
             this.listView1.UseCompatibleStateImageBehavior = false;
+            this.listView1.ItemActivate += new System.EventHandler(this.listView1_ItemActivate);
             this.listView1.SelectedIndexChanged += new System.EventHandler(this.listView1_SelectedIndexChanged);
             // 
-            // tabControl1
+            // Groups
             // 
-            this.tabControl1.Controls.Add(this.tabPage1);
-            this.tabControl1.Controls.Add(this.tabPage2);
-            this.tabControl1.Controls.Add(this.tabPage3);
-            this.tabControl1.Location = new System.Drawing.Point(12, 76);
-            this.tabControl1.Name = "tabControl1";
-            this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(195, 327);
-            this.tabControl1.TabIndex = 12;
+            this.Groups.Controls.Add(this.tabPage1);
+            this.Groups.Controls.Add(this.tabPage2);
+            this.Groups.Controls.Add(this.tabPage3);
+            this.Groups.Controls.Add(this.tabPage4);
+            this.Groups.Location = new System.Drawing.Point(12, 76);
+            this.Groups.Name = "Groups";
+            this.Groups.SelectedIndex = 0;
+            this.Groups.Size = new System.Drawing.Size(195, 327);
+            this.Groups.TabIndex = 12;
             // 
             // tabPage1
             // 
@@ -225,6 +233,69 @@
             this.listView2.Size = new System.Drawing.Size(187, 381);
             this.listView2.TabIndex = 0;
             this.listView2.UseCompatibleStateImageBehavior = false;
+            // 
+            // tabPage3
+            // 
+            this.tabPage3.BackColor = System.Drawing.SystemColors.Control;
+            this.tabPage3.Controls.Add(this.searchOpponentButton);
+            this.tabPage3.Controls.Add(this.gameAPIList);
+            this.tabPage3.Controls.Add(this.addAPIButton);
+            this.tabPage3.Controls.Add(this.serverAddressLabel);
+            this.tabPage3.Controls.Add(this.addGameAPIText);
+            this.tabPage3.Location = new System.Drawing.Point(4, 22);
+            this.tabPage3.Name = "tabPage3";
+            this.tabPage3.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage3.Size = new System.Drawing.Size(187, 301);
+            this.tabPage3.TabIndex = 2;
+            this.tabPage3.Text = "Games";
+            // 
+            // searchOpponentButton
+            // 
+            this.searchOpponentButton.BackColor = System.Drawing.SystemColors.ButtonShadow;
+            this.searchOpponentButton.Location = new System.Drawing.Point(43, 267);
+            this.searchOpponentButton.Name = "searchOpponentButton";
+            this.searchOpponentButton.Size = new System.Drawing.Size(106, 28);
+            this.searchOpponentButton.TabIndex = 18;
+            this.searchOpponentButton.Text = "Search opponent";
+            this.searchOpponentButton.UseVisualStyleBackColor = false;
+            this.searchOpponentButton.Click += new System.EventHandler(this.searchOpponentButton_Click);
+            // 
+            // gameAPIList
+            // 
+            this.gameAPIList.FormattingEnabled = true;
+            this.gameAPIList.HorizontalScrollbar = true;
+            this.gameAPIList.Location = new System.Drawing.Point(4, 92);
+            this.gameAPIList.Name = "gameAPIList";
+            this.gameAPIList.Size = new System.Drawing.Size(180, 173);
+            this.gameAPIList.TabIndex = 17;
+            // 
+            // addAPIButton
+            // 
+            this.addAPIButton.BackColor = System.Drawing.SystemColors.ButtonShadow;
+            this.addAPIButton.Location = new System.Drawing.Point(57, 51);
+            this.addAPIButton.Name = "addAPIButton";
+            this.addAPIButton.Size = new System.Drawing.Size(58, 28);
+            this.addAPIButton.TabIndex = 16;
+            this.addAPIButton.Text = "Add API";
+            this.addAPIButton.UseVisualStyleBackColor = false;
+            this.addAPIButton.Click += new System.EventHandler(this.addAPIButton_Click);
+            // 
+            // serverAddressLabel
+            // 
+            this.serverAddressLabel.AutoSize = true;
+            this.serverAddressLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
+            this.serverAddressLabel.Location = new System.Drawing.Point(31, 6);
+            this.serverAddressLabel.Name = "serverAddressLabel";
+            this.serverAddressLabel.Size = new System.Drawing.Size(122, 16);
+            this.serverAddressLabel.TabIndex = 1;
+            this.serverAddressLabel.Text = "Game API address";
+            // 
+            // addGameAPIText
+            // 
+            this.addGameAPIText.Location = new System.Drawing.Point(9, 25);
+            this.addGameAPIText.Name = "addGameAPIText";
+            this.addGameAPIText.Size = new System.Drawing.Size(172, 20);
+            this.addGameAPIText.TabIndex = 0;
             // 
             // timerIAM
             // 
@@ -366,80 +437,64 @@
             this.UnblockButton.Visible = false;
             this.UnblockButton.Click += new System.EventHandler(this.UnblockButton_Click);
             // 
-            // tabPage3
+            // tabPage4
             // 
-            this.tabPage3.BackColor = System.Drawing.SystemColors.Control;
-            this.tabPage3.Controls.Add(this.searchOpponentButton);
-            this.tabPage3.Controls.Add(this.gameAPIList);
-            this.tabPage3.Controls.Add(this.addAPIButton);
-            this.tabPage3.Controls.Add(this.serverAddressLabel);
-            this.tabPage3.Controls.Add(this.addGameAPIText);
-            this.tabPage3.Location = new System.Drawing.Point(4, 22);
-            this.tabPage3.Name = "tabPage3";
-            this.tabPage3.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage3.Size = new System.Drawing.Size(187, 301);
-            this.tabPage3.TabIndex = 2;
-            this.tabPage3.Text = "Games";
+            this.tabPage4.Controls.Add(this.listViewGroups);
+            this.tabPage4.Location = new System.Drawing.Point(4, 22);
+            this.tabPage4.Name = "tabPage4";
+            this.tabPage4.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage4.Size = new System.Drawing.Size(187, 301);
+            this.tabPage4.TabIndex = 3;
+            this.tabPage4.Text = "Groups";
+            this.tabPage4.UseVisualStyleBackColor = true;
             // 
-            // addGameAPIText
+            // listViewGroups
             // 
-            this.addGameAPIText.Location = new System.Drawing.Point(9, 25);
-            this.addGameAPIText.Name = "addGameAPIText";
-            this.addGameAPIText.Size = new System.Drawing.Size(172, 20);
-            this.addGameAPIText.TabIndex = 0;
+            this.listViewGroups.HideSelection = false;
+            this.listViewGroups.Location = new System.Drawing.Point(0, 0);
+            this.listViewGroups.MultiSelect = false;
+            this.listViewGroups.Name = "listViewGroups";
+            this.listViewGroups.Size = new System.Drawing.Size(187, 304);
+            this.listViewGroups.TabIndex = 0;
+            this.listViewGroups.UseCompatibleStateImageBehavior = false;
+            this.listViewGroups.ItemActivate += new System.EventHandler(this.listViewGroups_ItemActivate);
+            this.listViewGroups.SelectedIndexChanged += new System.EventHandler(this.listViewGroups_SelectedIndexChanged);
             // 
-            // serverAddressLabel
+            // buttonCreateChat
             // 
-            this.serverAddressLabel.AutoSize = true;
-            this.serverAddressLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
-            this.serverAddressLabel.Location = new System.Drawing.Point(31, 6);
-            this.serverAddressLabel.Name = "serverAddressLabel";
-            this.serverAddressLabel.Size = new System.Drawing.Size(122, 16);
-            this.serverAddressLabel.TabIndex = 1;
-            this.serverAddressLabel.Text = "Game API address";
+            this.buttonCreateChat.BackColor = System.Drawing.SystemColors.ButtonShadow;
+            this.buttonCreateChat.Location = new System.Drawing.Point(642, 383);
+            this.buttonCreateChat.Name = "buttonCreateChat";
+            this.buttonCreateChat.Size = new System.Drawing.Size(70, 32);
+            this.buttonCreateChat.TabIndex = 16;
+            this.buttonCreateChat.Text = "Create chat";
+            this.buttonCreateChat.UseVisualStyleBackColor = false;
+            this.buttonCreateChat.Visible = false;
             // 
-            // addAPIButton
+            // buttonLeaveChat
             // 
-            this.addAPIButton.BackColor = System.Drawing.SystemColors.ButtonShadow;
-            this.addAPIButton.Location = new System.Drawing.Point(57, 51);
-            this.addAPIButton.Name = "addAPIButton";
-            this.addAPIButton.Size = new System.Drawing.Size(58, 28);
-            this.addAPIButton.TabIndex = 16;
-            this.addAPIButton.Text = "Add API";
-            this.addAPIButton.UseVisualStyleBackColor = false;
-            this.addAPIButton.Click += new System.EventHandler(this.addAPIButton_Click);
-            // 
-            // gameAPIList
-            // 
-            this.gameAPIList.FormattingEnabled = true;
-            this.gameAPIList.HorizontalScrollbar = true;
-            this.gameAPIList.Location = new System.Drawing.Point(4, 92);
-            this.gameAPIList.Name = "gameAPIList";
-            this.gameAPIList.Size = new System.Drawing.Size(180, 173);
-            this.gameAPIList.TabIndex = 17;
-            // 
-            // searchOpponentButton
-            // 
-            this.searchOpponentButton.BackColor = System.Drawing.SystemColors.ButtonShadow;
-            this.searchOpponentButton.Location = new System.Drawing.Point(43, 267);
-            this.searchOpponentButton.Name = "searchOpponentButton";
-            this.searchOpponentButton.Size = new System.Drawing.Size(106, 28);
-            this.searchOpponentButton.TabIndex = 18;
-            this.searchOpponentButton.Text = "Search opponent";
-            this.searchOpponentButton.UseVisualStyleBackColor = false;
-            this.searchOpponentButton.Click += new System.EventHandler(this.searchOpponentButton_Click);
+            this.buttonLeaveChat.BackColor = System.Drawing.SystemColors.ButtonShadow;
+            this.buttonLeaveChat.Location = new System.Drawing.Point(718, 383);
+            this.buttonLeaveChat.Name = "buttonLeaveChat";
+            this.buttonLeaveChat.Size = new System.Drawing.Size(70, 32);
+            this.buttonLeaveChat.TabIndex = 17;
+            this.buttonLeaveChat.Text = "Leave chat";
+            this.buttonLeaveChat.UseVisualStyleBackColor = false;
+            this.buttonLeaveChat.Visible = false;
             // 
             // MainWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(822, 491);
+            this.Controls.Add(this.buttonLeaveChat);
+            this.Controls.Add(this.buttonCreateChat);
             this.Controls.Add(this.UnblockButton);
             this.Controls.Add(this.deleteFriendButton);
             this.Controls.Add(this.gbAnswerCall);
             this.Controls.Add(this.gbInCall);
             this.Controls.Add(this.gbCall);
-            this.Controls.Add(this.tabControl1);
+            this.Controls.Add(this.Groups);
             this.Controls.Add(this.LogOutButton);
             this.Controls.Add(this.FriendButton);
             this.Controls.Add(this.SearchButton);
@@ -453,17 +508,18 @@
             this.Text = "TalkaTIP";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.MainWindow_FormClosed);
             this.Shown += new System.EventHandler(this.MainWindow_Shown);
-            this.tabControl1.ResumeLayout(false);
+            this.Groups.ResumeLayout(false);
             this.tabPage1.ResumeLayout(false);
             this.tabPage2.ResumeLayout(false);
+            this.tabPage3.ResumeLayout(false);
+            this.tabPage3.PerformLayout();
             this.gbCall.ResumeLayout(false);
             this.gbCall.PerformLayout();
             this.gbAnswerCall.ResumeLayout(false);
             this.gbAnswerCall.PerformLayout();
             this.gbInCall.ResumeLayout(false);
             this.gbInCall.PerformLayout();
-            this.tabPage3.ResumeLayout(false);
-            this.tabPage3.PerformLayout();
+            this.tabPage4.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -480,7 +536,6 @@
         private System.Windows.Forms.Button FriendButton;
         private System.Windows.Forms.Button LogOutButton;
         public System.Windows.Forms.ListView listView1;
-        private System.Windows.Forms.TabControl tabControl1;
         private System.Windows.Forms.TabPage tabPage1;
         private System.Windows.Forms.TabPage tabPage2;
         public System.Windows.Forms.ListView listView2;
@@ -504,6 +559,11 @@
         private System.Windows.Forms.Label serverAddressLabel;
         private System.Windows.Forms.TextBox addGameAPIText;
         private System.Windows.Forms.Button searchOpponentButton;
+        private System.Windows.Forms.TabPage tabPage4;
+        public System.Windows.Forms.TabControl Groups;
+        public System.Windows.Forms.ListView listViewGroups;
+        private System.Windows.Forms.Button buttonCreateChat;
+        private System.Windows.Forms.Button buttonLeaveChat;
     }
 }
 
