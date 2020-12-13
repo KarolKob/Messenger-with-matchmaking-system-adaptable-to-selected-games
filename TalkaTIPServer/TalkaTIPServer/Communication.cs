@@ -37,6 +37,8 @@ namespace TalkaTIPSerwer
             communiqueDictionary[24] = new Func<List<string>, string>(CreateGroupChat);
             communiqueDictionary[25] = new Func<List<string>, string>(AddUserToGroupChat);
             communiqueDictionary[26] = new Func<List<string>, string>(LeaveGroupChat);
+            communiqueDictionary[27] = new Func<List<string>, string>(GroupChatMessage);
+            communiqueDictionary[27] = new Func<List<string>, string>(GetAllGroupChatMessages);
         }
 
         // Incoming messages
@@ -908,23 +910,101 @@ namespace TalkaTIPSerwer
                             return Fail();
                         }
 
-                        // TODO: send the message to all online users in the chat
+                        // Send the message to all online users in the chat
+                        var allChatUsers = ctx.GroupChatUsers.Where(x => x.JoinedGroupChatID == chatID);
+
+                        foreach(var user in allChatUsers)
+                        {
+                            // Send the message to reciever
+                            if (Program.onlineUsers.ContainsKey(user.UserInChatID))
+                            {
+                                try
+                                {
+                                    EndPoint endPoint = new IPEndPoint(IPAddress.Parse(Program.onlineUsers[user.UserInChatID].addressIP), 14450);
+                                    builder = new StringBuilder();
+                                    for (int i = 0; i < param.Count; i++)
+                                    {
+                                        // Append each string to the StringBuilder overload.
+                                        builder.Append(param[i]).Append(" ");
+                                    }
+                                    message = chatName + " " + builder.ToString();
+
+                                    message = Convert.ToBase64String(Program.security.EncryptMessage(Program.onlineUsers[senderID].sessionKey, message));
+                                    message = ((char)27).ToString() + ' ' + message;
+                                    message += " <EOF>";
+
+                                    AsynchronousServer.SendMessage(message, endPoint);
+                                }
+                                catch(Exception)
+                                {
+                                    return Fail();
+                                }
+                            }
+                        }
+                        return OK();
+                    }
+                    else
+                    {
+                        return Fail();
                     }
                 }
+                else
+                {
+                    return Fail();
+                }
             }
-
-            return Fail();
         }
 
         public static string GetAllGroupChatMessages(List<string> param)
         {
+            string allChatMessages = string.Empty;
+            string loginFrom = param[0];
+            string chatName = param[1];
 
-            return Fail();
+            using (TalkaTipDB ctx = new TalkaTipDB())
+            {
+                long userID = ctx.Users.Where(x => x.Login == loginFrom).Select(x => x.UserID).FirstOrDefault();
+                if (userID != 0)
+                {
+                    long chatID = ctx.GroupChat.Where(x => x.GroupChatName == chatName).Select(x => x.GroupChatID).FirstOrDefault();
+                    if (chatID != 0)
+                    {
+                        var selectedRows = ctx.GroupChatMessages.Where(x => (x.UserSenderID == userID && x.ChatID == chatID));
+
+                        if (selectedRows != null)
+                        {
+                            foreach (GroupChatMessages msg in selectedRows)
+                            {
+                                allChatMessages = allChatMessages + "\n" + loginFrom + " " + msg.SendTime.ToString() + "\n" + msg.Message + "\n";
+                            }
+
+                            allChatMessages = Convert.ToBase64String(Program.security.EncryptMessage(
+                                Program.onlineUsers[userID].sessionKey, allChatMessages));
+                            allChatMessages = ((char)28).ToString() + ' ' + allChatMessages;
+                            allChatMessages += " <EOF>";
+
+                            return allChatMessages;
+                        }
+                        else
+                        {
+                            return Fail();
+                        }
+                    }
+                    else
+                    {
+                        return Fail();
+                    }
+                }
+                else
+                {
+                    return Fail();
+                }
+            }
         }
 
 
-            // Outgoing messages
-            public static string OK()
+        // Outgoing messages
+        public static string OK()
         {
             Console.WriteLine("OK");
             return ((char)5).ToString() + " <EOF>";
