@@ -38,7 +38,7 @@ namespace TalkaTIPSerwer
             communiqueDictionary[25] = new Func<List<string>, string>(AddUserToGroupChat);
             communiqueDictionary[26] = new Func<List<string>, string>(LeaveGroupChat);
             communiqueDictionary[27] = new Func<List<string>, string>(GroupChatMessage);
-            communiqueDictionary[27] = new Func<List<string>, string>(GetAllGroupChatMessages);
+            communiqueDictionary[28] = new Func<List<string>, string>(GetAllGroupChatMessages);
         }
 
         // Incoming messages
@@ -735,7 +735,7 @@ namespace TalkaTIPSerwer
             string chatName = param[0];
             string chatCreatorUN = param[1];    // UN = user name
 
-            // param[2] = date, param[3] = is API controlled
+            // param[3] = is API controlled, param[2] = date time
 
             using (TalkaTipDB ctx = new TalkaTipDB())
             {

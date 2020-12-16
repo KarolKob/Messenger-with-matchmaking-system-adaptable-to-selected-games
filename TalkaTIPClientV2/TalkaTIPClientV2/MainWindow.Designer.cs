@@ -50,6 +50,8 @@
             this.addAPIButton = new System.Windows.Forms.Button();
             this.serverAddressLabel = new System.Windows.Forms.Label();
             this.addGameAPIText = new System.Windows.Forms.TextBox();
+            this.tabPage4 = new System.Windows.Forms.TabPage();
+            this.listViewGroups = new System.Windows.Forms.ListView();
             this.timerIAM = new System.Windows.Forms.Timer(this.components);
             this.gbCall = new System.Windows.Forms.GroupBox();
             this.cancelCallButton = new System.Windows.Forms.Button();
@@ -63,18 +65,17 @@
             this.disconnectButton = new System.Windows.Forms.Button();
             this.deleteFriendButton = new System.Windows.Forms.Button();
             this.UnblockButton = new System.Windows.Forms.Button();
-            this.tabPage4 = new System.Windows.Forms.TabPage();
-            this.listViewGroups = new System.Windows.Forms.ListView();
             this.buttonCreateChat = new System.Windows.Forms.Button();
             this.buttonLeaveChat = new System.Windows.Forms.Button();
+            this.buttonInviteToChat = new System.Windows.Forms.Button();
             this.Groups.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.tabPage2.SuspendLayout();
             this.tabPage3.SuspendLayout();
+            this.tabPage4.SuspendLayout();
             this.gbCall.SuspendLayout();
             this.gbAnswerCall.SuspendLayout();
             this.gbInCall.SuspendLayout();
-            this.tabPage4.SuspendLayout();
             this.SuspendLayout();
             // 
             // AllMessages
@@ -297,6 +298,29 @@
             this.addGameAPIText.Size = new System.Drawing.Size(172, 20);
             this.addGameAPIText.TabIndex = 0;
             // 
+            // tabPage4
+            // 
+            this.tabPage4.Controls.Add(this.listViewGroups);
+            this.tabPage4.Location = new System.Drawing.Point(4, 22);
+            this.tabPage4.Name = "tabPage4";
+            this.tabPage4.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage4.Size = new System.Drawing.Size(187, 301);
+            this.tabPage4.TabIndex = 3;
+            this.tabPage4.Text = "Groups";
+            this.tabPage4.UseVisualStyleBackColor = true;
+            // 
+            // listViewGroups
+            // 
+            this.listViewGroups.HideSelection = false;
+            this.listViewGroups.Location = new System.Drawing.Point(0, 0);
+            this.listViewGroups.MultiSelect = false;
+            this.listViewGroups.Name = "listViewGroups";
+            this.listViewGroups.Size = new System.Drawing.Size(187, 304);
+            this.listViewGroups.TabIndex = 0;
+            this.listViewGroups.UseCompatibleStateImageBehavior = false;
+            this.listViewGroups.ItemActivate += new System.EventHandler(this.listViewGroups_ItemActivate);
+            this.listViewGroups.SelectedIndexChanged += new System.EventHandler(this.listViewGroups_SelectedIndexChanged);
+            // 
             // timerIAM
             // 
             this.timerIAM.Interval = 60000;
@@ -437,29 +461,6 @@
             this.UnblockButton.Visible = false;
             this.UnblockButton.Click += new System.EventHandler(this.UnblockButton_Click);
             // 
-            // tabPage4
-            // 
-            this.tabPage4.Controls.Add(this.listViewGroups);
-            this.tabPage4.Location = new System.Drawing.Point(4, 22);
-            this.tabPage4.Name = "tabPage4";
-            this.tabPage4.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage4.Size = new System.Drawing.Size(187, 301);
-            this.tabPage4.TabIndex = 3;
-            this.tabPage4.Text = "Groups";
-            this.tabPage4.UseVisualStyleBackColor = true;
-            // 
-            // listViewGroups
-            // 
-            this.listViewGroups.HideSelection = false;
-            this.listViewGroups.Location = new System.Drawing.Point(0, 0);
-            this.listViewGroups.MultiSelect = false;
-            this.listViewGroups.Name = "listViewGroups";
-            this.listViewGroups.Size = new System.Drawing.Size(187, 304);
-            this.listViewGroups.TabIndex = 0;
-            this.listViewGroups.UseCompatibleStateImageBehavior = false;
-            this.listViewGroups.ItemActivate += new System.EventHandler(this.listViewGroups_ItemActivate);
-            this.listViewGroups.SelectedIndexChanged += new System.EventHandler(this.listViewGroups_SelectedIndexChanged);
-            // 
             // buttonCreateChat
             // 
             this.buttonCreateChat.BackColor = System.Drawing.SystemColors.ButtonShadow;
@@ -469,7 +470,7 @@
             this.buttonCreateChat.TabIndex = 16;
             this.buttonCreateChat.Text = "Create chat";
             this.buttonCreateChat.UseVisualStyleBackColor = false;
-            this.buttonCreateChat.Visible = false;
+            this.buttonCreateChat.Click += new System.EventHandler(this.buttonCreateChat_Click);
             // 
             // buttonLeaveChat
             // 
@@ -481,12 +482,26 @@
             this.buttonLeaveChat.Text = "Leave chat";
             this.buttonLeaveChat.UseVisualStyleBackColor = false;
             this.buttonLeaveChat.Visible = false;
+            this.buttonLeaveChat.Click += new System.EventHandler(this.buttonLeaveChat_Click);
+            // 
+            // buttonInviteToChat
+            // 
+            this.buttonInviteToChat.BackColor = System.Drawing.SystemColors.ButtonShadow;
+            this.buttonInviteToChat.Location = new System.Drawing.Point(342, 383);
+            this.buttonInviteToChat.Name = "buttonInviteToChat";
+            this.buttonInviteToChat.Size = new System.Drawing.Size(70, 32);
+            this.buttonInviteToChat.TabIndex = 18;
+            this.buttonInviteToChat.Text = "Invite";
+            this.buttonInviteToChat.UseVisualStyleBackColor = false;
+            this.buttonInviteToChat.Visible = false;
+            this.buttonInviteToChat.Click += new System.EventHandler(this.buttonInviteToChat_Click);
             // 
             // MainWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(822, 491);
+            this.Controls.Add(this.buttonInviteToChat);
             this.Controls.Add(this.buttonLeaveChat);
             this.Controls.Add(this.buttonCreateChat);
             this.Controls.Add(this.UnblockButton);
@@ -513,13 +528,13 @@
             this.tabPage2.ResumeLayout(false);
             this.tabPage3.ResumeLayout(false);
             this.tabPage3.PerformLayout();
+            this.tabPage4.ResumeLayout(false);
             this.gbCall.ResumeLayout(false);
             this.gbCall.PerformLayout();
             this.gbAnswerCall.ResumeLayout(false);
             this.gbAnswerCall.PerformLayout();
             this.gbInCall.ResumeLayout(false);
             this.gbInCall.PerformLayout();
-            this.tabPage4.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -564,6 +579,7 @@
         public System.Windows.Forms.ListView listViewGroups;
         private System.Windows.Forms.Button buttonCreateChat;
         private System.Windows.Forms.Button buttonLeaveChat;
+        private System.Windows.Forms.Button buttonInviteToChat;
     }
 }
 

@@ -82,6 +82,12 @@
       <DependentUpon>RegisterWindow.cs</DependentUpon>
     </Compile>
     <Compile Include="Security.cs" />
+    <Compile Include="TextDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="TextDialog.Designer.cs">
+      <DependentUpon>TextDialog.cs</DependentUpon>
+    </Compile>
     <EmbeddedResource Include="LoginWindow.resx">
       <DependentUpon>LoginWindow.cs</DependentUpon>
     </EmbeddedResource>
@@ -100,6 +106,9 @@
     </Compile>
     <EmbeddedResource Include="RegisterWindow.resx">
       <DependentUpon>RegisterWindow.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TextDialog.resx">
+      <DependentUpon>TextDialog.cs</DependentUpon>
     </EmbeddedResource>
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
