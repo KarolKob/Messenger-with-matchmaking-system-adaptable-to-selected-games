@@ -45,7 +45,7 @@ namespace TalkaTIPClientV2
             int numberOfComm = 0;
             string[] comms = null;
             while (!Program.mainWindow.Visible) { }
-            while (numberOfComm < 2)
+            while (numberOfComm < 3)
             {
                 try
                 {
@@ -558,7 +558,7 @@ namespace TalkaTIPClientV2
 
         private void listView1_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (listView1.SelectedItems.Count == 0 || listView1.SelectedItems.Count > 1 || listView1.SelectedItems[0] == null)
+            if (listView1.SelectedItems.Count == 0 || listView1.SelectedItems.Count > 1)
             {
                 //MessageBox.Show("You need to select one user from the friends list.", "Error");
             }
@@ -631,7 +631,7 @@ namespace TalkaTIPClientV2
 
         private void listViewGroups_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (listViewGroups.SelectedItems.Count == 0 || listViewGroups.SelectedItems.Count > 1 || listViewGroups.SelectedItems[0] == null)
+            if (listViewGroups.SelectedItems.Count == 0 || listViewGroups.SelectedItems.Count > 1)
             {
                 //MessageBox.Show("You need to select one user from the friends list.", "Error");
             }

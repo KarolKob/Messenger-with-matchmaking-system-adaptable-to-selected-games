@@ -216,11 +216,20 @@ namespace TalkaTIPClientV2
                 case 14:
                     StateChng(message);
                     break;
+                case 19:
+                    GroupChats(message);
+                    break;
                 case 24:
                     RecieveChatMessage(message);
                     break;
                 case 25:
                     RecieveAllChatMessages(message);
+                    break;
+                case 27:
+                    RecieveGroupChatMessage(message);
+                    break;
+                case 28:
+                    RecieveAllGroupChatMessages(message);
                     break;
                 default:
                     break;
@@ -254,7 +263,7 @@ namespace TalkaTIPClientV2
             string loginFrom = param[0];
             string loginTo = param[1];
 
-            // Only recieve the messages meant for you (mistakes shouldn't happen unless on loopback)
+            // Only recieve the messages meant for you
             if (loginTo == Program.userLogin)
             {
                 DateTime msgSentTime = DateTime.ParseExact(param[2], "yyyy-MM-dd-HH:mm:ss", CultureInfo.InvariantCulture);
@@ -283,9 +292,10 @@ namespace TalkaTIPClientV2
                 // Display the messages or inform user
                 Program.mainWindow.Invoke((MethodInvoker)delegate
                 {
-                    if (Program.mainWindow.listView1.SelectedItems[0].Text == loginFrom)
+                    if (!(Program.mainWindow.listView1.SelectedItems.Count == 0 || Program.mainWindow.listView1.SelectedItems.Count > 1)
+                        && Program.mainWindow.listView1.SelectedItems[0].Text == loginFrom)
                     {
-                        Program.mainWindow.AllMessages.Text += message;
+                            Program.mainWindow.AllMessages.Text += message;
                     }
                     else
                     {
@@ -314,6 +324,92 @@ namespace TalkaTIPClientV2
                     }
                 });
             }
+        }
+
+        static void RecieveAllGroupChatMessages(string recievedMessages)
+        {
+            Program.mainWindow.Invoke((MethodInvoker)delegate
+            {
+                if (!Program.chatNameAndMessage.ContainsKey(Program.mainWindow.listViewGroups.SelectedItems[0].Text))
+                {
+                    Program.chatNameAndMessage.Add(Program.mainWindow.listViewGroups.SelectedItems[0].Text, recievedMessages);
+                    Program.mainWindow.UpdateChatText(recievedMessages);
+                }
+                else
+                {
+                    if (Program.chatNameAndMessage[Program.mainWindow.listViewGroups.SelectedItems[0].Text] != recievedMessages)
+                    {
+                        Program.mainWindow.UpdateChatText(recievedMessages);
+                    }
+                }
+            });
+        }
+
+        // TODO: Recieving messages in real time
+        static void RecieveGroupChatMessage(string chatMessage)
+        {
+            string[] param = chatMessage.Split(' ');
+
+            string loginFrom = param[0];
+            string chatName = param[1];
+            
+            DateTime msgSentTime = DateTime.ParseExact(param[2], "yyyy-MM-dd-HH:mm:ss", CultureInfo.InvariantCulture);
+
+            StringBuilder builder = new StringBuilder();
+            for (int i = 3; i < param.Length - 1; i++)  // Ignore the <EOF>
+            {
+                // Append each string to the StringBuilder overload
+                builder.Append(param[i]).Append(" ");
+            }
+
+            // Preparing the display format
+            string message = builder.ToString();
+            message = "\n" + loginFrom + " " + msgSentTime.ToString() + "\n" + message + "\n";
+
+            // Saving messages to memory
+            if (Program.chatNameAndMessage.ContainsKey(chatName))
+            {
+                Program.chatNameAndMessage[chatName] += message;
+            }
+            else
+            {
+                Program.chatNameAndMessage.Add(chatName, message);
+            }
+
+            // Display the messages or inform user
+            Program.mainWindow.Invoke((MethodInvoker)delegate
+            {
+                if (!(Program.mainWindow.listViewGroups.SelectedItems.Count == 0 || Program.mainWindow.listViewGroups.SelectedItems.Count > 1)
+                    && Program.mainWindow.listViewGroups.SelectedItems[0].Text == chatName)
+                {
+                    Program.mainWindow.AllMessages.Text += message;
+                }
+                else
+                {
+                    bool found = false;
+                    int index = 0;
+                    foreach (ListViewItem item in Program.mainWindow.listViewGroups.Items)
+                    {
+                        if (item.Text == chatName)
+                        {
+                            item.ForeColor = Color.Red;
+                            found = true;
+                            Program.mainWindow.listViewGroups.Refresh();
+                            break;
+                        }
+                        index++;
+                    }
+
+                    if (!found)
+                    {
+                        string[] chatDetails = { chatName, "0" };
+                        ListViewItem chat = new ListViewItem(chatDetails, 0);
+                        chat.ForeColor = Color.Red;
+                        Program.mainWindow.listViewGroups.Items.Add(chat);
+                        Program.mainWindow.listViewGroups.Refresh();
+                    }
+                }
+            });
         }
 
         static void LogIP(string messageFromServer)
@@ -345,16 +441,30 @@ namespace TalkaTIPClientV2
         static void History(string messageFromServer)
         {
             string[] history = messageFromServer.Split(' ');
-            string[] historyDetails;
+            string[] historyDetails = new string[3];
             for (int i = 0; i < history.Length - 1; i += 5)
             {
-                historyDetails = new string[3];
                 historyDetails[0] = history[i];
                 historyDetails[1] = history[i + 1] + " " + history[i + 2];
                 historyDetails[2] = history[i + 4] == "00:00:00" ? "missed call" : history[i + 4];
                 Program.mainWindow.Invoke((MethodInvoker)delegate
                 {
                     Program.mainWindow.listView2.Items.Insert(0, new ListViewItem(historyDetails));
+                });
+            }
+        }
+
+        static void GroupChats(string messageFromServer)
+        {
+            string[] chatNames = messageFromServer.Split(' ');
+            string[] chatDetails = new string[2];
+            for(int i = 0; i < chatNames.Length - 1; i += 2)
+            {
+                chatDetails[0] = chatNames[i];
+                chatDetails[1] = chatNames[i + 1];
+                Program.mainWindow.Invoke((MethodInvoker)delegate
+                {
+                    Program.mainWindow.listViewGroups.Items.Insert(0, new ListViewItem(chatDetails));
                 });
             }
         }

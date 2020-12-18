@@ -207,6 +207,8 @@ namespace TalkaTIPSerwer
                                 Send(handler, Communication.LogIP(userID));     // Data about the friend
                                 Thread.Sleep(250);
                                 Send(handler, Communication.History(userID));   // userID history
+                                Thread.Sleep(250);
+                                Send(handler, Communication.GroupChats(userID));   // joined group chats
                             }
                         }
 

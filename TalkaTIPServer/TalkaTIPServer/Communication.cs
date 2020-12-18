@@ -969,13 +969,14 @@ namespace TalkaTIPSerwer
                     long chatID = ctx.GroupChat.Where(x => x.GroupChatName == chatName).Select(x => x.GroupChatID).FirstOrDefault();
                     if (chatID != 0)
                     {
-                        var selectedRows = ctx.GroupChatMessages.Where(x => (x.UserSenderID == userID && x.ChatID == chatID));
+                        var selectedRows = ctx.GroupChatMessages.Where(x => x.ChatID == chatID);
 
                         if (selectedRows != null)
                         {
                             foreach (GroupChatMessages msg in selectedRows)
                             {
-                                allChatMessages = allChatMessages + "\n" + loginFrom + " " + msg.SendTime.ToString() + "\n" + msg.Message + "\n";
+                                string senderName = ctx.Users.Where(x => x.UserID == msg.UserSenderID).Select(x => x.Login).FirstOrDefault();
+                                allChatMessages = allChatMessages + "\n" + senderName + " " + msg.SendTime.ToString() + "\n" + msg.Message + "\n";
                             }
 
                             allChatMessages = Convert.ToBase64String(Program.security.EncryptMessage(
@@ -1019,7 +1020,7 @@ namespace TalkaTIPSerwer
 
         public static string LogIP(long userID)
         {
-            using (var ctx = new TalkaTipDB())
+            using (TalkaTipDB ctx = new TalkaTipDB())
             {
                 var user = ctx.Users.Where(x => x.UserID == userID).FirstOrDefault();
                 if (user != null)
@@ -1097,7 +1098,7 @@ namespace TalkaTIPSerwer
         public static string History(long userID)
         {
             string history = string.Empty;
-            using (var ctx = new TalkaTipDB())
+            using (TalkaTipDB ctx = new TalkaTipDB())
             {
                 var histories = ctx.Histories.Where(x => x.UserSenderID == userID || x.UserReceiverID == userID).OrderBy(x => x.Start).ToList();
                 if (histories.Count != 0)
@@ -1126,6 +1127,26 @@ namespace TalkaTIPSerwer
                 history = ((char)13).ToString() + ' ' + history;
                 return history + " <EOF>";
             }
+        }
+
+        public static string GroupChats(long userID)
+        {
+            string message = string.Empty;
+
+            using(TalkaTipDB ctx = new TalkaTipDB())
+            {
+                var groupChats = ctx.GroupChatUsers.Where(x => x.UserInChatID == userID);
+                foreach(var chatUser in groupChats)
+                {
+                    var chat = ctx.GroupChat.Where(x => x.GroupChatID == chatUser.JoinedGroupChatID).FirstOrDefault();
+                    message += chat.GroupChatName + " " + chat.IsApiControlled + " ";
+                }
+            }
+
+            message = Convert.ToBase64String(Program.security.EncryptMessage(Program.onlineUsers[userID].sessionKey, message));
+            message = (char)19 + " " + message;
+            message += " <EOF>";
+            return message;
         }
 
         public static string StateChng(long userID)
