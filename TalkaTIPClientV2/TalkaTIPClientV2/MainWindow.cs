@@ -606,10 +606,9 @@ namespace TalkaTIPClientV2
         private void addAPIButton_Click(object sender, EventArgs e)
         {
             string promptValue = addGameAPIText.Text;
-            if (promptValue != "") // TODO: Implement a regex that makes sure it's an IP address
+            if (promptValue != string.Empty)
             {
-                // TODO: Send a request to given API and get an answer
-                    // TODO: Get an answer and add the API to the list
+                new APIHandle(promptValue);
             }
         }
 

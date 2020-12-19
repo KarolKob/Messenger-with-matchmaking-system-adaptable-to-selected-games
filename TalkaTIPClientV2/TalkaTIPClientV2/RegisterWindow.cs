@@ -28,6 +28,10 @@ namespace TalkaTIPClientV2
             {
                 MessageBox.Show("The passwords don't match.", "Error");
             }
+            else if(LoginText.Text.Length > 16)
+            {
+                MessageBox.Show("The username is too long, it has to be 16 characters or less.", "Error");
+            }
             else
             {
                 // Password must contain:

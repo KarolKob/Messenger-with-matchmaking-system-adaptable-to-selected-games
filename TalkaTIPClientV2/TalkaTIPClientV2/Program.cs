@@ -22,6 +22,9 @@ namespace TalkaTIPClientV2
         // A dictionary containing group chat names with corresponding messages
         public static Dictionary<string, string> chatNameAndMessage = new Dictionary<string, string>();
 
+        // A dictionary used to handle multiple APIs
+        public static Dictionary<string, APIHandle> apiNameAndHandle = new Dictionary<string, APIHandle>();
+
         public static byte[] sessionKeyWithServer = null;
         public static byte[] sessionKeyWithClient = null;
 
