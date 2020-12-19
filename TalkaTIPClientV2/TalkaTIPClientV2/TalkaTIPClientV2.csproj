@@ -64,6 +64,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="APIHandle.cs" />
     <Compile Include="CallHandler.cs" />
     <Compile Include="Client.cs" />
     <Compile Include="Communication.cs" />

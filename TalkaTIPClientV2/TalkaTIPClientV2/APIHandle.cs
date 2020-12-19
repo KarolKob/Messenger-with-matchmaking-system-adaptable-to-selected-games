@@ -5,6 +5,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using System.Text;
+using Newtonsoft.Json;
 
 namespace TalkaTIPClientV2
 {
@@ -16,7 +17,8 @@ namespace TalkaTIPClientV2
         public APIHandle(string apiAddress)
         {
             httpClient = new HttpClient();
-            httpClient.BaseAddress = new Uri(apiAddress);
+            //httpClient.BaseAddress = new Uri(apiAddress);
+            httpClient.BaseAddress = new Uri("https://localhost:5001/api/");
             httpClient.DefaultRequestHeaders.Accept.Clear();
             httpClient.DefaultRequestHeaders.Accept.Add(
                 new MediaTypeWithQualityHeaderValue("application/json"));
@@ -45,7 +47,14 @@ namespace TalkaTIPClientV2
             string name;
             try
             {
-                HttpResponseMessage response = await httpClient.PostAsync("api/matchmaking", new StringContent(Program.userLogin));
+                var my_jsondata = new
+                {
+                    NickName = Program.userLogin
+                };
+                string json = JsonConvert.SerializeObject(my_jsondata);
+                var stringContent = new StringContent(json, Encoding.UTF8, "application/json");
+                //var response = await httpClient.PostAsync("http://www.sample.com/write", stringContent);  new StringContent(Program.userLogin)
+                HttpResponseMessage response = await httpClient.PostAsync("Matching", stringContent).ConfigureAwait(continueOnCapturedContext: false);
                 response.EnsureSuccessStatusCode();
                 name = await response.Content.ReadAsStringAsync();
             }
