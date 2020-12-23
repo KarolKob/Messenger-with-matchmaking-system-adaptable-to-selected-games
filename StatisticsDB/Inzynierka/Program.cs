@@ -1,9 +1,15 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using System.Collections.Generic;
 
 namespace Inzynierka
 {
+    class Lobby
+    {
+        public int LobbyID;
+        public List<Player> players;
+    }
     class Program
     {
         public static void Create_DataBase(string dbName)
@@ -14,7 +20,6 @@ namespace Inzynierka
             }
             using (var dbContext = new StatContext())
             {
-                //Ensure database is created
                 dbContext.Database.EnsureCreated();
                 dbContext.SaveChanges();
             }
@@ -30,46 +35,64 @@ namespace Inzynierka
             }
         }
 
-        public static void Add_Game()
+        public static void Add_Game(List<int> players, bool ranked)
         {
             using (var dbContext = new StatContext())
             {
-                dbContext.Games.Add(new Game { Player_1 = 1, Player_2 = 2, GameDate = DateTime.Today, Score_1 = 0, Score_2 = 0, RankedGame = false, Finished = false });
+                List<int> scores = new List<int>();
+                foreach (var p in players) scores.Add(0);
+                dbContext.Games.Add(new Game { Players = players, GameDate = DateTime.Today, Scores = scores, RankedGame = ranked, Finished = false });
                 dbContext.SaveChanges();
             }
         }
 
-        public static void Add_Result(int game_id)
+        public static void Add_Result(int game_id, List<int>scores)
         {
             using (var dbContext = new StatContext())
             {
                 var game = dbContext.Games.First(g => g.GameId == game_id);
-                game.Add_Result(1, 2);
-                
-                var player_1 = dbContext.Players.First(p => p.PlayerId == game.Player_1);
-                var player_2 = dbContext.Players.First(p => p.PlayerId == game.Player_2);
-                double skill_1 = player_1.SkillRating;
-                double skill_2 = player_2.SkillRating;
-                player_1.Update_Stats(1, 2, skill_2); 
-                player_2.Update_Stats(2, 1, skill_1);
+                game.Add_Result(scores);
+                if (game.RankedGame)
+                {
+                    List<double> skills = new List<double>();
+                    int i = 0;
+                    foreach (var pid in game.Players)
+                    {
+                        var player = dbContext.Players.First(p => p.PlayerId == game.Players[i]);
+                        skills.Add(player.SkillRating);
+                    }
+                    List<double> ranking_updates = game.CountRanking(scores, skills);
+                    i = 0;
+                    foreach (var pid in game.Players)
+                    {
+                        var player = dbContext.Players.First(p => p.PlayerId == game.Players[i]);
+                        player.Update_Stats(ranking_updates[i]);
+                    }
+                }
                 dbContext.SaveChanges();
             }
         }
 
-        public static void Find_Opponent(int id)
+        public static int Find_Opponent(int id, List<Lobby>rooms, int skilllimit)
         {
+            int result = -1;
             using (var dbContext = new StatContext())
             {
-                var player_1 = dbContext.Players.First(p => p.PlayerId == id);
-                if(player_1.Rank == null)
+                var player = dbContext.Players.First(p => p.PlayerId == id);
+                foreach(var r in rooms)
                 {
-                   // find player from any rank 
-                }
-                else
-                {
-                    //find any player from the same rank
+                    double skillMean = 0;
+                    double skillSum = 0;
+                    foreach (var p in r.players) skillSum += p.SkillRating;
+                    skillMean = skillSum / r.players.Count;
+                    if(skillMean-player.SkillRating < skilllimit)
+                    {
+                        result = r.LobbyID;
+                        break;
+                    }
                 }
             }
+            return result;
         }
         static void Main(string[] args)
         {
