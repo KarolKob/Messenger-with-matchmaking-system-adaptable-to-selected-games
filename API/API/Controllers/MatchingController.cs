@@ -19,18 +19,20 @@ namespace API.Controllers
     {
         private readonly IMapper _mapper;
         private readonly ILiteRepo _repository;
+        private readonly IPoczekalnia _poczekalnia;
         //private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly List<Lobby> poczekalnia;
-        private readonly int lobby_size;
+
+
         //konstruktor jest potrzebny by móc używać dependecy
         //injection
-        public matching(ILiteRepo repo, IMapper mapper)
+        public matching(ILiteRepo repo, IMapper mapper, IPoczekalnia poczekalnia)
         {
             _mapper = mapper;
             _repository = repo;
+            _poczekalnia = poczekalnia;
            //_httpContextAccessor = httpContextAccessor;
-            poczekalnia = new List<Lobby>();
-            lobby_size = 2;
+            //poczekalnia = new List<Lobby>();
+            
         }
 
         //GET api/Matching
@@ -45,7 +47,7 @@ namespace API.Controllers
             var player = await _repository.GetPlayerInfo(nick);
             //'find him a place in queue'
             //'add him to queue'
-            Lobby lobby=find_lobby(player);
+            Lobby lobby=_poczekalnia.find_lobby(player);
             //'send him server adress and lobby id'
             return (new Server(lobby.lobby_ID,lobby.max_size));
         }
@@ -58,30 +60,35 @@ namespace API.Controllers
 
 
 
-            //if (playerinfo != null)
-            //{
-            //    //bez if zwraca 204 no content w przypadku braku wyniku
-            //    //return Ok(_mapper.Map<CommandReadDTO>(commanditem));
-            //return Ok(_mapper.Map<PlayerReadDTO>(playerinfo));
-            //}
+            if (playerinfo != null)
+            {
+                //bez if zwraca 204 no content w przypadku braku wyniku
+                //return Ok(_mapper.Map<CommandReadDTO>(commanditem));
+                return Ok(_mapper.Map<PlayerReadDTO>(playerinfo));
+            }
             //zwraca 404 not found
-            //return NotFound();
+            return NotFound();
 
 
-            return Ok(nick);
+            //return Ok(nick);
         }
         //POST api/Matching
         [HttpPost]//tworzenie
         public async Task<ActionResult<PlayerReadDTO>> CreatePlayer(PlayerCreateDTO playerCreate) //dodawanie gracza to bazy danych
         {
-
-
+            Player response;
             var playerModel = _mapper.Map<Player>(playerCreate);
-            await _repository.AddPlayer(playerModel);
-            //var commandread = _mapper.Map<PlayerReadDTO>(playerModel);
-            return Ok(_mapper.Map<PlayerReadDTO>(playerModel)); 
-            ////
-            //return CreatedAtRoute(nameof(GetPlayerInfo), new { Id = commandread.Id }, commandread);
+            try
+            {
+                response = await _repository.AddPlayer(playerModel);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest("Nick jest już zajęty");
+            }
+            var playerReadModel = _mapper.Map<PlayerReadDTO>(response);
+            //return Ok(_mapper.Map<PlayerReadDTO>(playerModel)); 
+            return CreatedAtRoute(nameof(GetPlayerInfo), new { nick = playerReadModel.Nickname }, playerReadModel);
             //return NoContent();
         }
         //PUT api/Matching/{id}
@@ -132,21 +139,7 @@ namespace API.Controllers
             //_repository.SaveChanges();
             return NoContent();
         }
-        public Lobby find_lobby(Player player)
-        {
-            if (poczekalnia.Count>0)
-            {
-                Lobby temp = poczekalnia.FirstOrDefault();
-                temp.queue.Add(player);
-                return temp;
-            }
-            else
-            {
-                Lobby temp = new Lobby(player, player.NickName, lobby_size);
-                poczekalnia.Add(temp);
-                return temp;
-            }
-        }
+
 
     }
 }

@@ -19,10 +19,14 @@ namespace API.Data
             _context = context;
         }
 
-        public async Task<int> AddPlayer(Player player)
+        public async Task<Player> AddPlayer(Player player)
         {
-            await _context.PlayersDB.AddAsync(new Player { NickName = player.NickName, SkillRating = 0.0, GamesPlayed = 0, GamesWon = 0, GamesLost = 0, GamesTied = 0, WinRate = 0.0 });
-            return await _context.SaveChangesAsync();
+            //,Rank=null
+            Player p = new Player { NickName = player.NickName, SkillRating = 0.0, GamesPlayed = 0, GamesWon = 0, GamesLost = 0, GamesTied = 0, WinRate = 0.0 };
+            await _context.PlayersDB.AddAsync(p);
+
+            await _context.SaveChangesAsync();
+            return p;
             
         }
 

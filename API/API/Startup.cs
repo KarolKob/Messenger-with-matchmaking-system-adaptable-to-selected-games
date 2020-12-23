@@ -38,7 +38,7 @@ namespace API
         {
             //services.AddDbContext<Context>(opt => opt.UseSqlServer
             //(Configuration.GetConnectionString("APIconnection")));
-
+            services.AddScoped<IPoczekalnia, SerwisPoczekalni>();
             services.AddDbContext<SQLiteContext>();
 
             //services.AddDbContext<SQLiteContext>(opt => opt.UseSqlite
@@ -52,7 +52,7 @@ namespace API
 
             services.AddAutoMapper
                 (AppDomain.CurrentDomain.GetAssemblies());
-
+            
             //services.AddScoped<Ireposit, SQLrepositorium>();
             services.AddScoped<ILiteRepo, SQLiteRepo>();
             services.AddRazorPages();
@@ -73,7 +73,7 @@ namespace API
           //      ForwardedHeaders = ForwardedHeaders.XForwardedFor |
           //ForwardedHeaders.XForwardedProto
           //  });
-
+            
             app.UseStaticFiles();
 
             app.UseHttpsRedirection();

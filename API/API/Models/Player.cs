@@ -14,8 +14,11 @@ namespace API.Models
         [Key]
         public int PlayerId { get; set; }
         [Required]
-        [MaxLength(16)]
+        [MaxLength(16, ErrorMessage = "Maximum number of characters that can be entered is 16!")]
         public string NickName { get; set; }
+        //Added may give error
+        //[Required]
+       // public string Rank { get; set; }
         [Required]
         public double SkillRating { get; set; }
         [Required]

@@ -13,7 +13,7 @@ namespace API.Data
 
         IEnumerable<Player> MatchPlayers();
         Task<Player> GetPlayerInfo(string nick);
-        Task<int> AddPlayer(Player player);
+        Task<Player> AddPlayer(Player player);
         void UpdatePlayer(Player player);
         void RemovePlayer(Player player);
     }
