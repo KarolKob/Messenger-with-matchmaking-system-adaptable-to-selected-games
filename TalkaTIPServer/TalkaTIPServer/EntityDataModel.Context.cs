@@ -25,10 +25,13 @@ namespace TalkaTIPServer
             throw new UnintentionalCodeFirstException();
         }
     
-        public virtual DbSet<Friends> Friends { get; set; }
-        public virtual DbSet<Histories> Histories { get; set; }
-        public virtual DbSet<Users> Users { get; set; }
         public virtual DbSet<Blocked> Blocked { get; set; }
+        public virtual DbSet<Friends> Friends { get; set; }
+        public virtual DbSet<GroupChat> GroupChat { get; set; }
+        public virtual DbSet<GroupChatMessages> GroupChatMessages { get; set; }
+        public virtual DbSet<GroupChatUsers> GroupChatUsers { get; set; }
+        public virtual DbSet<Histories> Histories { get; set; }
         public virtual DbSet<Messages> Messages { get; set; }
+        public virtual DbSet<Users> Users { get; set; }
     }
 }

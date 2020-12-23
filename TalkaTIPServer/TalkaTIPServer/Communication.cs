@@ -34,6 +34,11 @@ namespace TalkaTIPSerwer
             communiqueDictionary[21] = new Func<List<string>, string>(BlockUser);
             communiqueDictionary[22] = new Func<List<string>, string>(UnblockUser);
             communiqueDictionary[23] = new Func<List<string>, string>(GetChatMessages);
+            communiqueDictionary[24] = new Func<List<string>, string>(CreateGroupChat);
+            communiqueDictionary[25] = new Func<List<string>, string>(AddUserToGroupChat);
+            communiqueDictionary[26] = new Func<List<string>, string>(LeaveGroupChat);
+            communiqueDictionary[27] = new Func<List<string>, string>(GroupChatMessage);
+            communiqueDictionary[28] = new Func<List<string>, string>(GetAllGroupChatMessages);
         }
 
         // Incoming messages
@@ -666,7 +671,7 @@ namespace TalkaTIPSerwer
             }
         }
 
-        // Return in a format ready to display
+        // Return all chat messages with a user in a format ready to display
         public static string GetChatMessages(List<string> param)
         {
             string allChatMessages = string.Empty;
@@ -723,6 +728,282 @@ namespace TalkaTIPSerwer
             }
         }
 
+
+        // Creating a group chat (also adds the user who created it)
+        public static string CreateGroupChat(List<string> param)
+        {
+            string chatName = param[0];
+            string chatCreatorUN = param[1];    // UN = user name
+
+            // param[3] = is API controlled, param[2] = date time
+
+            using (TalkaTipDB ctx = new TalkaTipDB())
+            {
+                int nameUnique = ctx.GroupChat.Where(x => x.GroupChatName == chatName).Count(); // Check if the name is unique
+
+                if (nameUnique == 0)
+                {
+                    long creatorID = ctx.Users.Where(x => x.Login == chatCreatorUN).Select(x => x.UserID).FirstOrDefault();
+                    if (creatorID != 0)
+                    {
+                        GroupChat groupChat = new GroupChat();
+                        groupChat.GroupChatName = chatName;
+                        groupChat.IsApiControlled = int.Parse(param[3]);
+
+                        try
+                        {
+                            ctx.GroupChat.Add(groupChat);
+                            ctx.SaveChanges();
+                            return AddUserToGroupChat(param);
+                        }
+                        catch (DbUpdateConcurrencyException)
+                        {
+                            return Fail();
+                        }
+                    }
+                    else
+                    {
+                        return Fail();
+                    }
+                }
+                else
+                {
+                    return Fail();
+                }
+            }
+        }
+
+        // Adding a user to group chat
+        public static string AddUserToGroupChat(List<string> param)
+        {
+            string chatName = param[0];
+            string userToAdd = param[1];
+
+            using (TalkaTipDB ctx = new TalkaTipDB())
+            {
+                long userID = ctx.Users.Where(x => x.Login == userToAdd).Select(x => x.UserID).FirstOrDefault();
+                GroupChat chat = ctx.GroupChat.Where(x => x.GroupChatName == chatName).FirstOrDefault();
+
+                if (userID != 0 && chat.GroupChatID != 0 && chat.IsApiControlled == 0)
+                {
+                    // Check if the user is already inside
+                    int isInChat = ctx.GroupChatUsers.Where(x => x.UserInChatID == userID && x.JoinedGroupChatID == chat.GroupChatID).Count();
+
+                    if(isInChat == 0)
+                    {
+                        GroupChatUsers joiningUser = new GroupChatUsers();
+                        joiningUser.JoinTime = DateTime.ParseExact(param[2], "yyyy-MM-dd-HH:mm:ss", CultureInfo.InvariantCulture);
+                        joiningUser.JoinedGroupChatID = chat.GroupChatID;
+                        joiningUser.UserInChatID = userID;
+
+                        try
+                        {
+                            ctx.GroupChatUsers.Add(joiningUser);
+                            ctx.SaveChanges();
+                            return OK();
+                        }
+                        catch (DbUpdateConcurrencyException)
+                        {
+                            return Fail();
+                        }
+                    }
+                    else
+                    {
+                        return Fail();
+                    }
+
+                }
+                else
+                {
+                    return Fail();
+                }
+            }
+        }
+
+        // Leaving a group chat (deletes the chat if everyone leaves)
+        public static string LeaveGroupChat(List<string> param)
+        {
+            string chatName = param[0];
+            string userLeaving = param[1];
+
+            using (TalkaTipDB ctx = new TalkaTipDB())
+            {
+                long leavingID = ctx.Users.Where(x => x.Login == userLeaving).Select(x => x.UserID).FirstOrDefault();
+                long chatID = ctx.GroupChat.Where(x => x.GroupChatName == chatName).Select(x => x.GroupChatID).FirstOrDefault();
+
+                if (leavingID != 0 && chatID != 0)
+                {
+                    GroupChatUsers removedUser = ctx.GroupChatUsers
+                        .Where(x => x.JoinedGroupChatID == chatID && x.UserInChatID == leavingID).FirstOrDefault();
+
+                    try
+                    {
+                        ctx.GroupChatUsers.Remove(removedUser);
+                        ctx.SaveChanges();
+                    }
+                    catch (DbUpdateConcurrencyException)
+                    {
+                        return Fail();
+                    }
+
+                    // Remove the chat if it's empty
+                    int isChatEmpty = ctx.GroupChatUsers.Where(x => x.JoinedGroupChatID == chatID).Count();
+                    if(isChatEmpty == 0)
+                    {
+                        GroupChat chatToRemove = ctx.GroupChat.Where(x => x.GroupChatID == chatID).FirstOrDefault();
+
+                        try
+                        {
+                            ctx.GroupChat.Remove(chatToRemove);
+                            ctx.SaveChanges();
+                        }
+                        catch(DbUpdateConcurrencyException)
+                        {
+                            return Fail();
+                        }
+                    }
+
+                    return OK();
+                }
+                else
+                {
+                    return Fail();
+                }
+            }
+        }
+
+        public static string GroupChatMessage(List<string> param)
+        {
+            string loginFrom = param[0];
+            string chatName = param[1];
+            DateTime msgSentTime = DateTime.ParseExact(param[2], "yyyy-MM-dd-HH:mm:ss", CultureInfo.InvariantCulture);
+
+            StringBuilder builder = new StringBuilder();
+            for (int i = 3; i < param.Count; i++)
+            {
+                // Append each string to the StringBuilder overload.
+                builder.Append(param[i]).Append(" ");
+            }
+            string message = builder.ToString();
+
+            using (TalkaTipDB ctx = new TalkaTipDB())
+            {
+                long senderID = ctx.Users.Where(x => x.Login == loginFrom).Select(x => x.UserID).FirstOrDefault();
+                if (senderID != 0)
+                {
+                    long chatID = ctx.GroupChat.Where(x => x.GroupChatName == chatName).Select(x => x.GroupChatID).FirstOrDefault();
+                    if(chatID != 0)
+                    {
+                        GroupChatMessages chatMessage = new GroupChatMessages();
+                        chatMessage.ChatID = chatID;
+                        chatMessage.UserSenderID = senderID;
+                        chatMessage.SendTime = msgSentTime;
+                        chatMessage.Message = message;
+
+                        try
+                        {
+                            ctx.GroupChatMessages.Add(chatMessage);
+                            ctx.SaveChanges();
+                        }
+                        catch (DbUpdateConcurrencyException)
+                        {
+                            return Fail();
+                        }
+
+                        // Send the message to all online users in the chat
+                        var allChatUsers = ctx.GroupChatUsers.Where(x => x.JoinedGroupChatID == chatID);
+
+                        foreach(var user in allChatUsers)
+                        {
+                            // Send the message to reciever
+                            if (Program.onlineUsers.ContainsKey(user.UserInChatID))
+                            {
+                                try
+                                {
+                                    EndPoint endPoint = new IPEndPoint(IPAddress.Parse(Program.onlineUsers[user.UserInChatID].addressIP), 14450);
+                                    builder = new StringBuilder();
+                                    for (int i = 0; i < param.Count; i++)
+                                    {
+                                        // Append each string to the StringBuilder overload.
+                                        builder.Append(param[i]).Append(" ");
+                                    }
+                                    message = chatName + " " + builder.ToString();
+
+                                    message = Convert.ToBase64String(Program.security.EncryptMessage(Program.onlineUsers[senderID].sessionKey, message));
+                                    message = ((char)27).ToString() + ' ' + message;
+                                    message += " <EOF>";
+
+                                    AsynchronousServer.SendMessage(message, endPoint);
+                                }
+                                catch(Exception)
+                                {
+                                    return Fail();
+                                }
+                            }
+                        }
+                        return OK();
+                    }
+                    else
+                    {
+                        return Fail();
+                    }
+                }
+                else
+                {
+                    return Fail();
+                }
+            }
+        }
+
+        public static string GetAllGroupChatMessages(List<string> param)
+        {
+            string allChatMessages = string.Empty;
+            string loginFrom = param[0];
+            string chatName = param[1];
+
+            using (TalkaTipDB ctx = new TalkaTipDB())
+            {
+                long userID = ctx.Users.Where(x => x.Login == loginFrom).Select(x => x.UserID).FirstOrDefault();
+                if (userID != 0)
+                {
+                    long chatID = ctx.GroupChat.Where(x => x.GroupChatName == chatName).Select(x => x.GroupChatID).FirstOrDefault();
+                    if (chatID != 0)
+                    {
+                        var selectedRows = ctx.GroupChatMessages.Where(x => x.ChatID == chatID);
+
+                        if (selectedRows != null)
+                        {
+                            foreach (GroupChatMessages msg in selectedRows)
+                            {
+                                string senderName = ctx.Users.Where(x => x.UserID == msg.UserSenderID).Select(x => x.Login).FirstOrDefault();
+                                allChatMessages = allChatMessages + "\n" + senderName + " " + msg.SendTime.ToString() + "\n" + msg.Message + "\n";
+                            }
+
+                            allChatMessages = Convert.ToBase64String(Program.security.EncryptMessage(
+                                Program.onlineUsers[userID].sessionKey, allChatMessages));
+                            allChatMessages = ((char)28).ToString() + ' ' + allChatMessages;
+                            allChatMessages += " <EOF>";
+
+                            return allChatMessages;
+                        }
+                        else
+                        {
+                            return Fail();
+                        }
+                    }
+                    else
+                    {
+                        return Fail();
+                    }
+                }
+                else
+                {
+                    return Fail();
+                }
+            }
+        }
+
+
         // Outgoing messages
         public static string OK()
         {
@@ -739,7 +1020,7 @@ namespace TalkaTIPSerwer
 
         public static string LogIP(long userID)
         {
-            using (var ctx = new TalkaTipDB())
+            using (TalkaTipDB ctx = new TalkaTipDB())
             {
                 var user = ctx.Users.Where(x => x.UserID == userID).FirstOrDefault();
                 if (user != null)
@@ -817,7 +1098,7 @@ namespace TalkaTIPSerwer
         public static string History(long userID)
         {
             string history = string.Empty;
-            using (var ctx = new TalkaTipDB())
+            using (TalkaTipDB ctx = new TalkaTipDB())
             {
                 var histories = ctx.Histories.Where(x => x.UserSenderID == userID || x.UserReceiverID == userID).OrderBy(x => x.Start).ToList();
                 if (histories.Count != 0)
@@ -846,6 +1127,26 @@ namespace TalkaTIPSerwer
                 history = ((char)13).ToString() + ' ' + history;
                 return history + " <EOF>";
             }
+        }
+
+        public static string GroupChats(long userID)
+        {
+            string message = string.Empty;
+
+            using(TalkaTipDB ctx = new TalkaTipDB())
+            {
+                var groupChats = ctx.GroupChatUsers.Where(x => x.UserInChatID == userID);
+                foreach(var chatUser in groupChats)
+                {
+                    var chat = ctx.GroupChat.Where(x => x.GroupChatID == chatUser.JoinedGroupChatID).FirstOrDefault();
+                    message += chat.GroupChatName + " " + chat.IsApiControlled + " ";
+                }
+            }
+
+            message = Convert.ToBase64String(Program.security.EncryptMessage(Program.onlineUsers[userID].sessionKey, message));
+            message = (char)19 + " " + message;
+            message += " <EOF>";
+            return message;
         }
 
         public static string StateChng(long userID)

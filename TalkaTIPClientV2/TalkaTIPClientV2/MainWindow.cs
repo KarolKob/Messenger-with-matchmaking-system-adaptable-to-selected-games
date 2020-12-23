@@ -29,6 +29,7 @@ namespace TalkaTIPClientV2
         private UdpClient receiveClient = new UdpClient();
         private UdpClient sendClient = new UdpClient();
         private IPEndPoint remoteEP = new IPEndPoint(IPAddress.Any, 1550);
+        private bool isOnGroupsTab = false;
 
         public MainWindow()
         {
@@ -36,13 +37,15 @@ namespace TalkaTIPClientV2
             timerIAM.Start();
         }
 
+
+        // TODO: recieve all group chat names from the server
         void waitForCommuniques()
         {
             string response = string.Empty;
             int numberOfComm = 0;
             string[] comms = null;
             while (!Program.mainWindow.Visible) { }
-            while (numberOfComm < 2)
+            while (numberOfComm < 3)
             {
                 try
                 {
@@ -449,26 +452,57 @@ namespace TalkaTIPClientV2
             {
                 if(InsertMessageText.Text.Length < 200)
                 {
-                    try
+                    if (!isOnGroupsTab && listView1.SelectedItems[0] != null)
                     {
-                        string recieverLogin = listView1.SelectedItems[0].Text;
-                        Program.client = new Client(Program.serverAddress);
-                        if(Communication.ChatMessage(Program.userLogin, recieverLogin, InsertMessageText.Text) == true)
+                        try
                         {
-                            AllMessages.Text += "\r\nMe " + DateTime.Now.ToString() + "\r\n" + InsertMessageText.Text + "\r\n";
-                            InsertMessageText.Text = string.Empty;
+                            string recieverLogin = listView1.SelectedItems[0].Text;
+                            Program.client = new Client(Program.serverAddress);
+                            if (Communication.ChatMessage(Program.userLogin, recieverLogin, InsertMessageText.Text) == true)
+                            {
+                                AllMessages.Text += "\r\n" + Program.userLogin + " " +
+                                    DateTime.Now.ToString() + "\r\n" + InsertMessageText.Text + "\r\n";
+                                InsertMessageText.Text = string.Empty;
+                            }
+                            else
+                            {
+                                InsertMessageText.Text = string.Empty;
+                                MessageBox.Show("Sending the message failed or blocked by the user.", "Error");
+                            }
                         }
-                        else
+                        catch (Exception)
                         {
-                            InsertMessageText.Text = string.Empty;
-                            MessageBox.Show("Sending the message failed or blocked by the user.", "Error");
+                            MessageBox.Show("Server connection error.", "Error");
+                        }
+                        Program.client.Disconnect();
+                    }
+                    else
+                    {
+                        if(listViewGroups.SelectedItems[0] != null)
+                        {
+                            try
+                            {
+                                string chatName = listViewGroups.SelectedItems[0].Text;
+                                Program.client = new Client(Program.serverAddress);
+                                if (Communication.GroupChatMessage(Program.userLogin, chatName, InsertMessageText.Text) == true)
+                                {
+                                    AllMessages.Text += "\r\n" + Program.userLogin + " " +
+                                        DateTime.Now.ToString() + "\r\n" + InsertMessageText.Text + "\r\n";
+                                    InsertMessageText.Text = string.Empty;
+                                }
+                                else
+                                {
+                                    InsertMessageText.Text = string.Empty;
+                                    MessageBox.Show("Sending the message failed.", "Error");
+                                }
+                            }
+                            catch (Exception)
+                            {
+                                MessageBox.Show("Server connection error.", "Error");
+                            }
+                            Program.client.Disconnect();
                         }
                     }
-                    catch(Exception)
-                    {
-                        MessageBox.Show("Server connection error.", "Error");
-                    }
-                    Program.client.Disconnect();
                 }
                 else
                 {
@@ -530,12 +564,15 @@ namespace TalkaTIPClientV2
             }
             else
             {
+                isOnGroupsTab = false;
                 try
                 {
                     FriendButton.Visible = false;
                     deleteFriendButton.Visible = true;
                     BlockButton.Visible = true;
                     UnblockButton.Visible = false;
+                    buttonLeaveChat.Visible = false;
+                    buttonInviteToChat.Visible = false;
 
                     if (listView1.SelectedItems[0].ForeColor == Color.Red)
                     {
@@ -569,10 +606,9 @@ namespace TalkaTIPClientV2
         private void addAPIButton_Click(object sender, EventArgs e)
         {
             string promptValue = addGameAPIText.Text;
-            if (promptValue != "") // TODO: Implement a regex that makes sure it's an IP address
+            if (promptValue != string.Empty)
             {
-                // TODO: Send a request to given API and get an answer
-                    // TODO: Get an answer and add the API to the list
+                new APIHandle(promptValue);
             }
         }
 
@@ -580,6 +616,177 @@ namespace TalkaTIPClientV2
         {
             // TODO: Send a request to given API and get an answer
                 // TODO: Get an answer and proceed accordingly to what it is
+        }
+
+        private void listView1_ItemActivate(object sender, EventArgs e)
+        {
+            isOnGroupsTab = false;
+        }
+
+        private void listViewGroups_ItemActivate(object sender, EventArgs e)
+        {
+            isOnGroupsTab = true;
+        }
+
+        private void listViewGroups_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (listViewGroups.SelectedItems.Count == 0 || listViewGroups.SelectedItems.Count > 1)
+            {
+                //MessageBox.Show("You need to select one user from the friends list.", "Error");
+            }
+            else
+            {
+                isOnGroupsTab = true;
+                try
+                {
+                    FriendButton.Visible = false;
+                    deleteFriendButton.Visible = false;
+                    BlockButton.Visible = false;
+                    UnblockButton.Visible = false;
+                    buttonLeaveChat.Visible = true;
+                    buttonInviteToChat.Visible = true;
+
+                    if (listViewGroups.SelectedItems[0].ForeColor == Color.Red)
+                    {
+                        listViewGroups.SelectedItems[0].ForeColor = Color.Black;
+                    }
+
+                    if (Program.chatNameAndMessage.ContainsKey(listViewGroups.SelectedItems[0].Text))
+                    {
+                        UpdateChatText(Program.chatNameAndMessage[listViewGroups.SelectedItems[0].Text]);
+                    }
+                    else
+                    {
+                        Program.client = new Client(Program.serverAddress);
+
+                        // Load the messages from server if available   
+                        Communication.GetAllGroupChatMessages(Program.userLogin, listViewGroups.SelectedItems[0].Text);
+
+                        Thread.Sleep(100);
+                        Program.client.Disconnect();
+                    }
+
+                    ContactName.Text = listViewGroups.SelectedItems[0].Text;
+                }
+                catch (Exception)
+                {
+                    MessageBox.Show("Server connection error.", "Error");
+                }
+            }
+        }
+
+        private void buttonCreateChat_Click(object sender, EventArgs e)
+        {
+            using (TextDialog f = new TextDialog())
+            {
+                f.labelDesc.Text = "Type in the chat name:";
+
+                if (f.ShowDialog() == DialogResult.OK)
+                {
+                    if(f.textContent.Text != string.Empty)
+                    {
+                        try
+                        {
+                            Program.client = new Client(Program.serverAddress);
+                            if (!Communication.CreateGroupChat(f.textContent.Text, Program.userLogin))
+                            {
+                                MessageBox.Show("Chat name already taken or task failed.", "Error");
+                                f.Dispose();
+                                buttonCreateChat.PerformClick();
+                            }
+                            else
+                            {
+                                MessageBox.Show("Chat created successfully.", "Success");
+                                ListViewItem chat = new ListViewItem(f.textContent.Text, 0);
+                                Program.mainWindow.listViewGroups.Items.Add(chat);
+                                listViewGroups.Refresh();
+                            }
+                        }
+                        catch(Exception)
+                        {
+                            MessageBox.Show("Server connection error.", "Error");
+                            f.Dispose();
+                        }
+                    }
+                    else
+                    {
+                        MessageBox.Show("Chat name can't be empty.", "Error");
+                        f.Dispose();
+                        buttonCreateChat.PerformClick();
+                    }
+                }
+            }
+        }
+
+        private void buttonLeaveChat_Click(object sender, EventArgs e)
+        {
+            if (listViewGroups.SelectedItems.Count == 0 || listViewGroups.SelectedItems.Count > 1 || listViewGroups.SelectedItems[0] == null)
+            {
+                //MessageBox.Show("You need to select one user from the friends list.", "Error");
+            }
+            else
+            {
+                try
+                {
+                    Program.client = new Client(Program.serverAddress);
+                    if (!Communication.LeaveGroupChat(listViewGroups.SelectedItems[0].Text, Program.userLogin))
+                    {
+                        MessageBox.Show("Failed to leave the chat.", "Error");
+                    }
+                    else
+                    {
+                        listViewGroups.Items.Remove(listViewGroups.SelectedItems[0]);
+                        MessageBox.Show("Success!");
+                    }
+                }
+                catch(Exception)
+                {
+                    MessageBox.Show("Server connection error.", "Error");
+                }
+            }
+        }
+
+        private void buttonInviteToChat_Click(object sender, EventArgs e)
+        {
+            if (!(listViewGroups.SelectedItems.Count == 0 || listViewGroups.SelectedItems.Count > 1 || listViewGroups.SelectedItems[0] == null))
+            {
+                using (TextDialog f = new TextDialog())
+                {
+                    f.labelDesc.Text = "Type in the user name:";
+
+                    if (f.ShowDialog() == DialogResult.OK)
+                    {
+                        if (f.textContent.Text != string.Empty)
+                        {
+                            try
+                            {
+                                Program.client = new Client(Program.serverAddress);
+                                if (!Communication.AddUserToGroupChat(listViewGroups.SelectedItems[0].Text, f.textContent.Text))
+                                {
+                                    MessageBox.Show("Task failed.", "Error");
+                                    f.Dispose();
+                                    buttonCreateChat.PerformClick();
+                                }
+                                else
+                                {
+                                    MessageBox.Show("User added successfully.", "Success");
+                                }
+                            }
+                            catch (Exception)
+                            {
+                                MessageBox.Show("Server connection error.", "Error");
+                                f.Dispose();
+                            }
+                        }
+                        else
+                        {
+                            MessageBox.Show("User name can't be empty.", "Error");
+                            f.Dispose();
+                            buttonCreateChat.PerformClick();
+                        }
+                    }
+                }
+            }
         }
     }
 }

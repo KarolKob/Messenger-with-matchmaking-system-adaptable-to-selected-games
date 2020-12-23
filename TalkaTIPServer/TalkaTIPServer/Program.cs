@@ -9,7 +9,7 @@ using System.Security.Cryptography;
 using System.Net;
 using System.Net.Sockets;
 using System.Diagnostics;
-
+//Jak coś to zmieniłem w app config lokalizacje bazy danych 
 namespace TalkaTIPSerwer
 {
     class Program
