@@ -10,7 +10,6 @@ namespace Inzynierka
     {
         [Key]
         public int GameId { get; set; }
-        [ForeignKey("Player")]
         public List<int> Players { get; set; }
         public bool RankedGame { get; set; }
         [Required]

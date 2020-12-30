@@ -20,7 +20,6 @@ namespace Inzynierka
         [Required]
         public int GamesWon { get; set; }
         public int GamesTied { get; set; }
-        [Required]
         public int GamesLost { get; set; }
         [Required]
         public int PointsScored { get; set; }
