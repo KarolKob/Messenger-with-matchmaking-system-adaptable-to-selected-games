@@ -54,9 +54,59 @@ namespace TalkaTIPClientV2
                 string json = JsonConvert.SerializeObject(my_jsondata);
                 var stringContent = new StringContent(json, Encoding.UTF8, "application/json");
                 //var response = await httpClient.PostAsync("http://www.sample.com/write", stringContent);  new StringContent(Program.userLogin)
-                HttpResponseMessage response = await httpClient.PostAsync("Matching", stringContent).ConfigureAwait(continueOnCapturedContext: false);
+                HttpResponseMessage response = await httpClient.PostAsync("Matching", stringContent)
+                    .ConfigureAwait(continueOnCapturedContext: false);
                 response.EnsureSuccessStatusCode();
                 name = await response.Content.ReadAsStringAsync();
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+
+            return name;
+        }
+
+        public async Task<string> apiGETData()
+        {
+            string name;
+            try
+            {
+                var my_jsondata = new
+                {
+                    NickName = Program.userLogin
+                };
+                string json = JsonConvert.SerializeObject(my_jsondata);
+                var stringContent = new StringContent(json, Encoding.UTF8, "application/json");
+                //var response = await httpClient.PostAsync("http://www.sample.com/write", stringContent);  new StringContent(Program.userLogin)
+                HttpResponseMessage response = await httpClient.GetAsync("Matching")
+                    .ConfigureAwait(continueOnCapturedContext: false);
+                response.EnsureSuccessStatusCode();
+                name = await response.Content.ReadAsStringAsync();
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+             
+            return name;
+        }
+
+        public async Task<string> apiGETPlayerInfo()
+        {
+            string name = null;
+            try
+            {
+                var my_jsondata = new
+                {
+                    NickName = Program.userLogin
+                };
+                string json = JsonConvert.SerializeObject(my_jsondata);
+                var stringContent = new StringContent(json, Encoding.UTF8, "application/json");
+                //var response = await httpClient.PostAsync("http://www.sample.com/write", stringContent);  new StringContent(Program.userLogin)
+                /*HttpResponseMessage response = await httpClient.Get("Matching", stringContent).ConfigureAwait(continueOnCapturedContext: false);
+                response.EnsureSuccessStatusCode();
+                name = await response.Content.ReadAsStringAsync();*/
             }
             catch (Exception)
             {
