@@ -3,24 +3,26 @@ using System.Collections.Generic;
 using System.Text;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using SQLiteNetExtensions.Attributes;
+using System.Text.Json;
 
 namespace Inzynierka
 {
-    class Game
+    class Match
     {
         [Key]
         public int GameId { get; set; }
-        public List<int> Players { get; set; }
+        public string Teams { get; set; }
         public bool RankedGame { get; set; }
         [Required]
         public DateTime GameDate { get; set; }
         [Required]
-        public List<int> Scores { get; set; }
+        public string Scores { get; set; }
         public bool Finished { get; set; }
 
         public void Add_Result(List<int> scores)
         {
-            Scores = scores;
+            Scores = JsonSerializer.Serialize(scores);
             Finished = true;
         }
 

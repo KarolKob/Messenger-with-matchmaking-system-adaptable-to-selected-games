@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 using System.Collections.Generic;
+using System.Text.Json;
 
 namespace Inzynierka
 {
@@ -24,7 +25,6 @@ namespace Inzynierka
                 dbContext.Database.EnsureCreated();
                 dbContext.SaveChanges();
             }
-            Console.ReadLine();
         }
         public static void Add_Player(string nick, GameConfigs config)
         {
@@ -36,13 +36,13 @@ namespace Inzynierka
             }
         }
 
-        public static void Add_Game(List<int> players, bool ranked)
+        public static void Add_Game(List<int> teams, bool ranked)
         {
             using (var dbContext = new StatContext())
             {
                 List<int> scores = new List<int>();
-                foreach (var p in players) scores.Add(0);
-                dbContext.Games.Add(new Game { Players = players, GameDate = DateTime.Today, Scores = scores, RankedGame = ranked, Finished = false });
+                foreach (var p in teams) scores.Add(0);
+                dbContext.Games.Add(new Match { Teams = JsonSerializer.Serialize(teams), GameDate = DateTime.Today, Scores = JsonSerializer.Serialize(scores), RankedGame = ranked, Finished = false });
                 dbContext.SaveChanges();
             }
         }
@@ -56,24 +56,24 @@ namespace Inzynierka
                 if (game.RankedGame)
                 {
                     List<double> skills = new List<double>();
-                    int i = 0;
+                    List<int> pids = JsonSerializer.Deserialize<List<int>>(game.Teams);
                     //fill skills list
-                    foreach (var pid in game.Players)
+                    foreach (var pid in pids)
                     {
-                        var player = dbContext.Players.First(p => p.PlayerId == game.Players[i]);
+                        var player = dbContext.Players.First(p => p.PlayerId == pid);
                         skills.Add(player.SkillRating);
                     }
 
                     //count new skills
                     List<double> ranking_updates = game.CountRanking(scores, skills);
-                    i = 0;
+                    int i = 0;
                     //update all stats
-                    foreach (var pid in game.Players)
+                    foreach (var pid in pids)
                     {
-                        var player = dbContext.Players.First(p => p.PlayerId == game.Players[i]);
+                        var player = dbContext.Players.First(p => p.PlayerId == pid);
 
-                        if(config.TieGames) player.Update_Stats(ranking_updates[i]);
-                        else player.Update_Stats(ranking_updates[i]);
+                        if(config.TieGames) player.Update_Stats(ranking_updates[i++]);
+                        else player.Update_Stats(ranking_updates[i++]);
                     }
                 }
                 dbContext.SaveChanges();
@@ -103,9 +103,11 @@ namespace Inzynierka
         }
         static void Main(string[] args)
         {
+            GameConfigs config = new GameConfigs();
+            config.TieGames = true;
             string dbName = "Statistics.db";
             Create_DataBase(dbName);
-            //Add_Player();
+            Add_Player("roman", config);
             //Add_Game();
             //Add_Result();
             Console.WriteLine("OK");
