@@ -33,5 +33,6 @@ namespace TalkaTIPServer
         public virtual DbSet<Histories> Histories { get; set; }
         public virtual DbSet<Messages> Messages { get; set; }
         public virtual DbSet<Users> Users { get; set; }
+        public virtual DbSet<UsersAPIs> UsersAPIs { get; set; }
     }
 }

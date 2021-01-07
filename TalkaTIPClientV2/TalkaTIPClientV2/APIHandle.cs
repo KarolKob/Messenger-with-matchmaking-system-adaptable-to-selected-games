@@ -23,15 +23,34 @@ namespace TalkaTIPClientV2
             httpClient.DefaultRequestHeaders.Accept.Add(
                 new MediaTypeWithQualityHeaderValue("application/json"));
             this.apiAddress = apiAddress;
-            string apiName = apiPOST().GetAwaiter().GetResult();
+            string result = ApiPOST().GetAwaiter().GetResult();
 
-            if(apiName != null)
+            if(result != null)
             {
                 Program.mainWindow.Invoke((System.Windows.Forms.MethodInvoker)delegate
                 {
-                    if (!Program.apiNameAndHandle.ContainsKey(apiName))
+                    if (!Program.apiNameAndHandle.ContainsKey(result))
                     {
-                        Program.apiNameAndHandle.Add(apiName, this);
+                        //Program.apiNameAndHandle.Add(apiName, this);
+                        System.Windows.Forms.MessageBox.Show(result, "OK");
+                    }
+                    else
+                    {
+                        System.Windows.Forms.MessageBox.Show("Adding API failed. Try again.", "Error");
+                    }
+                });
+            }
+
+            result = ApiPOST().GetAwaiter().GetResult();
+
+            if (result != null)
+            {
+                Program.mainWindow.Invoke((System.Windows.Forms.MethodInvoker)delegate
+                {
+                    if (!Program.apiNameAndHandle.ContainsKey(result))
+                    {
+                        //Program.apiNameAndHandle.Add(apiName, this);
+                        System.Windows.Forms.MessageBox.Show(result, "OK");
                     }
                     else
                     {
@@ -42,9 +61,9 @@ namespace TalkaTIPClientV2
         }
 
         // TODO: Figure out what is returned and act accordingly
-        public async Task<string> apiPOST()
+        public async Task<string> ApiPOST()
         {
-            string name;
+            string result;
             try
             {
                 var my_jsondata = new
@@ -57,44 +76,44 @@ namespace TalkaTIPClientV2
                 HttpResponseMessage response = await httpClient.PostAsync("Matching", stringContent)
                     .ConfigureAwait(continueOnCapturedContext: false);
                 response.EnsureSuccessStatusCode();
-                name = await response.Content.ReadAsStringAsync();
+                result = await response.Content.ReadAsStringAsync();
             }
             catch (Exception)
             {
                 return null;
             }
 
-            return name;
+            return result;
         }
 
-        public async Task<string> apiGETData()
+        public async Task<string> ApiGETData()
         {
-            string name;
+            string result;
             try
             {
-                var my_jsondata = new
+                /*var my_jsondata = new
                 {
                     NickName = Program.userLogin
                 };
                 string json = JsonConvert.SerializeObject(my_jsondata);
-                var stringContent = new StringContent(json, Encoding.UTF8, "application/json");
+                var stringContent = new StringContent(json, Encoding.UTF8, "application/json");*/
                 //var response = await httpClient.PostAsync("http://www.sample.com/write", stringContent);  new StringContent(Program.userLogin)
-                HttpResponseMessage response = await httpClient.GetAsync("Matching")
+                HttpResponseMessage response = await httpClient.GetAsync("Matching/" + Program.userLogin)
                     .ConfigureAwait(continueOnCapturedContext: false);
                 response.EnsureSuccessStatusCode();
-                name = await response.Content.ReadAsStringAsync();
+                result = await response.Content.ReadAsStringAsync();
             }
             catch (Exception)
             {
                 return null;
             }
              
-            return name;
+            return result;
         }
 
-        public async Task<string> apiGETPlayerInfo()
+        public async Task<string> ApiGETPlayerInfo()
         {
-            string name = null;
+            string result = null;
             try
             {
                 var my_jsondata = new
@@ -113,7 +132,7 @@ namespace TalkaTIPClientV2
                 return null;
             }
 
-            return name;
+            return result;
         }
     }
 }

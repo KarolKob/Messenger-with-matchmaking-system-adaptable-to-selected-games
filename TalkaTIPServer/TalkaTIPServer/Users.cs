@@ -27,6 +27,7 @@ namespace TalkaTIPServer
             this.Histories1 = new HashSet<Histories>();
             this.Messages = new HashSet<Messages>();
             this.Messages1 = new HashSet<Messages>();
+            this.UsersAPIs = new HashSet<UsersAPIs>();
         }
     
         public long UserID { get; set; }
@@ -55,5 +56,7 @@ namespace TalkaTIPServer
         public virtual ICollection<Messages> Messages { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Messages> Messages1 { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<UsersAPIs> UsersAPIs { get; set; }
     }
 }

@@ -192,11 +192,29 @@ namespace TalkaTIPClientV2
         public static void GetAllGroupChatMessages(string senderLogin, string receiverLogin)
         {
             char comm = (char)28;
-            string message = comm + " " + Convert.ToBase64String(Program.security.EncryptMessage(Program.sessionKeyWithServer,
-                senderLogin + " " + receiverLogin)) + " <EOF>";
+            string message = comm + " " + Convert.ToBase64String(Program.security.EncryptMessage(
+                Program.sessionKeyWithServer, senderLogin + " " + receiverLogin)) + " <EOF>";
             Program.client.Send(message);
             message = Program.client.Receive();
             commFromServer(message.Substring(0, message.Length - 6));
+        }
+
+        public static bool AddApiToUser(string senderLogin, string apiUri, string apiName)
+        {
+            char comm = (char)29;
+            string message = comm + " " + Convert.ToBase64String(Program.security.EncryptMessage(
+                Program.sessionKeyWithServer,senderLogin + " " + apiUri + " " + apiName)) + " <EOF>";
+            Program.client.Send(message);
+            return Response(Program.client.Receive()[0]);
+        }
+
+        public static bool DeleteApiFromUser(string senderLogin, string apiUri)
+        {
+            char comm = (char)29;
+            string message = comm + " " + Convert.ToBase64String(Program.security.EncryptMessage(
+                Program.sessionKeyWithServer, senderLogin + " " + apiUri)) + " <EOF>";
+            Program.client.Send(message);
+            return Response(Program.client.Receive()[0]);
         }
 
         public static void commFromServer(string messageFromServer)

@@ -25,6 +25,8 @@
         <AssociationConnector Association="TalkaTIPModel.FK_Histories_1_0" />
         <AssociationConnector Association="TalkaTIPModel.FK_Messages_0_0" />
         <AssociationConnector Association="TalkaTIPModel.FK_Messages_1_0" />
+        <EntityTypeShape EntityType="TalkaTIPModel.UsersAPIs" Width="1.5" PointX="2.625" PointY="3.25" />
+        <AssociationConnector Association="TalkaTIPModel.FK_UsersAPIs_0_0" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

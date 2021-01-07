@@ -104,6 +104,16 @@ namespace TalkaTIPSerwer
             ExecuteCommand(sql, m_dbConnection);
         }
 
+        static void CreateUsersAPIsTable(SQLiteConnection m_dbConnection)
+        {
+            string sql = "CREATE TABLE IF NOT EXISTS UsersAPIs(" +
+                                            "CorrelationID INTEGER PRIMARY KEY AUTOINCREMENT," +
+                                            "CorrelatedUserID INTEGER NOT NULL REFERENCES Users(UserID)," +
+                                            "ApiUri VARCHAR(100) NOT NULL," +
+                                            "ApiName VARCHAR(50) NOT NULL);";
+            ExecuteCommand(sql, m_dbConnection);
+        }
+
         public static void CreateDataBase(SQLiteConnection m_dbConnection)
         {
             if (!File.Exists("TalkaTIP.sqlite"))
@@ -121,6 +131,7 @@ namespace TalkaTIPSerwer
             CreateGroupChatTable(m_dbConnection);
             CreateGroupChatUsersTable(m_dbConnection);
             CreateGroupChatMessagesTable(m_dbConnection);
+            CreateUsersAPIsTable(m_dbConnection);
         }
     }
 }

@@ -4,7 +4,7 @@
   <edmx:Runtime>
     <!-- SSDL content -->
     <edmx:StorageModels>
-    <Schema Namespace="TalkaTIPModel.Store" Provider="System.Data.SQLite.EF6" ProviderManifestToken="data source=C:\Users\karol\source\repos\TalkaTIPServer\TalkaTIPServer\bin\Debug\TalkaTIP.sqlite" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+    <Schema Namespace="TalkaTIPModel.Store" Provider="System.Data.SQLite.EF6" ProviderManifestToken="data source=C:\Users\karol\Desktop\Messenger-with-matchmaking-system-adaptable-to-selected-games\TalkaTIPServer\TalkaTIPServer\bin\Debug\TalkaTIP.sqlite" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
         <EntityType Name="Blocked">
           <Key>
             <PropertyRef Name="BlockID" />
@@ -77,6 +77,15 @@
           <Property Name="Password" Type="char" MaxLength="64" Nullable="false" />
           <Property Name="LastLogoutDate" Type="datetime" Nullable="false" />
           <Property Name="RegistrationDate" Type="datetime" Nullable="false" />
+        </EntityType>
+        <EntityType Name="UsersAPIs">
+          <Key>
+            <PropertyRef Name="CorrelationID" />
+          </Key>
+          <Property Name="CorrelationID" Type="integer" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="CorrelatedUserID" Type="integer" Nullable="false" />
+          <Property Name="ApiUri" Type="varchar" MaxLength="100" Nullable="false" />
+          <Property Name="ApiName" Type="varchar" MaxLength="50" Nullable="false" />
         </EntityType>
         <Association Name="FK_Blocked_0_0">
           <End Role="Users" Type="Self.Users" Multiplicity="1" />
@@ -222,6 +231,18 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK_UsersAPIs_0_0">
+          <End Role="Users" Type="Self.Users" Multiplicity="1" />
+          <End Role="UsersAPIs" Type="Self.UsersAPIs" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Users">
+              <PropertyRef Name="UserID" />
+            </Principal>
+            <Dependent Role="UsersAPIs">
+              <PropertyRef Name="CorrelatedUserID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <EntityContainer Name="TalkaTIPModelStoreContainer">
           <EntitySet Name="Blocked" EntityType="Self.Blocked" store:Type="Tables" />
           <EntitySet Name="Friends" EntityType="Self.Friends" store:Type="Tables" />
@@ -231,6 +252,7 @@
           <EntitySet Name="Histories" EntityType="Self.Histories" store:Type="Tables" />
           <EntitySet Name="Messages" EntityType="Self.Messages" store:Type="Tables" />
           <EntitySet Name="Users" EntityType="Self.Users" store:Type="Tables" />
+          <EntitySet Name="UsersAPIs" EntityType="Self.UsersAPIs" store:Type="Tables" />
           <AssociationSet Name="FK_Blocked_0_0" Association="Self.FK_Blocked_0_0">
             <End Role="Users" EntitySet="Users" />
             <End Role="Blocked" EntitySet="Blocked" />
@@ -278,6 +300,10 @@
           <AssociationSet Name="FK_Messages_1_0" Association="Self.FK_Messages_1_0">
             <End Role="Users" EntitySet="Users" />
             <End Role="Messages" EntitySet="Messages" />
+          </AssociationSet>
+          <AssociationSet Name="FK_UsersAPIs_0_0" Association="Self.FK_UsersAPIs_0_0">
+            <End Role="Users" EntitySet="Users" />
+            <End Role="UsersAPIs" EntitySet="UsersAPIs" />
           </AssociationSet>
         </EntityContainer>
       </Schema></edmx:StorageModels>
@@ -340,6 +366,11 @@
           <AssociationSet Name="FK_Messages_1_0" Association="TalkaTIPModel.FK_Messages_1_0">
             <End Role="Users" EntitySet="Users" />
             <End Role="Messages" EntitySet="Messages" />
+          </AssociationSet>
+          <EntitySet Name="UsersAPIs" EntityType="TalkaTIPModel.UsersAPIs" />
+          <AssociationSet Name="FK_UsersAPIs_0_0" Association="TalkaTIPModel.FK_UsersAPIs_0_0">
+            <End Role="Users" EntitySet="Users" />
+            <End Role="UsersAPIs" EntitySet="UsersAPIs" />
           </AssociationSet>
         </EntityContainer>
         <EntityType Name="Blocked">
@@ -438,6 +469,7 @@
           <NavigationProperty Name="Histories1" Relationship="TalkaTIPModel.FK_Histories_1_0" FromRole="Users" ToRole="Histories" />
           <NavigationProperty Name="Messages" Relationship="TalkaTIPModel.FK_Messages_0_0" FromRole="Users" ToRole="Messages" />
           <NavigationProperty Name="Messages1" Relationship="TalkaTIPModel.FK_Messages_1_0" FromRole="Users" ToRole="Messages" />
+          <NavigationProperty Name="UsersAPIs" Relationship="TalkaTIPModel.FK_UsersAPIs_0_0" FromRole="Users" ToRole="UsersAPIs" />
         </EntityType>
         <Association Name="FK_Blocked_0_0">
           <End Type="TalkaTIPModel.Users" Role="Users" Multiplicity="1" />
@@ -583,6 +615,28 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <EntityType Name="UsersAPIs">
+          <Key>
+            <PropertyRef Name="CorrelationID" />
+          </Key>
+          <Property Name="CorrelationID" Type="Int64" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="CorrelatedUserID" Type="Int64" Nullable="false" />
+          <Property Name="ApiUri" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="ApiName" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="Users" Relationship="TalkaTIPModel.FK_UsersAPIs_0_0" FromRole="UsersAPIs" ToRole="Users" />
+        </EntityType>
+        <Association Name="FK_UsersAPIs_0_0">
+          <End Type="TalkaTIPModel.Users" Role="Users" Multiplicity="1" />
+          <End Type="TalkaTIPModel.UsersAPIs" Role="UsersAPIs" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Users">
+              <PropertyRef Name="UserID" />
+            </Principal>
+            <Dependent Role="UsersAPIs">
+              <PropertyRef Name="CorrelatedUserID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -667,6 +721,16 @@
                 <ScalarProperty Name="Password" ColumnName="Password" />
                 <ScalarProperty Name="Login" ColumnName="Login" />
                 <ScalarProperty Name="UserID" ColumnName="UserID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="UsersAPIs">
+            <EntityTypeMapping TypeName="TalkaTIPModel.UsersAPIs">
+              <MappingFragment StoreEntitySet="UsersAPIs">
+                <ScalarProperty Name="ApiName" ColumnName="ApiName" />
+                <ScalarProperty Name="ApiUri" ColumnName="ApiUri" />
+                <ScalarProperty Name="CorrelatedUserID" ColumnName="CorrelatedUserID" />
+                <ScalarProperty Name="CorrelationID" ColumnName="CorrelationID" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>

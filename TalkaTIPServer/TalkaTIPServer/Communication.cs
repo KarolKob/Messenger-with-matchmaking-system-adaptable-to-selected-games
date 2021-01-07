@@ -39,6 +39,8 @@ namespace TalkaTIPSerwer
             communiqueDictionary[26] = new Func<List<string>, string>(LeaveGroupChat);
             communiqueDictionary[27] = new Func<List<string>, string>(GroupChatMessage);
             communiqueDictionary[28] = new Func<List<string>, string>(GetAllGroupChatMessages);
+            communiqueDictionary[29] = new Func<List<string>, string>(AddApiToUser);
+            communiqueDictionary[30] = new Func<List<string>, string>(DeleteApiFromUser);
         }
 
         // Incoming messages
@@ -1003,6 +1005,78 @@ namespace TalkaTIPSerwer
             }
         }
 
+        public static string AddApiToUser(List<string> param)
+        {
+            string login = param[0];
+            string apiUri = param[1];
+            string apiName = param[2];
+            using (TalkaTipDB ctx = new TalkaTipDB())
+            {
+                long userID = ctx.Users.Where(x => x.Login == login).Select(x => x.UserID).FirstOrDefault();
+                if (userID != 0)
+                {
+                    UsersAPIs usersAPI = new UsersAPIs();
+                    usersAPI.CorrelatedUserID = userID;
+                    usersAPI.ApiUri = apiUri;
+                    usersAPI.ApiName = apiName;
+
+                    try
+                    {
+                        ctx.UsersAPIs.Add(usersAPI);
+                        ctx.SaveChanges();
+                    }
+                    catch (DbUpdateConcurrencyException)
+                    {
+                        return Fail();
+                    }
+
+                    return OK();
+                }
+                else
+                {
+                    return Fail();
+                }
+            }
+        }
+
+        public static string DeleteApiFromUser(List<string> param)
+        {
+            string login = param[0];
+            string apiUri = param[1];
+
+            using(TalkaTipDB ctx = new TalkaTipDB())
+            {
+                long userID = ctx.Users.Where(x => x.Login == login).Select(x => x.UserID).FirstOrDefault();
+                if (userID != 0)
+                {
+                    UsersAPIs apiToRemove = ctx.UsersAPIs.Where(
+                        x => x.CorrelatedUserID == userID && x.ApiUri == apiUri).FirstOrDefault();
+
+                    if(apiToRemove != null && apiToRemove.ApiUri == apiUri)
+                    {
+                        try
+                        {
+                            ctx.UsersAPIs.Remove(apiToRemove);
+                            ctx.SaveChanges();
+                        }
+                        catch (DbUpdateConcurrencyException)
+                        {
+                            return Fail();
+                        }
+
+                        return OK();
+                    }
+                    else
+                    {
+                        return Fail();
+                    }
+                }
+                else
+                {
+                    return Fail();
+                }
+            }
+        }
 
         // Outgoing messages
         public static string OK()
