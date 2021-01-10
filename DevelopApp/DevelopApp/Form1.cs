@@ -1,18 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Text.Json;
+using System;
+using System.IO;
 
 namespace DevelopApp
 {
     public partial class Form1 : Form
     {
-        private List<Rank> ranks;
+        private readonly List<Rank> ranks;
         public Form1()
         {
             InitializeComponent();
@@ -30,30 +27,44 @@ namespace DevelopApp
 
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private void Button1_Click(object sender, EventArgs e)
         {
-            GameConfig config = new GameConfig();
-
-            //general settings
-            config.Name = nameBox.Text;
-            config.Description = descBox.Text;
-            config.NumberOfPlayers = Int32.Parse(mPlayersBox.Text);
-            config.Server = serverBox.Text;
-            config.TeamPlays = teamsCheck.Checked;
-            config.TieGames = tieCheck.Checked;
-            config.AvgTime = Int32.Parse(avgTime.Text);
-
-            //advanced settings
-            config.KValue = KvalueBar.Value;
-            config.StartRating = SratingBar.Value;
-            config.PktsRatio = pRatioCheck.Checked;
-            config.MatchmakingLimit = matchmakBar.Value;
-
             //ranks
+            List<int> ranklimits = new List<int>();
+            foreach (var rank in ranks)
+            {
+                if (rank.MaxRating > 0) ranklimits.Add(rank.MaxRating);
+            }
 
+            GameConfig new_game = new GameConfig
+            {
+                //general settings
+                Name = nameBox.Text,
+                Description = descBox.Text,
+                NumberOfPlayers = Int32.Parse(mPlayersBox.Text),
+                Server = serverBox.Text,
+                TeamPlays = teamsCheck.Checked,
+                TieGames = tieCheck.Checked,
+                AvgTime = Int32.Parse(avgTime.Text),
+
+                //advanced settings
+                KValue = KvalueBar.Value,
+                StartRating = SratingBar.Value,
+                PktsRatio = pRatioCheck.Checked,
+                MatchmakingLimit = matchmakBar.Value,
+
+                //ranks
+                RanksLimit = JsonSerializer.Serialize(ranklimits)
+            };
+
+            using (var dbContext = new ConfigContext())
+            {
+                dbContext.games.Add(new_game);
+                dbContext.SaveChanges();
+            }
         }
 
-        private void addRank(string name)
+        private void AddRank(string name)
         {
             Rank rank = new Rank(name, ranks[ranks.Count - 1].MinRating + 1000, -1);
             ranks[ranks.Count - 1].MaxRating = ranks[ranks.Count - 1].MinRating + 999;
@@ -61,10 +72,11 @@ namespace DevelopApp
             UpdateRanks();
         }
 
-        private void removeRank()
+        private void RemoveRank()
         {
             ranks.RemoveAt(ranks.Count-1);
             ranks[ranks.Count - 1].MaxRating = -1;
+            UpdateRanks();
         }
 
         private void UpdateRanks()
@@ -89,12 +101,29 @@ namespace DevelopApp
                     if (rank.MaxRating < 0) diamondMaxBox.Text = "MAX";
                     else diamondMaxBox.Text = rank.MaxRating.ToString();
                 }
-                else
+                else if (rank.Name=="platin")
                 {
                     eliteMinBox.Text = rank.MinRating.ToString();
                     if (rank.MaxRating < 0) eliteMaxBox.Text = "MAX";
                     else eliteMaxBox.Text = rank.MaxRating.ToString();
                 }
+            }
+        }
+        private void PlatinCheck_CheckedChanged(object sender, EventArgs e)
+        {
+            if (PlatinCheck.Checked)
+            {
+                DiamondCheck.Enabled = true;
+                platinPanel.Enabled = true;
+                AddRank("platin");
+            }
+            else
+            {
+                DiamondCheck.Enabled = false;
+                platinMinBox.Text = String.Empty;
+                PlatinMaxBox.Text = String.Empty;
+                platinPanel.Enabled = false;
+                RemoveRank();
             }
         }
 
@@ -104,7 +133,8 @@ namespace DevelopApp
             {
                 EliteCheck.Enabled = true;
                 diamondPanel.Enabled = true;
-                addRank("diamond");
+                PlatinCheck.Enabled = false;
+                AddRank("diamond");
             }
             else
             {
@@ -112,7 +142,8 @@ namespace DevelopApp
                 diamondMaxBox.Text = String.Empty;
                 EliteCheck.Enabled = false;
                 diamondPanel.Enabled = false;
-                removeRank();
+                PlatinCheck.Enabled = true;
+                RemoveRank();
             }
         }
 
@@ -121,32 +152,45 @@ namespace DevelopApp
             if (EliteCheck.Checked)
             {
                 elitePanel.Enabled = true;
-                addRank("elite");
+                DiamondCheck.Enabled = false;
+                AddRank("elite");
             }
             else
             {
                 eliteMinBox.Text = String.Empty;
                 eliteMaxBox.Text = String.Empty;
+                DiamondCheck.Enabled = true;
                 elitePanel.Enabled = false;
-                removeRank();
+                RemoveRank();
             }
         }
 
-        private void PlatinCheck_CheckedChanged(object sender, EventArgs e)
+        private void KvalueBar_Scroll(object sender, EventArgs e)
         {
-            if (PlatinCheck.Checked)
+            kvalueLabel.Text = KvalueBar.Value.ToString();
+        }
+
+        private void SratingBar_Scroll(object sender, EventArgs e)
+        {
+            startRLabel.Text = SratingBar.Value.ToString();
+        }
+
+        private void MatchmakBar_Scroll(object sender, EventArgs e)
+        {
+            MMlabel.Text = matchmakBar.Value.ToString();
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            if (File.Exists("Games"))
             {
-                DiamondCheck.Enabled = true;
-                platinPanel.Enabled = true;
-                addRank("platin");
+                File.Delete("Games");
             }
-            else
+
+            using (var dbContext = new ConfigContext())
             {
-                DiamondCheck.Enabled = false;
-                platinMinBox.Text = String.Empty;
-                PlatinMaxBox.Text = String.Empty;
-                platinPanel.Enabled = false;
-                removeRank();
+                dbContext.Database.EnsureCreated();
+                dbContext.SaveChanges();
             }
         }
     }

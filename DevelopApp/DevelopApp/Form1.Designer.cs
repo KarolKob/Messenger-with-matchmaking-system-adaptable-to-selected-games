@@ -46,12 +46,12 @@
             this.label2 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
             this.tabPage2 = new System.Windows.Forms.TabPage();
-            this.label15 = new System.Windows.Forms.Label();
+            this.MMlabel = new System.Windows.Forms.Label();
             this.matchmakBar = new System.Windows.Forms.TrackBar();
-            this.label14 = new System.Windows.Forms.Label();
+            this.startRLabel = new System.Windows.Forms.Label();
             this.SratingBar = new System.Windows.Forms.TrackBar();
             this.pRatioCheck = new System.Windows.Forms.CheckBox();
-            this.label13 = new System.Windows.Forms.Label();
+            this.kvalueLabel = new System.Windows.Forms.Label();
             this.KvalueBar = new System.Windows.Forms.TrackBar();
             this.EliteCheck = new System.Windows.Forms.CheckBox();
             this.DiamondCheck = new System.Windows.Forms.CheckBox();
@@ -96,6 +96,7 @@
             this.bronzeMinBox = new System.Windows.Forms.TextBox();
             this.label16 = new System.Windows.Forms.Label();
             this.button1 = new System.Windows.Forms.Button();
+            this.button2 = new System.Windows.Forms.Button();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.tabPage2.SuspendLayout();
@@ -278,12 +279,12 @@
             // 
             // tabPage2
             // 
-            this.tabPage2.Controls.Add(this.label15);
+            this.tabPage2.Controls.Add(this.MMlabel);
             this.tabPage2.Controls.Add(this.matchmakBar);
-            this.tabPage2.Controls.Add(this.label14);
+            this.tabPage2.Controls.Add(this.startRLabel);
             this.tabPage2.Controls.Add(this.SratingBar);
             this.tabPage2.Controls.Add(this.pRatioCheck);
-            this.tabPage2.Controls.Add(this.label13);
+            this.tabPage2.Controls.Add(this.kvalueLabel);
             this.tabPage2.Controls.Add(this.KvalueBar);
             this.tabPage2.Controls.Add(this.EliteCheck);
             this.tabPage2.Controls.Add(this.DiamondCheck);
@@ -303,14 +304,14 @@
             this.tabPage2.Text = "Advanced";
             this.tabPage2.UseVisualStyleBackColor = true;
             // 
-            // label15
+            // MMlabel
             // 
-            this.label15.AutoSize = true;
-            this.label15.Location = new System.Drawing.Point(390, 304);
-            this.label15.Name = "label15";
-            this.label15.Size = new System.Drawing.Size(25, 13);
-            this.label15.TabIndex = 17;
-            this.label15.Text = "250";
+            this.MMlabel.AutoSize = true;
+            this.MMlabel.Location = new System.Drawing.Point(390, 304);
+            this.MMlabel.Name = "MMlabel";
+            this.MMlabel.Size = new System.Drawing.Size(25, 13);
+            this.MMlabel.TabIndex = 17;
+            this.MMlabel.Text = "250";
             // 
             // matchmakBar
             // 
@@ -322,15 +323,16 @@
             this.matchmakBar.TabIndex = 16;
             this.matchmakBar.TickFrequency = 10;
             this.matchmakBar.Value = 250;
+            this.matchmakBar.Scroll += new System.EventHandler(this.MatchmakBar_Scroll);
             // 
-            // label14
+            // startRLabel
             // 
-            this.label14.AutoSize = true;
-            this.label14.Location = new System.Drawing.Point(390, 231);
-            this.label14.Name = "label14";
-            this.label14.Size = new System.Drawing.Size(25, 13);
-            this.label14.TabIndex = 15;
-            this.label14.Text = "750";
+            this.startRLabel.AutoSize = true;
+            this.startRLabel.Location = new System.Drawing.Point(390, 231);
+            this.startRLabel.Name = "startRLabel";
+            this.startRLabel.Size = new System.Drawing.Size(25, 13);
+            this.startRLabel.TabIndex = 15;
+            this.startRLabel.Text = "750";
             // 
             // SratingBar
             // 
@@ -341,6 +343,7 @@
             this.SratingBar.TabIndex = 14;
             this.SratingBar.TickFrequency = 50;
             this.SratingBar.Value = 750;
+            this.SratingBar.Scroll += new System.EventHandler(this.SratingBar_Scroll);
             // 
             // pRatioCheck
             // 
@@ -352,14 +355,14 @@
             this.pRatioCheck.Text = "YES";
             this.pRatioCheck.UseVisualStyleBackColor = true;
             // 
-            // label13
+            // kvalueLabel
             // 
-            this.label13.AutoSize = true;
-            this.label13.Location = new System.Drawing.Point(390, 114);
-            this.label13.Name = "label13";
-            this.label13.Size = new System.Drawing.Size(19, 13);
-            this.label13.TabIndex = 12;
-            this.label13.Text = "30";
+            this.kvalueLabel.AutoSize = true;
+            this.kvalueLabel.Location = new System.Drawing.Point(390, 114);
+            this.kvalueLabel.Name = "kvalueLabel";
+            this.kvalueLabel.Size = new System.Drawing.Size(19, 13);
+            this.kvalueLabel.TabIndex = 12;
+            this.kvalueLabel.Text = "30";
             // 
             // KvalueBar
             // 
@@ -370,6 +373,7 @@
             this.KvalueBar.Size = new System.Drawing.Size(257, 45);
             this.KvalueBar.TabIndex = 11;
             this.KvalueBar.Value = 30;
+            this.KvalueBar.Scroll += new System.EventHandler(this.KvalueBar_Scroll);
             // 
             // EliteCheck
             // 
@@ -538,6 +542,7 @@
             // 
             // PlatinMaxBox
             // 
+            this.PlatinMaxBox.Enabled = false;
             this.PlatinMaxBox.Location = new System.Drawing.Point(164, 48);
             this.PlatinMaxBox.Name = "PlatinMaxBox";
             this.PlatinMaxBox.Size = new System.Drawing.Size(64, 20);
@@ -545,6 +550,7 @@
             // 
             // platinMinBox
             // 
+            this.platinMinBox.Enabled = false;
             this.platinMinBox.Location = new System.Drawing.Point(20, 48);
             this.platinMinBox.Name = "platinMinBox";
             this.platinMinBox.Size = new System.Drawing.Size(64, 20);
@@ -583,6 +589,7 @@
             // 
             // diamondMaxBox
             // 
+            this.diamondMaxBox.Enabled = false;
             this.diamondMaxBox.Location = new System.Drawing.Point(164, 48);
             this.diamondMaxBox.Name = "diamondMaxBox";
             this.diamondMaxBox.Size = new System.Drawing.Size(64, 20);
@@ -590,6 +597,7 @@
             // 
             // diamondMinBox
             // 
+            this.diamondMinBox.Enabled = false;
             this.diamondMinBox.Location = new System.Drawing.Point(20, 48);
             this.diamondMinBox.Name = "diamondMinBox";
             this.diamondMinBox.Size = new System.Drawing.Size(64, 20);
@@ -628,6 +636,7 @@
             // 
             // eliteMaxBox
             // 
+            this.eliteMaxBox.Enabled = false;
             this.eliteMaxBox.Location = new System.Drawing.Point(168, 46);
             this.eliteMaxBox.Name = "eliteMaxBox";
             this.eliteMaxBox.Size = new System.Drawing.Size(64, 20);
@@ -635,6 +644,7 @@
             // 
             // eliteMinBox
             // 
+            this.eliteMinBox.Enabled = false;
             this.eliteMinBox.Location = new System.Drawing.Point(24, 46);
             this.eliteMinBox.Name = "eliteMinBox";
             this.eliteMinBox.Size = new System.Drawing.Size(64, 20);
@@ -672,6 +682,7 @@
             // 
             // goldMaxBox
             // 
+            this.goldMaxBox.Enabled = false;
             this.goldMaxBox.Location = new System.Drawing.Point(164, 46);
             this.goldMaxBox.Name = "goldMaxBox";
             this.goldMaxBox.Size = new System.Drawing.Size(64, 20);
@@ -680,6 +691,7 @@
             // 
             // goldMinBox
             // 
+            this.goldMinBox.Enabled = false;
             this.goldMinBox.Location = new System.Drawing.Point(20, 46);
             this.goldMinBox.Name = "goldMinBox";
             this.goldMinBox.Size = new System.Drawing.Size(64, 20);
@@ -718,6 +730,7 @@
             // 
             // silverMaxBox
             // 
+            this.silverMaxBox.Enabled = false;
             this.silverMaxBox.Location = new System.Drawing.Point(164, 48);
             this.silverMaxBox.Name = "silverMaxBox";
             this.silverMaxBox.Size = new System.Drawing.Size(64, 20);
@@ -726,6 +739,7 @@
             // 
             // silverMinBox
             // 
+            this.silverMinBox.Enabled = false;
             this.silverMinBox.Location = new System.Drawing.Point(20, 48);
             this.silverMinBox.Name = "silverMinBox";
             this.silverMinBox.Size = new System.Drawing.Size(64, 20);
@@ -755,6 +769,7 @@
             // 
             // bronzeMaxBox
             // 
+            this.bronzeMaxBox.Enabled = false;
             this.bronzeMaxBox.Location = new System.Drawing.Point(164, 48);
             this.bronzeMaxBox.Name = "bronzeMaxBox";
             this.bronzeMaxBox.Size = new System.Drawing.Size(64, 20);
@@ -787,13 +802,24 @@
             this.button1.TabIndex = 14;
             this.button1.Text = "Create Game";
             this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
+            this.button1.Click += new System.EventHandler(this.Button1_Click);
+            // 
+            // button2
+            // 
+            this.button2.Location = new System.Drawing.Point(22, 395);
+            this.button2.Name = "button2";
+            this.button2.Size = new System.Drawing.Size(75, 23);
+            this.button2.TabIndex = 15;
+            this.button2.Text = "button2";
+            this.button2.UseVisualStyleBackColor = true;
+            this.button2.Click += new System.EventHandler(this.button2_Click);
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.button2);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.tabControl1);
             this.Controls.Add(this.LogOutButton);
@@ -844,10 +870,10 @@
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.TabPage tabPage2;
-        private System.Windows.Forms.Label label14;
+        private System.Windows.Forms.Label startRLabel;
         private System.Windows.Forms.TrackBar SratingBar;
         private System.Windows.Forms.CheckBox pRatioCheck;
-        private System.Windows.Forms.Label label13;
+        private System.Windows.Forms.Label kvalueLabel;
         private System.Windows.Forms.TrackBar KvalueBar;
         private System.Windows.Forms.CheckBox EliteCheck;
         private System.Windows.Forms.CheckBox DiamondCheck;
@@ -861,7 +887,7 @@
         private System.Windows.Forms.Label label9;
         private System.Windows.Forms.Label label8;
         private System.Windows.Forms.TabPage tabPage3;
-        private System.Windows.Forms.Label label15;
+        private System.Windows.Forms.Label MMlabel;
         private System.Windows.Forms.TrackBar matchmakBar;
         private System.Windows.Forms.Panel platinPanel;
         private System.Windows.Forms.Label label25;
@@ -894,6 +920,7 @@
         private System.Windows.Forms.TextBox bronzeMinBox;
         private System.Windows.Forms.Label label16;
         private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button button2;
     }
 }
 

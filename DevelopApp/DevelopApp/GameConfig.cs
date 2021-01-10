@@ -1,13 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace DevelopApp
 {
     class GameConfig
     {
+        [Key]
         public int ConfigId { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
@@ -21,6 +18,6 @@ namespace DevelopApp
         public bool PktsRatio { get; set; }
         public int StartRating { get; set; }
         public int MatchmakingLimit { get; set; }
-        public List<int> RanksLimit { get; set; }
+        public string RanksLimit { get; set; }
     }
 }
