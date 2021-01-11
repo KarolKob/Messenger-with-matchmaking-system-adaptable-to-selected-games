@@ -14,27 +14,31 @@ namespace Inzynierka
 
     class Program
     {
-        public static int Get_Version(GameConfigs config)
+        public static int Get_Version(int game_id)
         {
             int ver;
-            if (config.TeamPlays) ver = 1;
-            else ver = 2;
+            using (var dbContext = new ConfigContext())
+            {
+                var game = dbContext.games.First(g => g.ConfigId == game_id);
+                if (game.TeamPlays) ver = 1;
+                else ver = 2;
+            }
             return ver;
         }
-        public static void Create_DataBase(string dbName, GameConfigs config)
+        public static void Create_DataBase(string dbName, int game_id)
         {
             if (File.Exists(dbName))
             {
                 File.Delete(dbName);
             }
             //get matchmaking version
-            int ver = Get_Version(config);
+            int ver = Get_Version(game_id);
 
             switch (ver)
             {
                 case 1:
                     //create database
-                    using (var dbContext = new StatContextv1())
+                    using (var dbContext = new StatContextTeam())
                     {
                         dbContext.Database.EnsureCreated();
                         dbContext.SaveChanges();
@@ -43,7 +47,7 @@ namespace Inzynierka
 
                 case 2:
                     //create database
-                    using (var dbContext = new StatContextv2())
+                    using (var dbContext = new StatContextSolo())
                     {
                         dbContext.Database.EnsureCreated();
                         dbContext.SaveChanges();
@@ -51,28 +55,36 @@ namespace Inzynierka
                     break;
             }
         }
-        public static void Add_Player(string nick, GameConfigs config)
+        public static void Add_Player(string nick, int game_id)
         {
-            int ver = Get_Version(config);
+            int ver = Get_Version(game_id);
 
             switch (ver)
             {
                 case 1:
-                    using (var dbContext = new StatContextv1())
+                    using (var dbContext = new StatContextTeam())
                     {
+                        using (var config = new ConfigContext())
+                        {
+                            var game = config.games.First(g => g.ConfigId == game_id);
+                            if (game.TieGames) dbContext.Players.Add(new Player { NickName = nick, SkillRating = game.StartRating, GamesPlayed = 0, GamesWon = 0, GamesLost = 0, GamesTied = 0, WinRate = 0.0 });
+                            else dbContext.Players.Add(new Player { NickName = nick, SkillRating = game.StartRating, GamesPlayed = 0, GamesWon = 0, GamesLost = 0, WinRate = 0.0 });
+                        }
                         //check if tie games are allowed
-                        if (config.TieGames) dbContext.Players.Add(new Player { NickName = nick, SkillRating = config.StartRating, GamesPlayed = 0, GamesWon = 0, GamesLost = 0, GamesTied = 0, WinRate = 0.0 });
-                        else dbContext.Players.Add(new Player { NickName = nick, SkillRating = config.StartRating, GamesPlayed = 0, GamesWon = 0, GamesLost = 0, WinRate = 0.0 });
                         dbContext.SaveChanges();
                     }
                     break;
 
                 case 2:
-                    using (var dbContext = new StatContextv2())
+                    using (var dbContext = new StatContextSolo())
                     {
-                        //check if tie games are allowed
-                        if (config.TieGames) dbContext.Players.Add(new Player { NickName = nick, SkillRating = config.StartRating, GamesPlayed = 0, GamesWon = 0, GamesLost = 0, GamesTied = 0, WinRate = 0.0 });
-                        else dbContext.Players.Add(new Player { NickName = nick, SkillRating = config.StartRating, GamesPlayed = 0, GamesWon = 0, GamesLost = 0, WinRate = 0.0 });
+                        using (var config = new ConfigContext())
+                        {
+                            var game = config.games.First(g => g.ConfigId == game_id);
+                            //check if tie games are allowed
+                            if (game.TieGames) dbContext.Players.Add(new Player { NickName = nick, SkillRating = game.StartRating, GamesPlayed = 0, GamesWon = 0, GamesLost = 0, GamesTied = 0, WinRate = 0.0 });
+                            else dbContext.Players.Add(new Player { NickName = nick, SkillRating = game.StartRating, GamesPlayed = 0, GamesWon = 0, GamesLost = 0, WinRate = 0.0 });
+                        }
                         dbContext.SaveChanges();
                     }
                     break;
@@ -81,7 +93,7 @@ namespace Inzynierka
 
         public static void Add_Team(List<int> players)
         {
-            using (var dbContext = new StatContextv1())
+            using (var dbContext = new StatContextTeam())
             {
                 dbContext.Teams.Add(new Team { PlayersID = JsonSerializer.Serialize(players) });
                 dbContext.SaveChanges();
@@ -90,7 +102,7 @@ namespace Inzynierka
 
         public static void Add_Game_Team(List<int> teams, bool ranked)
         {
-            using (var dbContext = new StatContextv1())
+            using (var dbContext = new StatContextTeam())
             {
                 List<int> scores = new List<int>();
                 foreach (var p in teams) scores.Add(0);
@@ -101,7 +113,7 @@ namespace Inzynierka
 
         public static void Add_Game_Solo(List<int> players, bool ranked)
         {
-            using (var dbContext = new StatContextv2())
+            using (var dbContext = new StatContextSolo())
             {
                 List<int> scores = new List<int>();
                 foreach (var p in players) scores.Add(0);
@@ -110,9 +122,9 @@ namespace Inzynierka
             }
         }
 
-        public static void Add_Result_Team(int game_id, List<int>scores, GameConfigs config)
+        public static void Add_Result_Team(int game_id, List<int>scores, int config_id)
         {
-            using (var dbContext = new StatContextv1())
+            using (var dbContext = new StatContextTeam())
             {
                 var game = dbContext.TeamGames.First(g => g.GameId == game_id);
                 game.Add_Result(scores);
@@ -135,9 +147,14 @@ namespace Inzynierka
                         avg_skills = avg_skills / team_players.Count;
                         skills.Add(avg_skills);
                     }
-
+                    List<double> ranking_updates = new List<double>();
+                    using (var config = new ConfigContext())
+                    {
+                        var game_config = config.games.First(g => g.ConfigId == config_id);
+                        ranking_updates = game.CountRanking(scores, skills, game_config.KValue);
+                    }
                     //count new skills
-                    List<double> ranking_updates = game.CountRanking(scores, skills);
+                    
                     int i = 0;
                     List<int> highest = new List<int>();
                     int hresult = scores[0];
@@ -183,9 +200,9 @@ namespace Inzynierka
             }
         }
 
-        public static void Add_Result_Solo(int game_id, List<int> scores, GameConfigs config)
+        public static void Add_Result_Solo(int game_id, List<int> scores, int config_id)
         {
-            using (var dbContext = new StatContextv2())
+            using (var dbContext = new StatContextSolo())
             {
                 var game = dbContext.SoloGames.First(g => g.GameId == game_id);
                 game.Add_Result(scores);
@@ -199,9 +216,15 @@ namespace Inzynierka
                         var player = dbContext.Players.First(p => p.PlayerId == pid);
                         skills.Add(player.SkillRating);
                     }
+                    List<double> ranking_updates = new List<double>();
+
+                    using (var config = new ConfigContext())
+                    {
+                        var game_config = config.games.First(g => g.ConfigId == config_id);
+                        ranking_updates = game.CountRanking(scores, skills, game_config.KValue);
+                    }
 
                     //count new skills
-                    List<double> ranking_updates = game.CountRanking(scores, skills);
                     int i = 0;
 
                     //update ratings and stats
@@ -236,7 +259,7 @@ namespace Inzynierka
         public static int Find_Opponent_Solo(int id, List<Lobby>rooms, int skilllimit)
         {
             int result = -1;
-            using (var dbContext = new StatContextv2())
+            using (var dbContext = new StatContextSolo())
             {
                 var player = dbContext.Players.First(p => p.PlayerId == id);
                 foreach(var r in rooms)
@@ -258,7 +281,7 @@ namespace Inzynierka
         public static int Find_Opponent_Team(int id, List<Lobby> rooms, int skilllimit)
         {
             int result = -1;
-            using (var dbContext = new StatContextv1())
+            using (var dbContext = new StatContextTeam())
             {
                 var player = dbContext.Players.First(p => p.PlayerId == id);
                 foreach (var r in rooms)
@@ -278,21 +301,15 @@ namespace Inzynierka
         }
         static void Main(string[] args)
         {
-            GameConfigs config = new GameConfigs();
-            config.TieGames = true;
-            config.TeamPlays = true;
-            config.StartRating = 1000;
-            config.PktsRatio = false;
-            string dbName = "Statistics.db";
-            Create_DataBase(dbName, config);
-            Add_Player("roman", config);
-            Add_Player("arek", config);
-            Add_Player("krzychu", config);
-            Add_Player("luj", config);
-            Add_Player("luj1", config);
-            Add_Player("luj2", config);
-
-            /*
+            string dbName = "C:/DataBase/Statistics.db";
+            Create_DataBase(dbName, 1);
+            
+            Add_Player("roman", 1);
+            Add_Player("arek", 1);
+            Add_Player("krzychu", 1);
+            Add_Player("luj", 1);
+            
+            
             //solo test
             List<int> players = new List<int>();
             players.Add(1);
@@ -305,10 +322,10 @@ namespace Inzynierka
             scores.Add(5);
 
             Add_Game_Solo(players, true);
-            Add_Result_Solo(1, scores, config);
-            */
+            Add_Result_Solo(1, scores, 1);
 
             //team test
+            /*
             List<int> teamA = new List<int>();
             List<int> teamB = new List<int>();
 
@@ -330,7 +347,8 @@ namespace Inzynierka
             scores.Add(10);
             scores.Add(5);
 
-            Add_Result_Team(1, scores, config);
+            Add_Result_Team(1, scores, 1);
+            */
 
             Console.WriteLine("OK");
         }

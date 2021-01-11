@@ -32,13 +32,12 @@ namespace Inzynierka
             return result;
         }
 
-        public double Count_Skills(double result, double skillrival, double skill)
+        public double Count_Skills(int K, double result, double skillrival, double skill)
         {
-            int K = 32;
             return K * (result - Count_Probablity(skillrival, skill));
         }
 
-        public List<double> CountRanking(List<int> scores, List<double> rankings)
+        public List<double> CountRanking(List<int> scores, List<double> rankings, int K)
         {
             List<double>new_rankings = new List<double>();
             for (int i = 0; i < scores.Count; i++)
@@ -48,9 +47,9 @@ namespace Inzynierka
                 {
                     if (j!= i)
                     {
-                        if (scores[i] > scores[j]) new_skill += Count_Skills(1, rankings[j], rankings[i]);
-                        if (scores[i] < scores[j]) new_skill += Count_Skills(0, rankings[j], rankings[i]);
-                        else new_skill += Count_Skills(0.5, rankings[j], rankings[i]);
+                        if (scores[i] > scores[j]) new_skill += Count_Skills(K, 1, rankings[j], rankings[i]);
+                        if (scores[i] < scores[j]) new_skill += Count_Skills(K, 0, rankings[j], rankings[i]);
+                        else new_skill += Count_Skills(K, 0.5, rankings[j], rankings[i]);
                     }
                 }
                 new_rankings.Add(new_skill / scores.Count);
@@ -83,13 +82,12 @@ namespace Inzynierka
             return result;
         }
 
-        public double Count_Skills(double result, double skillrival, double skill)
+        public double Count_Skills(int K, double result, double skillrival, double skill)
         {
-            int K = 32;
             return K * (result - Count_Probablity(skillrival, skill));
         }
 
-        public List<double> CountRanking(List<int> scores, List<double> rankings)
+        public List<double> CountRanking(List<int> scores, List<double> rankings, int K)
         {
             List<double> new_rankings = new List<double>();
             for (int i = 0; i < scores.Count; i++)
@@ -99,9 +97,9 @@ namespace Inzynierka
                 {
                     if (j != i)
                     {
-                        if (scores[i] > scores[j]) new_skill += Count_Skills(1, rankings[j], rankings[i]);
-                        if (scores[i] < scores[j]) new_skill += Count_Skills(0, rankings[j], rankings[i]);
-                        else new_skill += Count_Skills(0.5, rankings[j], rankings[i]);
+                        if (scores[i] > scores[j]) new_skill += Count_Skills(K, 1, rankings[j], rankings[i]);
+                        if (scores[i] < scores[j]) new_skill += Count_Skills(K, 0, rankings[j], rankings[i]);
+                        else new_skill += Count_Skills(K, 0.5, rankings[j], rankings[i]);
                     }
                 }
                 new_rankings.Add(new_skill / scores.Count);

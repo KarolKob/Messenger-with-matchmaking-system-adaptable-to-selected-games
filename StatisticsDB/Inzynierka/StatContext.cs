@@ -3,14 +3,14 @@ using System.Reflection;
 
 namespace Inzynierka
 {
-    class StatContextv1 : DbContext
+    class StatContextTeam : DbContext
     {
         public DbSet<Player> Players { get; set; }
         public DbSet<MatchTeam> TeamGames { get; set; }
         public DbSet<Team> Teams { get; set; }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlite("Filename=Statistics.db", options =>
+            optionsBuilder.UseSqlite("Filename=C:/DataBase/Statistics.db", options =>
             {
                 options.MigrationsAssembly(Assembly.GetExecutingAssembly().FullName);
             });
@@ -41,13 +41,13 @@ namespace Inzynierka
         }
     }
 
-    class StatContextv2 : DbContext
+    class StatContextSolo : DbContext
     {
         public DbSet<Player> Players { get; set; }
         public DbSet<MatchSolo> SoloGames { get; set; }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlite("Filename=Statistics.db", options =>
+            optionsBuilder.UseSqlite("Filename=C:/DataBase/Statistics.db", options =>
             {
                 options.MigrationsAssembly(Assembly.GetExecutingAssembly().FullName);
             });
