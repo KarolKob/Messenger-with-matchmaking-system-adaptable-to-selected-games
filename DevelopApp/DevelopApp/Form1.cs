@@ -43,7 +43,6 @@ namespace DevelopApp
                 Description = descBox.Text,
                 NumberOfPlayers = Int32.Parse(mPlayersBox.Text),
                 Server = serverBox.Text,
-                TeamPlays = teamsCheck.Checked,
                 TieGames = tieCheck.Checked,
                 AvgTime = Int32.Parse(avgTime.Text),
 

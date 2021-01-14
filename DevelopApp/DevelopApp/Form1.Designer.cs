@@ -33,14 +33,12 @@
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.avgTime = new System.Windows.Forms.TextBox();
             this.tieCheck = new System.Windows.Forms.CheckBox();
-            this.teamsCheck = new System.Windows.Forms.CheckBox();
             this.mPlayersBox = new System.Windows.Forms.TextBox();
             this.serverBox = new System.Windows.Forms.TextBox();
             this.descBox = new System.Windows.Forms.TextBox();
             this.nameBox = new System.Windows.Forms.TextBox();
             this.label7 = new System.Windows.Forms.Label();
             this.label6 = new System.Windows.Forms.Label();
-            this.label5 = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
@@ -138,14 +136,12 @@
             // 
             this.tabPage1.Controls.Add(this.avgTime);
             this.tabPage1.Controls.Add(this.tieCheck);
-            this.tabPage1.Controls.Add(this.teamsCheck);
             this.tabPage1.Controls.Add(this.mPlayersBox);
             this.tabPage1.Controls.Add(this.serverBox);
             this.tabPage1.Controls.Add(this.descBox);
             this.tabPage1.Controls.Add(this.nameBox);
             this.tabPage1.Controls.Add(this.label7);
             this.tabPage1.Controls.Add(this.label6);
-            this.tabPage1.Controls.Add(this.label5);
             this.tabPage1.Controls.Add(this.label4);
             this.tabPage1.Controls.Add(this.label3);
             this.tabPage1.Controls.Add(this.label2);
@@ -153,14 +149,14 @@
             this.tabPage1.Location = new System.Drawing.Point(4, 22);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(768, 351);
+            this.tabPage1.Size = new System.Drawing.Size(562, 351);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "Genral";
             this.tabPage1.UseVisualStyleBackColor = true;
             // 
             // avgTime
             // 
-            this.avgTime.Location = new System.Drawing.Point(133, 279);
+            this.avgTime.Location = new System.Drawing.Point(133, 243);
             this.avgTime.Name = "avgTime";
             this.avgTime.Size = new System.Drawing.Size(62, 20);
             this.avgTime.TabIndex = 13;
@@ -168,22 +164,12 @@
             // tieCheck
             // 
             this.tieCheck.AutoSize = true;
-            this.tieCheck.Location = new System.Drawing.Point(133, 241);
+            this.tieCheck.Location = new System.Drawing.Point(133, 205);
             this.tieCheck.Name = "tieCheck";
             this.tieCheck.Size = new System.Drawing.Size(47, 17);
             this.tieCheck.TabIndex = 12;
             this.tieCheck.Text = "YES";
             this.tieCheck.UseVisualStyleBackColor = true;
-            // 
-            // teamsCheck
-            // 
-            this.teamsCheck.AutoSize = true;
-            this.teamsCheck.Location = new System.Drawing.Point(133, 206);
-            this.teamsCheck.Name = "teamsCheck";
-            this.teamsCheck.Size = new System.Drawing.Size(47, 17);
-            this.teamsCheck.TabIndex = 11;
-            this.teamsCheck.Text = "YES";
-            this.teamsCheck.UseVisualStyleBackColor = true;
             // 
             // mPlayersBox
             // 
@@ -217,7 +203,7 @@
             // label7
             // 
             this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(18, 282);
+            this.label7.Location = new System.Drawing.Point(18, 246);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(83, 13);
             this.label7.TabIndex = 6;
@@ -226,20 +212,11 @@
             // label6
             // 
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(18, 245);
+            this.label6.Location = new System.Drawing.Point(18, 209);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(58, 13);
             this.label6.TabIndex = 5;
             this.label6.Text = "Tie results:";
-            // 
-            // label5
-            // 
-            this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(17, 210);
-            this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(42, 13);
-            this.label5.TabIndex = 4;
-            this.label5.Text = "Teams:";
             // 
             // label4
             // 
@@ -299,7 +276,7 @@
             this.tabPage2.Controls.Add(this.label8);
             this.tabPage2.Location = new System.Drawing.Point(4, 22);
             this.tabPage2.Name = "tabPage2";
-            this.tabPage2.Size = new System.Drawing.Size(768, 351);
+            this.tabPage2.Size = new System.Drawing.Size(562, 351);
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "Advanced";
             this.tabPage2.UseVisualStyleBackColor = true;
@@ -857,14 +834,12 @@
         private System.Windows.Forms.TabPage tabPage1;
         private System.Windows.Forms.TextBox avgTime;
         private System.Windows.Forms.CheckBox tieCheck;
-        private System.Windows.Forms.CheckBox teamsCheck;
         private System.Windows.Forms.TextBox mPlayersBox;
         private System.Windows.Forms.TextBox serverBox;
         private System.Windows.Forms.TextBox descBox;
         private System.Windows.Forms.TextBox nameBox;
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.Label label6;
-        private System.Windows.Forms.Label label5;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label label2;
