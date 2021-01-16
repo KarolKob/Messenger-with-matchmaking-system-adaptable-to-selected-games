@@ -17,13 +17,15 @@ namespace TalkaTIPClientV2
     {
         private AutoResetEvent autoResetEvent;
         private WaveFormat waveFormat;
-        private int bufferSize;
+        //private int bufferSize;
         private UdpClient udpClient;                // Listens and sends data on port 1550, used in synchronous mode
         public Socket clientSocket;
         private volatile bool bStop;                // Flag to end the Start and Receive threads
         private IPEndPoint otherPartyIP;            // IP of the party we want to make a call with
         private EndPoint otherPartyEP;
         private volatile bool bIsCallActive;        // Tells whether we have an active call
+        
+        // TODO: remove this one the server side and then here
         private Vocoder vocoder;
         private byte[] byteData = new byte[1024];   // Buffer to store the data received
         private volatile int nUdpClientFlag;        // Flag used to close the udpClient socket
@@ -51,8 +53,8 @@ namespace TalkaTIPClientV2
             try
             {
                 short channels = 1; // Stereo
-                short bitsPerSample = 16; // 16bit, alternatively use 8Bits
-                int samplesPerSecond = 22050; // 11KHz use 11025 , 22KHz use 22050, 44KHz use 44100 etc
+                short bitsPerSample = 16; // 16bit, alternatively use 8bit
+                int samplesPerSecond = 22050; // 11kHz use 11025 , 22kHz use 22050, 44kHz use 44100 etc
 
                 // Set up the wave format to be captured
                 waveFormat = new WaveFormat(samplesPerSecond, bitsPerSample, channels);
@@ -81,7 +83,7 @@ namespace TalkaTIPClientV2
                 clientSocket.Bind(ourEP);
 
                 // Receive data from any IP
-                EndPoint remoteEP = (new IPEndPoint(IPAddress.Any, 0));
+                EndPoint remoteEP = new IPEndPoint(IPAddress.Any, 0);
 
                 byteData = new byte[1024];
 
@@ -410,7 +412,7 @@ namespace TalkaTIPClientV2
             Program.mainWindow.listView2.Items.Insert(0, (new ListViewItem(historyDetails)));
             Program.mainWindow.listView2.Refresh();
 
-            bStop = true;
+            //bStop = true;
             if (receiverThread.IsAlive)
             {
                 receiverThread.Join();

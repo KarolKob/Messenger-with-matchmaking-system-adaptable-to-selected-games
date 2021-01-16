@@ -19,9 +19,9 @@ namespace TalkaTIPClientV2
             return owner.PublicKey;
         }
 
-        public void CreatePublicKey()
+        public void SetDerivationFunction()
         {
-            // Gets or sets the key derivation function for the ECDiffieHellmanCng class
+            // Sets the key derivation function for the ECDiffieHellmanCng class
             owner.KeyDerivationFunction = ECDiffieHellmanKeyDerivationFunction.Hash;
             owner.HashAlgorithm = CngAlgorithm.Sha256;
         }
