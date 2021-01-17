@@ -42,13 +42,16 @@ namespace Inzynierka
             }
         }
 
-        public static void Add_Team(List<int> players)
+        public static int Add_Team(List<int> players)
         {
+            int result;
             using (var dbContext = new StatContext())
             {
                 dbContext.Teams.Add(new Team { PlayersID = JsonSerializer.Serialize(players) });
+                result = dbContext.Teams.Count();
                 dbContext.SaveChanges();
             }
+            return result;
         }
 
         public static void Add_Game_Team(List<int> teams, bool ranked)
@@ -249,15 +252,63 @@ namespace Inzynierka
             }
             return result;
         }
+
+        public static List<int> Manage_Teams(Lobby lobby, int n_teams)
+        {
+            List<int> result = new List<int>();
+
+            List<List<Player>> teams = new List<List<Player>>();
+            List<Player> sortedPlayers = lobby.players.OrderBy(p => p.SkillRating).ToList();
+            int iterations = lobby.players.Count / n_teams;
+            bool front = true;
+
+            for (int i = 0; i < n_teams; i++) teams.Add(new List<Player>());
+
+            for(int i = 0; i < iterations; i++)
+            {
+                if (front)
+                {
+                    for(int j = 0; j < n_teams; j++)
+                    {
+                        teams[j].Add(sortedPlayers.First());
+                        sortedPlayers.RemoveAt(0);
+                    }
+                }
+                else
+                {
+                    for (int j = 0; j < n_teams; j++)
+                    {
+                        teams[j].Add(sortedPlayers.Last());
+                        sortedPlayers.RemoveAt(sortedPlayers.Count-1);
+                    }
+                }
+            }
+
+            List<int> members = new List<int>();
+
+            foreach (var tTeam in teams)
+            {
+                foreach(var player in tTeam)
+                {
+                    members.Add(player.PlayerId);
+                }
+                result.Add(Add_Team(members));
+                members.Clear();
+            }
+
+            return result;
+        }
         static void Main(string[] args)
         {
             string dbName = "C:/DataBase/Statistics.db";
             Create_DataBase(dbName, 1);
             
+            
             Add_Player("roman", 1);
             Add_Player("arek", 1);
             Add_Player("krzychu", 1);
             Add_Player("luj", 1);
+            
             
             //solo test
             List<int> players = new List<int>();
@@ -272,7 +323,7 @@ namespace Inzynierka
 
             Add_Game_Solo(players, true);
             Add_Result_Solo(1, scores, 1);
-
+            
             //team test
             /*
             List<int> teamA = new List<int>();
@@ -298,6 +349,21 @@ namespace Inzynierka
 
             Add_Result_Team(1, scores, 1);
             */
+
+            //manage teams test
+            Lobby lobby = new Lobby();
+            lobby.players = new List<Player>();
+
+            for(int i = 1; i <= 4; i++)
+            {
+                using (var dbContext = new StatContext())
+                {
+                    var game = dbContext.Players.First(p => p.PlayerId == i);
+                    lobby.players.Add(game);
+                }
+            }
+            
+            List<int> teams = Manage_Teams(lobby, 2);
 
             Console.WriteLine("OK");
         }

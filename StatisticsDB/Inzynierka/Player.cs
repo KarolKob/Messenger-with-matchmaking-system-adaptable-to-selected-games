@@ -36,7 +36,8 @@ namespace Inzynierka
         public void Update_Stats(double newrtaing, int result)
         {
             GamesPlayed++;
-            SkillRating += newrtaing;
+            SkillRating += Math.Round(newrtaing);
+            if (SkillRating < 0) SkillRating = 0;
             if (result == 2) GamesLost++;
             else if (result == 0) GamesTied++;
             else GamesWon++;

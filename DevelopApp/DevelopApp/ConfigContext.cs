@@ -11,7 +11,7 @@ namespace DevelopApp
         public DbSet<GameConfig> games { get; set; }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlite("Filename=Games.db", options =>
+            optionsBuilder.UseSqlite("Filename=C:/DataBase/Games.db", options =>
             {
                 options.MigrationsAssembly(Assembly.GetExecutingAssembly().FullName);
             });
