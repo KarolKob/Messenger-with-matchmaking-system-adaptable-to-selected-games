@@ -18,11 +18,13 @@ namespace TalkaTIPSerwer
 
             return owner.PublicKey;
         }
+
         public void CreatePublicKey()
         {
             owner.KeyDerivationFunction = ECDiffieHellmanKeyDerivationFunction.Hash; //Gets or sets the key derivation function for the ECDiffieHellmanCng class.
             owner.HashAlgorithm = CngAlgorithm.Sha256;
         }
+
         public byte[] SetSessionKey(byte[] clientPublicKey) //set session key
         {
             //CngKey k = CngKey.Import(clientPublicKey, CngKeyBlobFormat.EccPublicBlob); //firs argument public key from client

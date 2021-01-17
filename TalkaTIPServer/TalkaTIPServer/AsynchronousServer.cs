@@ -50,7 +50,7 @@ namespace TalkaTIPSerwer
         public static void StartListening()
         {
             // Data buffer for incoming data
-            byte[] bytes = new Byte[1024];
+            byte[] bytes = new byte[1024];
 
             // Establish the local endpoint for the socket
             // The DNS name of the computer
@@ -145,7 +145,7 @@ namespace TalkaTIPSerwer
 
         public static void ReadCallback(IAsyncResult ar)
         {
-            String content = String.Empty;
+            string content = string.Empty;
 
             // Retrieve the state object and the handler socket from the asynchronous state object
             StateObject state = (StateObject)ar.AsyncState;

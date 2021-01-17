@@ -26,7 +26,7 @@ namespace TalkaTIPClientV2
         public static Dictionary<string, APIHandle> apiNameAndHandle = new Dictionary<string, APIHandle>();
 
         public static byte[] sessionKeyWithServer = null;
-        public static byte[] sessionKeyWithClient = null;
+        //public static byte[] sessionKeyWithClient = null;
 
         /// <summary>
         /// Główny punkt wejścia dla aplikacji.
@@ -49,7 +49,7 @@ namespace TalkaTIPClientV2
 
             LoginWindow logIn;
             RegisterWindow register;
-            security.CreatePublicKey();
+            security.SetDerivationFunction();
 
             DialogResult dialogResult = DialogResult.No;
 
