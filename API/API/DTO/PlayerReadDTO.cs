@@ -16,5 +16,7 @@ namespace API.DTO
         public int GamesTied { get; set; }
         public int GamesLost { get; set; }
         public double WinRate { get; set; }
+        public string Rank { get; set; }
+        public string ApiName = "Tic Tac Toe"; //tu pobrać z config
     }
 }

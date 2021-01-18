@@ -9,11 +9,15 @@ namespace API.Data
 {
     public interface ILiteRepo
     {
-        bool SaveChanges();
 
-        IEnumerable<Player> MatchPlayers();
         Task<Player> GetPlayerInfo(string nick);
-        Task<Player> AddPlayer(Player player);
+        Task<Player> AddPlayer(Player player, int game_id);
+        Task<int> Add_Game_Solo(List<string> players, bool ranked);
+        Task<int> Add_Game_Team(List<int> teams, bool ranked);
+        Task<int> Add_Team(List<string> players);
+        Task<int> Add_Result_Team(int game_id, List<int> scores, int config_id);
+        Task<int> Add_Result_Solo(int game_id, List<int> scores, int config_id);
+        Task<List<int>> Manage_Teams(Lobby lobby, int n_teams);
         void UpdatePlayer(Player player);
         void RemovePlayer(Player player);
     }

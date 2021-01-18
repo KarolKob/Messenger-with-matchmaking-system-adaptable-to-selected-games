@@ -24,7 +24,6 @@ namespace API
             Configuration = configuration;
             using (var db = new SQLiteContext())
             {
-                //db.Database.EnsureCreated();
                 db.Database.EnsureCreatedAsync();
                 db.SaveChangesAsync();
             }
@@ -40,7 +39,7 @@ namespace API
             //(Configuration.GetConnectionString("APIconnection")));
             services.AddScoped<IPoczekalnia, SerwisPoczekalni>();
             services.AddDbContext<SQLiteContext>();
-
+            services.AddDbContext<ConfigContext>();
             //services.AddDbContext<SQLiteContext>(opt => opt.UseSqlite
             //("Data Source=SQLitePlayerBase.db"));
 
@@ -60,7 +59,7 @@ namespace API
         }
 
         // Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, SQLiteContext dataContext)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             //here we add midleware (order maters) 
             if (env.IsDevelopment())

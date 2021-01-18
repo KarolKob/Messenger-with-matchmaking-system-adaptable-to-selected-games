@@ -9,6 +9,9 @@ namespace API.Data
 {
     public interface IPoczekalnia
     {
-        Lobby find_lobby(Player player);
+        Lobby find_lobby(Player player, int skilllimit);
+        void remove_player_from_lobby(string nick,string lobby_id);
+        void add_lobby_to_pool(Lobby lobby);
+        void remove_lobby_from_pool(string lobby_id);
     }
 }

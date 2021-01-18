@@ -4,15 +4,12 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace API.DTO
+namespace API.Models
 {
-    public class PlayerCreateDTO
+    public class Team
     {
-        [Required]
-        [MaxLength(16)]
-        public string NickName { get; set; }
-
-
-
+        [Key]
+        public int TeamID { get; }
+        public string PlayersID { get; set; }
     }
 }

@@ -6,10 +6,9 @@ using System.Threading.Tasks;
 
 namespace API.DTO
 {
-    public class PlayerCreateDTO
+    public class PlayerMatch
     {
         [Required]
-        [MaxLength(16)]
         public string NickName { get; set; }
 
 

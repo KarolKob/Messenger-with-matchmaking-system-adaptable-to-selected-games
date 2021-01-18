@@ -12,15 +12,15 @@ namespace API.Models
     {
         public string lobby_ID { get; set; }
         public int max_size { get; set; }
-        int cur_size;
+        public double AvgSkill { get; set; }
         public List<Player> queue { get; set; }
-        public Lobby(Player player, string id,int size)
+        public Lobby(Player player, string id,int size,double skill)
         {
             lobby_ID = id;
             max_size = size;
             //queue = new List<Player>();
             queue=new List<Player> { player };
-
+            AvgSkill = skill;
         }
     }
 }

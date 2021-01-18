@@ -121,11 +121,23 @@ namespace TalkaTIPClientV2
                     NickName = Program.userLogin
                 };
                 string json = JsonConvert.SerializeObject(my_jsondata);
-                var stringContent = new StringContent(json, Encoding.UTF8, "application/json");
+                var request = new HttpRequestMessage
+                {
+                    Method = HttpMethod.Get,
+                    RequestUri = new Uri("https://localhost:5001/api/Matching"),
+                    Content = new StringContent(json, Encoding.UTF8, "application/json"),
+
+                    //setRequestProperty("Content-Type", "application/json; charset=utf8")
+
+                };
+                //var stringContent = new StringContent(json, Encoding.UTF8, "application/json");
                 //var response = await httpClient.PostAsync("http://www.sample.com/write", stringContent);  new StringContent(Program.userLogin)
                 /*HttpResponseMessage response = await httpClient.Get("Matching", stringContent).ConfigureAwait(continueOnCapturedContext: false);
                 response.EnsureSuccessStatusCode();
                 name = await response.Content.ReadAsStringAsync();*/
+                HttpResponseMessage response = await httpClient.SendAsync(request).ConfigureAwait(continueOnCapturedContext: false);
+                response.EnsureSuccessStatusCode();
+                var name = await response.Content.ReadAsStringAsync();
             }
             catch (Exception)
             {

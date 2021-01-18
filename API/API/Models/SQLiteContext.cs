@@ -10,42 +10,51 @@ namespace API.Models
 {
     public class SQLiteContext : DbContext
     {
-        //Tabela PlayersDB o kolumnach zawartych w modelu Player
         public DbSet<Player> PlayersDB { get; set; }
-        public DbSet<Game> GamesDB { get; set; }
+        public DbSet<MatchTeam> TeamGamesDB { get; set; }
+        public DbSet<Team> Teams { get; set; }
+        public DbSet<MatchSolo> SoloGamesDB { get; set; }
         //public SQLiteContext(DbContextOptions<SQLiteContext> opt) : base(opt)
         //{
 
         //}
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            var connectionStringBuilder = new SqliteConnectionStringBuilder { DataSource = "SQLitePlayerBase.db" };
-            var connectionString = connectionStringBuilder.ToString();
-            var connection = new SqliteConnection(connectionString);
-
-            optionsBuilder.UseSqlite(connection, options =>
+            optionsBuilder.UseSqlite("Filename=SQLiteMatchmakingDataBase.db", options =>
             {
                 options.MigrationsAssembly(Assembly.GetExecutingAssembly().FullName);
             });
+            base.OnConfiguring(optionsBuilder);
         }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+
             // Map table names
             modelBuilder.Entity<Player>().ToTable("Players", "test");
             modelBuilder.Entity<Player>(entity =>
             {
                 entity.HasKey(e => e.PlayerId);
                 entity.HasIndex(e => e.NickName).IsUnique();
-                
             });
-            modelBuilder.Entity<Game>().ToTable("Games", "test");
-            modelBuilder.Entity<Game>(entity =>
+            modelBuilder.Entity<MatchTeam>().ToTable("Team Matches", "test");
+            modelBuilder.Entity<MatchTeam>(entity =>
+            {
+                entity.HasKey(e => e.GameId);
+                entity.Property(e => e.GameDate).HasDefaultValueSql("CURRENT_TIMESTAMP");
+            });
+            modelBuilder.Entity<Team>().ToTable("Teams", "test");
+            modelBuilder.Entity<Team>(entity =>
+            {
+                entity.HasKey(e => e.TeamID);
+            });
+            modelBuilder.Entity<MatchSolo>().ToTable("Solo Matches", "test");
+            modelBuilder.Entity<MatchSolo>(entity =>
             {
                 entity.HasKey(e => e.GameId);
                 entity.Property(e => e.GameDate).HasDefaultValueSql("CURRENT_TIMESTAMP");
             });
             base.OnModelCreating(modelBuilder);
         }
-
     }
+
 }
