@@ -649,7 +649,7 @@ namespace TalkaTIPSerwer
                                 }
                                 message = builder.ToString();
 
-                                message = Convert.ToBase64String(Program.security.EncryptMessage(Program.onlineUsers[SenderID].sessionKey, message));
+                                message = Program.security.EncryptMessage(Program.onlineUsers[SenderID].sessionKey, message);
                                 message = ((char)24).ToString() + ' ' + message;
                                 message += " <EOF>";
 
@@ -707,8 +707,8 @@ namespace TalkaTIPSerwer
                                 }
                             }
 
-                            allChatMessages = Convert.ToBase64String(Program.security.EncryptMessage(
-                                Program.onlineUsers[User1ID].sessionKey, allChatMessages));
+                            allChatMessages = Program.security.EncryptMessage(
+                                Program.onlineUsers[User1ID].sessionKey, allChatMessages);
                             allChatMessages = ((char)25).ToString() + ' ' + allChatMessages;
                             allChatMessages += " <EOF>";
 
@@ -932,7 +932,7 @@ namespace TalkaTIPSerwer
                                     }
                                     message = chatName + " " + builder.ToString();
 
-                                    message = Convert.ToBase64String(Program.security.EncryptMessage(Program.onlineUsers[senderID].sessionKey, message));
+                                    message = Program.security.EncryptMessage(Program.onlineUsers[senderID].sessionKey, message);
                                     message = ((char)27).ToString() + ' ' + message;
                                     message += " <EOF>";
 
@@ -982,8 +982,8 @@ namespace TalkaTIPSerwer
                                 allChatMessages = allChatMessages + "\n" + senderName + " " + msg.SendTime.ToString() + "\n" + msg.Message + "\n";
                             }
 
-                            allChatMessages = Convert.ToBase64String(Program.security.EncryptMessage(
-                                Program.onlineUsers[userID].sessionKey, allChatMessages));
+                            allChatMessages = Program.security.EncryptMessage(
+                                Program.onlineUsers[userID].sessionKey, allChatMessages);
                             allChatMessages = ((char)28).ToString() + ' ' + allChatMessages;
                             allChatMessages += " <EOF>";
 
@@ -1158,7 +1158,7 @@ namespace TalkaTIPSerwer
                         }
                     }
 
-                    message = Convert.ToBase64String(Program.security.EncryptMessage(Program.onlineUsers[userID].sessionKey, message));
+                    message = Program.security.EncryptMessage(Program.onlineUsers[userID].sessionKey, message);
                     message = ((char)7).ToString() + ' ' + message;
                     message += " <EOF>";
                     return message;
@@ -1198,7 +1198,7 @@ namespace TalkaTIPSerwer
                         }
                     }
                 }
-                history = Convert.ToBase64String(Program.security.EncryptMessage(Program.onlineUsers[userID].sessionKey, history));
+                history = Program.security.EncryptMessage(Program.onlineUsers[userID].sessionKey, history);
                 history = ((char)13).ToString() + ' ' + history;
                 return history + " <EOF>";
             }
@@ -1218,8 +1218,27 @@ namespace TalkaTIPSerwer
                 }
             }
 
-            message = Convert.ToBase64String(Program.security.EncryptMessage(Program.onlineUsers[userID].sessionKey, message));
+            message = Program.security.EncryptMessage(Program.onlineUsers[userID].sessionKey, message);
             message = (char)19 + " " + message;
+            message += " <EOF>";
+            return message;
+        }
+
+        public static string ApiList(long userID)
+        {
+            string message = string.Empty;
+
+            using (TalkaTipDB ctx = new TalkaTipDB())
+            {
+                var apiList = ctx.UsersAPIs.Where(x => x.CorrelatedUserID == userID);
+                foreach (var api in apiList)
+                {
+                    message += api.ApiName + " " + api.ApiUri + " ";
+                }
+            }
+
+            message = Program.security.EncryptMessage(Program.onlineUsers[userID].sessionKey, message);
+            message = (char)31 + " " + message;
             message += " <EOF>";
             return message;
         }
@@ -1232,7 +1251,7 @@ namespace TalkaTIPSerwer
                 message += item.Key + " " + item.Value + " ";
             }
 
-            message = Convert.ToBase64String(Program.security.EncryptMessage(Program.onlineUsers[userID].sessionKey, message));
+            message = Program.security.EncryptMessage(Program.onlineUsers[userID].sessionKey, message);
             message = (char)14 + " " + message;
             message += " <EOF>";
 
@@ -1270,7 +1289,7 @@ namespace TalkaTIPSerwer
             }
 
             // Decipher   
-            string decryptedMessage = Program.security.DecryptMessage(Convert.FromBase64String(message.Substring(2, message.Length - 8)), sessKey);
+            string decryptedMessage = Program.security.DecryptMessage(message.Substring(2, message.Length - 8), sessKey);
 
             // Take 8 bits to recognize the communique
             int bits8 = (int)message[0];    // Decimal value

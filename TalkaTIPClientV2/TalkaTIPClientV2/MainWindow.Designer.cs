@@ -324,6 +324,7 @@
             // timerIAM
             // 
             this.timerIAM.Interval = 60000;
+            this.timerIAM.Tick += new System.EventHandler(this.timerIAM_Tick);
             // 
             // gbCall
             // 
@@ -569,7 +570,6 @@
         private System.Windows.Forms.Button UnblockButton;
         public System.Windows.Forms.TextBox AllMessages;
         private System.Windows.Forms.TabPage tabPage3;
-        private System.Windows.Forms.ListBox gameAPIList;
         private System.Windows.Forms.Button addAPIButton;
         private System.Windows.Forms.Label serverAddressLabel;
         private System.Windows.Forms.TextBox addGameAPIText;
@@ -580,6 +580,7 @@
         private System.Windows.Forms.Button buttonCreateChat;
         private System.Windows.Forms.Button buttonLeaveChat;
         private System.Windows.Forms.Button buttonInviteToChat;
+        public System.Windows.Forms.ListBox gameAPIList;
     }
 }
 

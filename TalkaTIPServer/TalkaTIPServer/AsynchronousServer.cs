@@ -16,6 +16,9 @@ namespace TalkaTIPSerwer
         private static Socket messageSocket = new Socket(AddressFamily.InterNetwork,
                 SocketType.Stream, ProtocolType.Tcp);
 
+        // Thread signal
+        public static ManualResetEvent allDone = new ManualResetEvent(false);
+
         private static void SetTimer()
         {
             // Create a timer with a 61 seconds interval
@@ -27,7 +30,7 @@ namespace TalkaTIPSerwer
             serverTimer.Enabled = true;
         }
 
-        private static void OnTimedEvent(Object source, ElapsedEventArgs e)
+        private static void OnTimedEvent(object source, ElapsedEventArgs e)
         {
             DateTime time = DateTime.Now;
             List<long> usersIDToRemove = new List<long>();
@@ -43,9 +46,6 @@ namespace TalkaTIPSerwer
                 Program.onlineUsers.Remove(item);
             }
         }
-
-        // Thread signal
-        public static ManualResetEvent allDone = new ManualResetEvent(false);
 
         public static void StartListening()
         {
@@ -205,10 +205,12 @@ namespace TalkaTIPSerwer
                             }
                             {
                                 Send(handler, Communication.LogIP(userID));     // Data about the friend
-                                Thread.Sleep(250);
+                                Thread.Sleep(200);
                                 Send(handler, Communication.History(userID));   // userID history
-                                Thread.Sleep(250);
+                                Thread.Sleep(200);
                                 Send(handler, Communication.GroupChats(userID));   // joined group chats
+                                Thread.Sleep(200);
+                                Send(handler, Communication.ApiList(userID));   // Joined APIs
                             }
                         }
 

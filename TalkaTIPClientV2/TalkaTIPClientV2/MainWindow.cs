@@ -38,14 +38,14 @@ namespace TalkaTIPClientV2
         }
 
 
-        // TODO: recieve all group chat names from the server
+        // Recieve all basic user data from the server
         void waitForCommuniques()
         {
             string response = string.Empty;
             int numberOfComm = 0;
             string[] comms = null;
             while (!Program.mainWindow.Visible) { }
-            while (numberOfComm < 3)
+            while (numberOfComm < 4)
             {
                 try
                 {
@@ -787,6 +787,18 @@ namespace TalkaTIPClientV2
                     }
                 }
             }
+        }
+
+        private void timerIAM_Tick(object sender, EventArgs e)
+        {
+            try
+            {
+                Program.client = new Client(Program.serverAddress);
+                Communication.Iam(Program.userLogin);
+                Program.client.Disconnect();
+            }
+            catch (Exception)
+            { }
         }
     }
 }

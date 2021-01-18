@@ -26,7 +26,7 @@ namespace TalkaTIPClientV2
         public static bool Register(string login, string password, byte[] key)
         {
             char comm = (char)0;
-            string message = comm + " " + Convert.ToBase64String(Program.security.EncryptMessage(key, login + " " + password)) + " <EOF>";
+            string message = comm + " " + Program.security.EncryptMessage(key, login + " " + password) + " <EOF>";
 
             Program.client.Send(message);
             return Response(Program.client.Receive()[0]);
@@ -35,7 +35,7 @@ namespace TalkaTIPClientV2
         public static bool LogIn(string login, string password, byte[] key)
         {
             char comm = (char)1;
-            string message = comm + " " + Convert.ToBase64String(Program.security.EncryptMessage(key, login + " " + password)) + " <EOF>";
+            string message = comm + " " + Program.security.EncryptMessage(key, login + " " + password) + " <EOF>";
 
             Program.client.Send(message);
 
@@ -45,7 +45,7 @@ namespace TalkaTIPClientV2
         public static void LogOut(string login)
         {
             char comm = (char)2;
-            string message = comm + " " + Convert.ToBase64String(Program.security.EncryptMessage(Program.sessionKeyWithServer, login)) + " <EOF>";
+            string message = comm + " " + Program.security.EncryptMessage(Program.sessionKeyWithServer, login) + " <EOF>";
 
             Program.client.Send(message);
             return;
@@ -54,8 +54,8 @@ namespace TalkaTIPClientV2
         public static bool AccDel(string login, string password)
         {
             char comm = (char)3;
-            string message = comm + " " + Convert.ToBase64String(Program.security.EncryptMessage(Program.sessionKeyWithServer,
-                login + " " + password)) + " <EOF>";
+            string message = comm + " " + Program.security.EncryptMessage(Program.sessionKeyWithServer,
+                login + " " + password) + " <EOF>";
             Program.client.Send(message);
             return Response(Program.client.Receive()[0]);
         }
@@ -63,8 +63,8 @@ namespace TalkaTIPClientV2
         public static bool PassChng(string login, string oldPassword, string newPassword)
         {
             char comm = (char)4;
-            string message = comm + " " + Convert.ToBase64String(Program.security.EncryptMessage(Program.sessionKeyWithServer,
-                login + " " + oldPassword + " " + newPassword)) + " <EOF>";
+            string message = comm + " " + Program.security.EncryptMessage(Program.sessionKeyWithServer,
+                login + " " + oldPassword + " " + newPassword) + " <EOF>";
             Program.client.Send(message);
             var ans = Program.client.Receive();
             return Response(ans[0]);
@@ -73,8 +73,8 @@ namespace TalkaTIPClientV2
         public static bool AddFriend(string login, string friendLogin)
         {
             char comm = (char)8;
-            string message = comm + " " + Convert.ToBase64String(Program.security.EncryptMessage(Program.sessionKeyWithServer,
-                login + " " + friendLogin)) + " <EOF>";
+            string message = comm + " " + Program.security.EncryptMessage(Program.sessionKeyWithServer,
+                login + " " + friendLogin) + " <EOF>";
             Program.client.Send(message);
             return Response(Program.client.Receive()[0]);
         }
@@ -82,8 +82,8 @@ namespace TalkaTIPClientV2
         public static bool DelFriend(string login, string friendLogin)
         {
             char comm = (char)9;
-            string message = comm + " " + Convert.ToBase64String(Program.security.EncryptMessage(Program.sessionKeyWithServer,
-                login + " " + friendLogin)) + " <EOF>";
+            string message = comm + " " + Program.security.EncryptMessage(Program.sessionKeyWithServer,
+                login + " " + friendLogin) + " <EOF>";
             Program.client.Send(message);
             return Response(Program.client.Receive()[0]);
         }
@@ -91,8 +91,8 @@ namespace TalkaTIPClientV2
         public static bool BlockUser(string login, string userToBlock)
         {
             char comm = (char)21;
-            string message = comm + " " + Convert.ToBase64String(Program.security.EncryptMessage(Program.sessionKeyWithServer,
-                login + " " + userToBlock)) + " <EOF>";
+            string message = comm + " " + Program.security.EncryptMessage(Program.sessionKeyWithServer,
+                login + " " + userToBlock) + " <EOF>";
             Program.client.Send(message);
             return Response(Program.client.Receive()[0]);
         }
@@ -100,8 +100,8 @@ namespace TalkaTIPClientV2
         public static bool UnblockUser(string login, string userToUnblock)
         {
             char comm = (char)22;
-            string message = comm + " " + Convert.ToBase64String(Program.security.EncryptMessage(Program.sessionKeyWithServer,
-                login + " " + userToUnblock)) + " <EOF>";
+            string message = comm + " " + Program.security.EncryptMessage(Program.sessionKeyWithServer,
+                login + " " + userToUnblock) + " <EOF>";
             Program.client.Send(message);
             return Response(Program.client.Receive()[0]);
         }
@@ -111,8 +111,8 @@ namespace TalkaTIPClientV2
             char comm = (char)11;
             string dateString = date.ToString("yyyy-MM-dd-HH:mm:ss", CultureInfo.InvariantCulture);
             string callTimeString = string.Format("{0:D2}:{1:D2}:{2:D2}", callTime.Hours, callTime.Minutes, callTime.Seconds);
-            string message = Convert.ToBase64String(Program.security.EncryptMessage(Program.sessionKeyWithServer,
-                callerLogin + " " + receiverLogin + " " + dateString + " " + callTimeString));
+            string message = Program.security.EncryptMessage(Program.sessionKeyWithServer,
+                callerLogin + " " + receiverLogin + " " + dateString + " " + callTimeString);
             message = comm + " " + message + " <EOF>";
             Program.client.Send(message);
         }
@@ -121,13 +121,14 @@ namespace TalkaTIPClientV2
         {
             char comm = (char)20;
             string dateString = DateTime.Now.ToString("yyyy-MM-dd-HH:mm:ss", CultureInfo.InvariantCulture);
-            string message = Convert.ToBase64String(Program.security.EncryptMessage(Program.sessionKeyWithServer,
-                senderLogin + " " + receiverLogin + " " + dateString + " " + chatMessage));
+            string message = Program.security.EncryptMessage(Program.sessionKeyWithServer,
+                senderLogin + " " + receiverLogin + " " + dateString + " " + chatMessage);
             message = comm + " " + message + " <EOF>";
             Program.client.Send(message);
             return Response(Program.client.Receive()[0]);
         }
 
+        // Leave Base64 encoding here
         public static byte[] KeyExchange()
         {
             var byteArray = Program.security.GetOwnerPublicKey().ToByteArray();
@@ -141,8 +142,8 @@ namespace TalkaTIPClientV2
         public static void GetAllChatMessages(string senderLogin, string receiverLogin)
         {
             char comm = (char)23;
-            string message = comm + " " + Convert.ToBase64String(Program.security.EncryptMessage(Program.sessionKeyWithServer,
-                senderLogin + " " + receiverLogin)) + " <EOF>";
+            string message = comm + " " + Program.security.EncryptMessage(Program.sessionKeyWithServer,
+                senderLogin + " " + receiverLogin) + " <EOF>";
             Program.client.Send(message);
             message = Program.client.Receive();
             commFromServer(message.Substring(0, message.Length - 6));
@@ -152,8 +153,8 @@ namespace TalkaTIPClientV2
         {
             char comm = (char)24;
             string dateString = DateTime.Now.ToString("yyyy-MM-dd-HH:mm:ss", CultureInfo.InvariantCulture);
-            string message = comm + " " + Convert.ToBase64String(Program.security.EncryptMessage(Program.sessionKeyWithServer,
-                chatName + " " + userLogin + " " + dateString + " 0")) + " <EOF>";
+            string message = comm + " " + Program.security.EncryptMessage(Program.sessionKeyWithServer,
+                chatName + " " + userLogin + " " + dateString + " 0") + " <EOF>";
             Program.client.Send(message);
             return Response(Program.client.Receive()[0]);
         }
@@ -162,8 +163,8 @@ namespace TalkaTIPClientV2
         {
             char comm = (char)25;
             string dateString = DateTime.Now.ToString("yyyy-MM-dd-HH:mm:ss", CultureInfo.InvariantCulture);
-            string message = comm + " " + Convert.ToBase64String(Program.security.EncryptMessage(Program.sessionKeyWithServer,
-                chatName + " " + userLogin + " " + dateString)) + " <EOF>";
+            string message = comm + " " + Program.security.EncryptMessage(Program.sessionKeyWithServer,
+                chatName + " " + userLogin + " " + dateString) + " <EOF>";
             Program.client.Send(message);
             return Response(Program.client.Receive()[0]);
         }
@@ -171,8 +172,8 @@ namespace TalkaTIPClientV2
         public static bool LeaveGroupChat(string chatName, string userLogin)
         {
             char comm = (char)26;
-            string message = comm + " " + Convert.ToBase64String(Program.security.EncryptMessage(Program.sessionKeyWithServer,
-                chatName + " " + userLogin)) + " <EOF>";
+            string message = comm + " " + Program.security.EncryptMessage(Program.sessionKeyWithServer,
+                chatName + " " + userLogin) + " <EOF>";
             Program.client.Send(message);
             return Response(Program.client.Receive()[0]);
         }
@@ -181,8 +182,8 @@ namespace TalkaTIPClientV2
         {
             char comm = (char)27;
             string dateString = DateTime.Now.ToString("yyyy-MM-dd-HH:mm:ss", CultureInfo.InvariantCulture);
-            string message = Convert.ToBase64String(Program.security.EncryptMessage(Program.sessionKeyWithServer,
-                senderLogin + " " + chatName + " " + dateString + " " + chatMessage));
+            string message = Program.security.EncryptMessage(Program.sessionKeyWithServer,
+                senderLogin + " " + chatName + " " + dateString + " " + chatMessage);
             message = comm + " " + message + " <EOF>";
             Program.client.Send(message);
             return Response(Program.client.Receive()[0]);
@@ -192,8 +193,8 @@ namespace TalkaTIPClientV2
         public static void GetAllGroupChatMessages(string senderLogin, string receiverLogin)
         {
             char comm = (char)28;
-            string message = comm + " " + Convert.ToBase64String(Program.security.EncryptMessage(
-                Program.sessionKeyWithServer, senderLogin + " " + receiverLogin)) + " <EOF>";
+            string message = comm + " " + Program.security.EncryptMessage(
+                Program.sessionKeyWithServer, senderLogin + " " + receiverLogin) + " <EOF>";
             Program.client.Send(message);
             message = Program.client.Receive();
             commFromServer(message.Substring(0, message.Length - 6));
@@ -202,8 +203,8 @@ namespace TalkaTIPClientV2
         public static bool AddApiToUser(string senderLogin, string apiUri, string apiName)
         {
             char comm = (char)29;
-            string message = comm + " " + Convert.ToBase64String(Program.security.EncryptMessage(
-                Program.sessionKeyWithServer,senderLogin + " " + apiUri + " " + apiName)) + " <EOF>";
+            string message = comm + " " + Program.security.EncryptMessage(
+                Program.sessionKeyWithServer,senderLogin + " " + apiUri + " " + apiName) + " <EOF>";
             Program.client.Send(message);
             return Response(Program.client.Receive()[0]);
         }
@@ -211,17 +212,27 @@ namespace TalkaTIPClientV2
         public static bool DeleteApiFromUser(string senderLogin, string apiUri)
         {
             char comm = (char)29;
-            string message = comm + " " + Convert.ToBase64String(Program.security.EncryptMessage(
-                Program.sessionKeyWithServer, senderLogin + " " + apiUri)) + " <EOF>";
+            string message = comm + " " + Program.security.EncryptMessage(
+                Program.sessionKeyWithServer, senderLogin + " " + apiUri) + " <EOF>";
             Program.client.Send(message);
             return Response(Program.client.Receive()[0]);
+        }
+
+        public static void Iam(string login)
+        {
+            char comm = (char)15;
+            string message = comm + " " + Program.security.EncryptMessage(Program.sessionKeyWithServer, login) + " <EOF>";
+
+            Program.client.Send(message);
+            message = Program.client.Receive();
+            commFromServer(message.Substring(0, message.Length - 6));
         }
 
         public static void commFromServer(string messageFromServer)
         {
             // Decipher the message
             int comm = (int)messageFromServer[0];
-            string message = Program.security.DecryptMessage(Convert.FromBase64String(messageFromServer.Substring(2)), Program.sessionKeyWithServer);
+            string message = Program.security.DecryptMessage(messageFromServer.Substring(2), Program.sessionKeyWithServer);
            
             switch (comm)
             {
@@ -248,6 +259,9 @@ namespace TalkaTIPClientV2
                     break;
                 case 28:
                     RecieveAllGroupChatMessages(message);
+                    break;
+                case 31:
+                    ApiList(message);
                     break;
                 default:
                     break;
@@ -483,6 +497,22 @@ namespace TalkaTIPClientV2
                 Program.mainWindow.Invoke((MethodInvoker)delegate
                 {
                     Program.mainWindow.listViewGroups.Items.Insert(0, new ListViewItem(chatDetails));
+                });
+            }
+        }
+
+        static void ApiList(string messageFromServer)
+        {
+            string[] apiNameUri = messageFromServer.Split(' ');
+            string[] apiDetails = new string[2];
+            for (int i = 0; i < apiNameUri.Length - 1; i += 2)
+            {
+                apiDetails[0] = apiNameUri[i];
+                apiDetails[1] = apiNameUri[i + 1];
+                Program.apiNameAndHandle[apiDetails[0]] = new APIHandle(apiDetails[1]);
+                Program.mainWindow.Invoke((MethodInvoker)delegate
+                {
+                    Program.mainWindow.gameAPIList.Items.Insert(0, new ListViewItem(apiDetails));
                 });
             }
         }

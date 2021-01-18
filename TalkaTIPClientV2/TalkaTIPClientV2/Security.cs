@@ -35,7 +35,13 @@ namespace TalkaTIPClientV2
             return SessionKey;
         }
 
-        public byte[] EncryptMessage(byte[] key, string secretMessage)
+        /// <summary>
+        /// Returns a ciphered text in Base64 format
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="secretMessage"></param>
+        /// <returns></returns>
+        public string EncryptMessage(byte[] key, string secretMessage)
         {
             using (Aes aes = new AesCryptoServiceProvider())
             {
@@ -50,13 +56,14 @@ namespace TalkaTIPClientV2
                     cs.Write(plaintextMessage, 0, plaintextMessage.Length);
                     cs.Close();
                     byte[] encryptedMessage = ciphertext.ToArray();
-                    return encryptedMessage;
+                    return Convert.ToBase64String(encryptedMessage);
                 }
             }
         }
 
-        public string DecryptMessage(byte[] encryptedMessage, byte[] sessionKey)
+        public string DecryptMessage(string encryptedMessage, byte[] sessionKey)
         {
+            byte[] convertedMessage = Convert.FromBase64String(encryptedMessage);
             using (Aes aes = new AesCryptoServiceProvider())
             {
                 aes.Key = sessionKey;
@@ -66,7 +73,7 @@ namespace TalkaTIPClientV2
                 {
                     using (CryptoStream cs = new CryptoStream(plaintext, aes.CreateDecryptor(), CryptoStreamMode.Write))
                     {
-                        cs.Write(encryptedMessage, 0, encryptedMessage.Length);
+                        cs.Write(convertedMessage, 0, convertedMessage.Length);
                         cs.Close();
                         string message = Encoding.UTF8.GetString(plaintext.ToArray());
                         return message;

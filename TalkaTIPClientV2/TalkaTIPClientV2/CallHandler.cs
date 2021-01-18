@@ -101,6 +101,7 @@ namespace TalkaTIPClientV2
             }
         }
 
+        // Start calling selected user
         public void Call()
         {
             try
@@ -128,6 +129,7 @@ namespace TalkaTIPClientV2
             }
         }
 
+        // Stop calling selected user
         public void CancelCall()
         {
             try
@@ -498,9 +500,7 @@ namespace TalkaTIPClientV2
             }
         }
 
-        /*
-         * Send a message to the remote party.
-         */
+        // Send a message to the remote party
         private void SendMessage(string message, EndPoint sendToEP)
         {
             try
