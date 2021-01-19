@@ -94,7 +94,6 @@
             this.bronzeMinBox = new System.Windows.Forms.TextBox();
             this.label16 = new System.Windows.Forms.Label();
             this.button1 = new System.Windows.Forms.Button();
-            this.button2 = new System.Windows.Forms.Button();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.tabPage2.SuspendLayout();
@@ -288,18 +287,18 @@
             this.MMlabel.Name = "MMlabel";
             this.MMlabel.Size = new System.Drawing.Size(25, 13);
             this.MMlabel.TabIndex = 17;
-            this.MMlabel.Text = "250";
+            this.MMlabel.Text = "160";
             // 
             // matchmakBar
             // 
             this.matchmakBar.Location = new System.Drawing.Point(110, 291);
-            this.matchmakBar.Maximum = 400;
-            this.matchmakBar.Minimum = 100;
+            this.matchmakBar.Maximum = 300;
+            this.matchmakBar.Minimum = 20;
             this.matchmakBar.Name = "matchmakBar";
             this.matchmakBar.Size = new System.Drawing.Size(257, 45);
             this.matchmakBar.TabIndex = 16;
             this.matchmakBar.TickFrequency = 10;
-            this.matchmakBar.Value = 250;
+            this.matchmakBar.Value = 160;
             this.matchmakBar.Scroll += new System.EventHandler(this.MatchmakBar_Scroll);
             // 
             // startRLabel
@@ -309,17 +308,17 @@
             this.startRLabel.Name = "startRLabel";
             this.startRLabel.Size = new System.Drawing.Size(25, 13);
             this.startRLabel.TabIndex = 15;
-            this.startRLabel.Text = "750";
+            this.startRLabel.Text = "375";
             // 
             // SratingBar
             // 
             this.SratingBar.Location = new System.Drawing.Point(110, 225);
-            this.SratingBar.Maximum = 1500;
+            this.SratingBar.Maximum = 750;
             this.SratingBar.Name = "SratingBar";
             this.SratingBar.Size = new System.Drawing.Size(257, 45);
             this.SratingBar.TabIndex = 14;
             this.SratingBar.TickFrequency = 50;
-            this.SratingBar.Value = 750;
+            this.SratingBar.Value = 375;
             this.SratingBar.Scroll += new System.EventHandler(this.SratingBar_Scroll);
             // 
             // pRatioCheck
@@ -781,22 +780,11 @@
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.Button1_Click);
             // 
-            // button2
-            // 
-            this.button2.Location = new System.Drawing.Point(258, 405);
-            this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(75, 23);
-            this.button2.TabIndex = 15;
-            this.button2.Text = "button2";
-            this.button2.UseVisualStyleBackColor = true;
-            this.button2.Click += new System.EventHandler(this.button2_Click);
-            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(589, 450);
-            this.Controls.Add(this.button2);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.tabControl1);
             this.Controls.Add(this.LogOutButton);
@@ -895,7 +883,6 @@
         private System.Windows.Forms.TextBox bronzeMinBox;
         private System.Windows.Forms.Label label16;
         private System.Windows.Forms.Button button1;
-        private System.Windows.Forms.Button button2;
     }
 }
 

@@ -101,11 +101,16 @@ namespace Inzynierka
                         avg_skills = avg_skills / team_players.Count;
                         skills.Add(avg_skills);
                     }
+
+                    bool ties = false;
+
                     List<double> ranking_updates = new List<double>();
                     using (var config = new ConfigContext())
                     {
                         var game_config = config.games.First(g => g.ConfigId == config_id);
                         ranking_updates = game.CountRanking(scores, skills, game_config.KValue);
+
+                        if (game_config.TieGames) ties = true;
                     }
                     //count new skills
                     
@@ -130,23 +135,57 @@ namespace Inzynierka
                         var team = dbContext.Teams.First(t => t.TeamID == tid);
                         List<int> team_players = JsonSerializer.Deserialize<List<int>>(team.PlayersID);
 
-                        if (highest.Contains(i))
+                        if (ties)
                         {
-                            foreach (var pid in team_players)
+                            if (highest.Contains(i) & highest.Count < 2)
                             {
-                                var player = dbContext.Players.First(p => p.PlayerId == pid);
-                                player.Update_Stats(ranking_updates[i], 1);
+                                foreach (var pid in team_players)
+                                {
+                                    var player = dbContext.Players.First(p => p.PlayerId == pid);
+                                    player.Update_Stats(ranking_updates[i], 1);
+                                }
+                                i++;
                             }
-                            i++;
+                            else if(highest.Contains(i) & highest.Count > 1)
+                            {
+                                foreach (var pid in team_players)
+                                {
+                                    var player = dbContext.Players.First(p => p.PlayerId == pid);
+                                    player.Update_Stats(ranking_updates[i], 0);
+                                }
+                                i++;
+                            }
+                            else
+                            {
+                                foreach (var pid in team_players)
+                                {
+                                    var player = dbContext.Players.First(p => p.PlayerId == pid);
+                                    player.Update_Stats(ranking_updates[i], 2);
+                                }
+                                i++;
+                            }
                         }
+
                         else
                         {
-                            foreach (var pid in team_players)
+                            if (highest.Contains(i))
                             {
-                                var player = dbContext.Players.First(p => p.PlayerId == pid);
-                                player.Update_Stats(ranking_updates[i], 2);
+                                foreach (var pid in team_players)
+                                {
+                                    var player = dbContext.Players.First(p => p.PlayerId == pid);
+                                    player.Update_Stats(ranking_updates[i], 1);
+                                }
+                                i++;
                             }
-                            i++;
+                            else
+                            {
+                                foreach (var pid in team_players)
+                                {
+                                    var player = dbContext.Players.First(p => p.PlayerId == pid);
+                                    player.Update_Stats(ranking_updates[i], 2);
+                                }
+                                i++;
+                            }
                         }
                     }
                 }
@@ -172,10 +211,14 @@ namespace Inzynierka
                     }
                     List<double> ranking_updates = new List<double>();
 
+                    bool ties = false;
+
                     using (var config = new ConfigContext())
                     {
                         var game_config = config.games.First(g => g.ConfigId == config_id);
                         ranking_updates = game.CountRanking(scores, skills, game_config.KValue);
+
+                        if (game_config.TieGames) ties = true;
                     }
 
                     //count new skills
@@ -201,8 +244,17 @@ namespace Inzynierka
                     {
                         var player = dbContext.Players.First(p => p.PlayerId == pid);
 
-                        if (highest.Contains(i)) player.Update_Stats(ranking_updates[i++], 1);
-                        else player.Update_Stats(ranking_updates[i++], 2);
+                        if (ties)
+                        {
+                            if (highest.Contains(i) & highest.Count < 2) player.Update_Stats(ranking_updates[i++], 1);
+                            else if(highest.Contains(i) & highest.Count > 1) player.Update_Stats(ranking_updates[i++], 0);
+                            else player.Update_Stats(ranking_updates[i++], 2);
+                        }
+                        else
+                        {
+                            if (highest.Contains(i)) player.Update_Stats(ranking_updates[i++], 1);
+                            else player.Update_Stats(ranking_updates[i++], 2);
+                        }
                     }
                 }
                 dbContext.SaveChanges();
@@ -300,16 +352,16 @@ namespace Inzynierka
         }
         static void Main(string[] args)
         {
-            string dbName = "C:/DataBase/Statistics.db";
-            Create_DataBase(dbName, 1);
+            /*string dbName = "C:/DataBase/Statistics.db";
+            Create_DataBase(dbName, 1);*/
             
-            
+            /*
             Add_Player("roman", 1);
             Add_Player("arek", 1);
             Add_Player("krzychu", 1);
-            Add_Player("luj", 1);
+            Add_Player("luj", 1);*/
             
-            
+            /*
             //solo test
             List<int> players = new List<int>();
             players.Add(1);
@@ -322,8 +374,20 @@ namespace Inzynierka
             scores.Add(5);
 
             Add_Game_Solo(players, true);
-            Add_Result_Solo(1, scores, 1);
-            
+            Add_Result_Solo(1, scores, 1);*/
+
+            //solo test2
+            List<int> players = new List<int>();
+            players.Add(1);
+            players.Add(2);
+
+            List<int> scores = new List<int>();
+            scores.Add(5);
+            scores.Add(5);
+
+            Add_Game_Solo(players, true);
+            Add_Result_Solo(5, scores, 1);
+
             //team test
             /*
             List<int> teamA = new List<int>();
@@ -349,7 +413,7 @@ namespace Inzynierka
 
             Add_Result_Team(1, scores, 1);
             */
-
+            /*
             //manage teams test
             Lobby lobby = new Lobby();
             lobby.players = new List<Player>();
@@ -364,7 +428,7 @@ namespace Inzynierka
             }
             
             List<int> teams = Manage_Teams(lobby, 2);
-
+            */
             Console.WriteLine("OK");
         }
     }
