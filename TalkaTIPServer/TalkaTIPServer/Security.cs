@@ -10,7 +10,8 @@ namespace TalkaTIPSerwer
 {
     class Security
     {
-        ECDiffieHellmanCng owner = new ECDiffieHellmanCng();//Initializes a new instance of the ECDiffieHellmanCng class with a random key pair.
+        // Initializes a new instance of the ECDiffieHellmanCng class with a random key pair
+        ECDiffieHellmanCng owner = new ECDiffieHellmanCng();
         byte[] iv = { 126, 122, 93, 86, 153, 51, 216, 230, 93, 82, 240, 192, 201, 239, 119, 120 };
 
         public ECDiffieHellmanPublicKey GetOwnerPublicKey()
@@ -21,15 +22,16 @@ namespace TalkaTIPSerwer
 
         public void CreatePublicKey()
         {
-            owner.KeyDerivationFunction = ECDiffieHellmanKeyDerivationFunction.Hash; //Gets or sets the key derivation function for the ECDiffieHellmanCng class.
+            // Sets the key derivation function for the ECDiffieHellmanCng class
+            owner.KeyDerivationFunction = ECDiffieHellmanKeyDerivationFunction.Hash;
             owner.HashAlgorithm = CngAlgorithm.Sha256;
         }
 
-        public byte[] SetSessionKey(byte[] clientPublicKey) //set session key
+        // Set session key
+        public byte[] SetSessionKey(byte[] clientPublicKey)
         {
-            //CngKey k = CngKey.Import(clientPublicKey, CngKeyBlobFormat.EccPublicBlob); //firs argument public key from client
-            byte[] sessionKey = owner.DeriveKeyMaterial(CngKey.Import(clientPublicKey, CngKeyBlobFormat.EccPublicBlob));//firs argument public key from client           
-            //byte[] sessionKey = owner.DeriveKeyMaterial(ECDiffieHellmanCngPublicKey.FromByteArray(clientPublicKey, CngKeyBlobFormat.EccPublicBlob));
+            // Firs argument public key from client  
+            byte[] sessionKey = owner.DeriveKeyMaterial(CngKey.Import(clientPublicKey, CngKeyBlobFormat.EccPublicBlob));         
             return sessionKey;
         }
 

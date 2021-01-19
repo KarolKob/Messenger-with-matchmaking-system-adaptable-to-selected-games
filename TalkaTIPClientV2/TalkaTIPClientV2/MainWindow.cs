@@ -603,21 +603,6 @@ namespace TalkaTIPClientV2
             }
         }
 
-        private void addAPIButton_Click(object sender, EventArgs e)
-        {
-            string promptValue = addGameAPIText.Text;
-            if (promptValue != string.Empty)
-            {
-                new APIHandle(promptValue);
-            }
-        }
-
-        private void searchOpponentButton_Click(object sender, EventArgs e)
-        {
-            // TODO: Send a request to given API and get an answer
-                // TODO: Get an answer and proceed accordingly to what it is
-        }
-
         private void listView1_ItemActivate(object sender, EventArgs e)
         {
             isOnGroupsTab = false;
@@ -701,6 +686,7 @@ namespace TalkaTIPClientV2
                                 Program.mainWindow.listViewGroups.Items.Add(chat);
                                 listViewGroups.Refresh();
                             }
+                            Program.client.Disconnect();
                         }
                         catch(Exception)
                         {
@@ -738,6 +724,7 @@ namespace TalkaTIPClientV2
                         listViewGroups.Items.Remove(listViewGroups.SelectedItems[0]);
                         MessageBox.Show("Success!");
                     }
+                    Program.client.Disconnect();
                 }
                 catch(Exception)
                 {
@@ -771,6 +758,7 @@ namespace TalkaTIPClientV2
                                 {
                                     MessageBox.Show("User added successfully.", "Success");
                                 }
+                                Program.client.Disconnect();
                             }
                             catch (Exception)
                             {
@@ -799,6 +787,92 @@ namespace TalkaTIPClientV2
             }
             catch (Exception)
             { }
+        }
+
+        private void addAPIButton_Click(object sender, EventArgs e)
+        {
+            string promptValue = addGameAPIText.Text;
+            if (promptValue != string.Empty)
+            {
+                APIHandle aPIHandle = new APIHandle(promptValue);
+                if (Program.apiNameAndHandle.ContainsValue(aPIHandle))
+                {
+                    MessageBox.Show("The API is already on the list.", "Error");
+                }
+                else
+                {
+                    string result = aPIHandle.ApiPOST().GetAwaiter().GetResult();
+
+                    if (result != null)
+                    {
+                        if (!Program.apiNameAndHandle.ContainsKey(result))
+                        {
+                            // TODO: Extract the API name from JSON
+                            Program.apiNameAndHandle.Add(result, aPIHandle);
+                            MessageBox.Show(result, "OK");
+                        }
+                        else
+                        {
+                            MessageBox.Show("API connection failed. Try again later.", "Error");
+                        }
+                    }
+                }
+            }
+        }
+
+        private void playerStatisticsButton_Click(object sender, EventArgs e)
+        {
+            if (gameAPIListView.SelectedItems.Count == 0 || gameAPIListView.SelectedItems.Count > 1)
+            { }
+            else
+            {
+                string apiName = gameAPIListView.SelectedItems[0].Text;
+                if (!Program.apiNameAndHandle.ContainsKey(apiName))
+                {
+                    string stats = Program.apiNameAndHandle[apiName].ApiGETUserStatistics().GetAwaiter().GetResult();
+
+                    // TODO: Extract the data from JSON and convert to acceptable form for display
+
+
+                    // Display statistics on the main screen
+                    UpdateChatText(stats);
+                }
+                else
+                {
+                    MessageBox.Show("API not in the main class variable.", "Error");
+                }
+            }
+        }
+
+        private void searchOpponentButton_Click(object sender, EventArgs e)
+        {
+            if (gameAPIListView.SelectedItems.Count == 0 || gameAPIListView.SelectedItems.Count > 1)
+            { }
+            else
+            {
+                string apiName = gameAPIListView.SelectedItems[0].Text;
+                if (!Program.apiNameAndHandle.ContainsKey(apiName))
+                {
+                    string data = Program.apiNameAndHandle[apiName].ApiGETMatchmaking().GetAwaiter().GetResult();
+
+                    // TODO: Extract chat name and replace "data" string
+
+                    // Create/join the proper chat
+                    if (Communication.CreateAPIGroupChatAndAddUser(data, Program.userLogin))
+                    {
+                        string str = "Select chat: " + data + "from your group chat list.";
+                        MessageBox.Show(str, "Success.");
+                    }
+                    else
+                    {
+                        MessageBox.Show("Joining or creating chat failed.", "Error");
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("API not in the main class variable.", "Error");
+                }
+            }
         }
     }
 }

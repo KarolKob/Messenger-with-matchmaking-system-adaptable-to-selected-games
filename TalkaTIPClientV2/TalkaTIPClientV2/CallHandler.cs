@@ -173,18 +173,24 @@ namespace TalkaTIPClientV2
                 // Convert the bytes received into an object of type Data
                 string message = Encoding.ASCII.GetString(byteData);
 
-                // Act according to the received message
-                switch (message[0])
+                // Real time communication handling messages from server
+                if (message[0] == (char)24 || message[0] == (char)27)
                 {
-                    // Incoming call
-                    case (char)10:
-                        {
+                    Communication.commFromServer(message);
+                }
+                else
+                {
+                    // Act accordingly to the received message
+                    switch (message[0])
+                    {
+                        // Incoming call
+                        case (char)10:
                             if (Program.mainWindow.gbCall.Visible == true)
                             {
                                 Program.mainWindow.Invoke((MethodInvoker)delegate
                                 {
-                                    //Program.mainWindow.timerCallOut.Stop();
-                                    Program.mainWindow.gbCall.Visible = false;
+                                //Program.mainWindow.timerCallOut.Stop();
+                                Program.mainWindow.gbCall.Visible = false;
                                     player.Stop();
                                 });
                             }
@@ -200,9 +206,9 @@ namespace TalkaTIPClientV2
                                 {
                                     Program.mainWindow.gbAnswerCall.Visible = true;
                                     Program.mainWindow.labelCallingUN.Text = msgTable[1];
-                                    //Program.mainWindow.gBChangePass.Enabled = false;
-                                    //Program.mainWindow.gBDelAcc.Enabled = false;
-                                });
+                                //Program.mainWindow.gBChangePass.Enabled = false;
+                                //Program.mainWindow.gBDelAcc.Enabled = false;
+                            });
                                 Program.mainWindow.callerEndPoint = receivedFromEP;
                                 Program.mainWindow.isReceiver = true;
                                 //Program.mainWindow.Refresh();
@@ -212,23 +218,15 @@ namespace TalkaTIPClientV2
                                 DeclineCall(receivedFromEP);
                             }
                             break;
-                        }
 
-                    // OK is received in response to an Invite
-                    case (char)5:
-                        {
+                        // OK is received in response to an Invite
+                        case (char)5:
                             // Start a call
-                            Program.mainWindow.Invoke((MethodInvoker)delegate
-                            {
-                                //Program.mainWindow.timerCallOut.Stop();
-                            });
                             InitializeCall();
                             break;
-                        }
 
-                    // Remote party is busy
-                    case (char)6: //FAIL
-                        {
+                        // Remote party is busy
+                        case (char)6: //FAIL
                             player.Stop();
 
                             // Send msg to DB with history
@@ -238,8 +236,8 @@ namespace TalkaTIPClientV2
                                 Program.client = new Client(Program.serverAddress);
                                 Program.mainWindow.Invoke((MethodInvoker)delegate
                                 {
-                                    //Program.mainWindow.timerCallOut.Stop();
-                                    Communication.CallState(Program.userLogin, Program.mainWindow.listView1.SelectedItems[0].Text, DateTime.Now, TimeSpan.Zero);
+                                //Program.mainWindow.timerCallOut.Stop();
+                                Communication.CallState(Program.userLogin, Program.mainWindow.listView1.SelectedItems[0].Text, DateTime.Now, TimeSpan.Zero);
                                     historyDetails[0] = Program.mainWindow.listView1.SelectedItems[0].Text;
                                 });
                                 Program.client.Disconnect();
@@ -254,7 +252,7 @@ namespace TalkaTIPClientV2
                             // Refresh user panel with histories
                             historyDetails[1] = DateTime.Now.ToString();
                             historyDetails[2] = "missed call";
-                            Program.mainWindow.listView2.Items.Insert(0, (new ListViewItem(historyDetails)));
+                            Program.mainWindow.listView2.Items.Insert(0, new ListViewItem(historyDetails));
                             Program.mainWindow.listView2.Refresh();
 
                             // Close ring panel
@@ -272,21 +270,18 @@ namespace TalkaTIPClientV2
                                 MessageBox.Show("Call denied.", "TalkaTIP", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                             }
                             break;
-                        }
 
-                    case (char)12: // BYE
-                        {
+                        // End call
+                        case (char)12:
                             // Check if the Bye command has come from the user/IP with which we have an established call.
                             // This is used to prevent other users from sending a Bye, which would otherwise end the call
                             if (receivedFromEP.Equals(otherPartyEP) == true)
                             {
-                                //Program.mainWindow.timerConv.Stop();
-
                                 // End the call
                                 UninitializeCall();
                             }
                             break;
-                        }
+                    }
                 }
 
                 byteData = new byte[1024];

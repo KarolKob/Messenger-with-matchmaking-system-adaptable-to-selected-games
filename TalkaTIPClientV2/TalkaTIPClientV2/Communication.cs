@@ -159,12 +159,39 @@ namespace TalkaTIPClientV2
             return Response(Program.client.Receive()[0]);
         }
 
+        /// <summary>
+        /// If the chat is already created, only adds user
+        /// </summary>
+        /// <param name="chatName"></param>
+        /// <param name="userLogin"></param>
+        /// <returns></returns>
+        public static bool CreateAPIGroupChatAndAddUser(string chatName, string userLogin)
+        {
+            char comm = (char)24;
+            string dateString = DateTime.Now.ToString("yyyy-MM-dd-HH:mm:ss", CultureInfo.InvariantCulture);
+            string message = Program.security.EncryptMessage(Program.sessionKeyWithServer,
+                chatName + " " + userLogin + " " + dateString + " 1") + " <EOF>";
+            Program.client.Send(comm + " " + message);
+            bool response = Response(Program.client.Receive()[0]);
+
+            if (response)
+            {
+                return true;
+            }
+            else
+            {
+                comm = (char)25;
+                Program.client.Send(comm + " " + message);
+                return Response(Program.client.Receive()[0]);
+            }
+        }
+
         public static bool AddUserToGroupChat(string chatName, string userLogin)
         {
             char comm = (char)25;
             string dateString = DateTime.Now.ToString("yyyy-MM-dd-HH:mm:ss", CultureInfo.InvariantCulture);
             string message = comm + " " + Program.security.EncryptMessage(Program.sessionKeyWithServer,
-                chatName + " " + userLogin + " " + dateString) + " <EOF>";
+                chatName + " " + userLogin + " " + dateString + " 0") + " <EOF>";
             Program.client.Send(message);
             return Response(Program.client.Receive()[0]);
         }
@@ -243,7 +270,7 @@ namespace TalkaTIPClientV2
                     History(message);
                     break;
                 case 14:
-                    StateChng(message);
+                    StateChange(message);
                     break;
                 case 19:
                     GroupChats(message);
@@ -268,7 +295,7 @@ namespace TalkaTIPClientV2
             }
         }
 
-        static void RecieveAllChatMessages(string recievedMessages)
+        private static void RecieveAllChatMessages(string recievedMessages)
         {
             Program.mainWindow.Invoke((MethodInvoker)delegate
             {
@@ -288,7 +315,7 @@ namespace TalkaTIPClientV2
         }
 
         // Recieve and display the message
-        static void RecieveChatMessage(string chatMessage)
+        private static void RecieveChatMessage(string chatMessage)
         {
             string[] param = chatMessage.Split(' ');
 
@@ -358,7 +385,7 @@ namespace TalkaTIPClientV2
             }
         }
 
-        static void RecieveAllGroupChatMessages(string recievedMessages)
+        private static void RecieveAllGroupChatMessages(string recievedMessages)
         {
             Program.mainWindow.Invoke((MethodInvoker)delegate
             {
@@ -378,7 +405,7 @@ namespace TalkaTIPClientV2
         }
 
         // TODO: Recieving messages in real time
-        static void RecieveGroupChatMessage(string chatMessage)
+        private static void RecieveGroupChatMessage(string chatMessage)
         {
             string[] param = chatMessage.Split(' ');
 
@@ -444,7 +471,7 @@ namespace TalkaTIPClientV2
             });
         }
 
-        static void LogIP(string messageFromServer)
+        private static void LogIP(string messageFromServer)
         {
             string[] friends = messageFromServer.Split(' ');
             ListViewItem friend;
@@ -470,7 +497,7 @@ namespace TalkaTIPClientV2
             }
         }
 
-        static void History(string messageFromServer)
+        private static void History(string messageFromServer)
         {
             string[] history = messageFromServer.Split(' ');
             string[] historyDetails = new string[3];
@@ -486,7 +513,7 @@ namespace TalkaTIPClientV2
             }
         }
 
-        static void GroupChats(string messageFromServer)
+        private static void GroupChats(string messageFromServer)
         {
             string[] chatNames = messageFromServer.Split(' ');
             string[] chatDetails = new string[2];
@@ -501,7 +528,7 @@ namespace TalkaTIPClientV2
             }
         }
 
-        static void ApiList(string messageFromServer)
+        private static void ApiList(string messageFromServer)
         {
             string[] apiNameUri = messageFromServer.Split(' ');
             string[] apiDetails = new string[2];
@@ -512,12 +539,12 @@ namespace TalkaTIPClientV2
                 Program.apiNameAndHandle[apiDetails[0]] = new APIHandle(apiDetails[1]);
                 Program.mainWindow.Invoke((MethodInvoker)delegate
                 {
-                    Program.mainWindow.gameAPIList.Items.Insert(0, new ListViewItem(apiDetails));
+                    Program.mainWindow.gameAPIListView.Items.Insert(0, new ListViewItem(apiDetails));
                 });
             }
         }
 
-        static void StateChng(string messageFromServer)
+        private static void StateChange(string messageFromServer)
         {
             string[] friends = messageFromServer.Split(' ');
             for (int i = 0; i < friends.Length - 1; i += 2)

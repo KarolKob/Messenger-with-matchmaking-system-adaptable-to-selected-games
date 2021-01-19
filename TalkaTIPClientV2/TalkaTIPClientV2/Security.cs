@@ -30,9 +30,9 @@ namespace TalkaTIPClientV2
         public byte[] SetSessionKey(byte[] clientPublicKey) 
         {
             // The first argument is public key from the client
-            byte[] SessionKey = owner.DeriveKeyMaterial(ECDiffieHellmanCngPublicKey.FromByteArray(clientPublicKey, CngKeyBlobFormat.EccPublicBlob));           
+            byte[] sessionKey = owner.DeriveKeyMaterial(ECDiffieHellmanCngPublicKey.FromByteArray(clientPublicKey, CngKeyBlobFormat.EccPublicBlob));           
 
-            return SessionKey;
+            return sessionKey;
         }
 
         /// <summary>

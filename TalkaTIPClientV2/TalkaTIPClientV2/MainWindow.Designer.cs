@@ -46,7 +46,6 @@
             this.listView2 = new System.Windows.Forms.ListView();
             this.tabPage3 = new System.Windows.Forms.TabPage();
             this.searchOpponentButton = new System.Windows.Forms.Button();
-            this.gameAPIList = new System.Windows.Forms.ListBox();
             this.addAPIButton = new System.Windows.Forms.Button();
             this.serverAddressLabel = new System.Windows.Forms.Label();
             this.addGameAPIText = new System.Windows.Forms.TextBox();
@@ -68,6 +67,8 @@
             this.buttonCreateChat = new System.Windows.Forms.Button();
             this.buttonLeaveChat = new System.Windows.Forms.Button();
             this.buttonInviteToChat = new System.Windows.Forms.Button();
+            this.playerStatisticsButton = new System.Windows.Forms.Button();
+            this.gameAPIListView = new System.Windows.Forms.ListView();
             this.Groups.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.tabPage2.SuspendLayout();
@@ -238,8 +239,9 @@
             // tabPage3
             // 
             this.tabPage3.BackColor = System.Drawing.SystemColors.Control;
+            this.tabPage3.Controls.Add(this.gameAPIListView);
+            this.tabPage3.Controls.Add(this.playerStatisticsButton);
             this.tabPage3.Controls.Add(this.searchOpponentButton);
-            this.tabPage3.Controls.Add(this.gameAPIList);
             this.tabPage3.Controls.Add(this.addAPIButton);
             this.tabPage3.Controls.Add(this.serverAddressLabel);
             this.tabPage3.Controls.Add(this.addGameAPIText);
@@ -261,19 +263,10 @@
             this.searchOpponentButton.UseVisualStyleBackColor = false;
             this.searchOpponentButton.Click += new System.EventHandler(this.searchOpponentButton_Click);
             // 
-            // gameAPIList
-            // 
-            this.gameAPIList.FormattingEnabled = true;
-            this.gameAPIList.HorizontalScrollbar = true;
-            this.gameAPIList.Location = new System.Drawing.Point(4, 92);
-            this.gameAPIList.Name = "gameAPIList";
-            this.gameAPIList.Size = new System.Drawing.Size(180, 173);
-            this.gameAPIList.TabIndex = 17;
-            // 
             // addAPIButton
             // 
             this.addAPIButton.BackColor = System.Drawing.SystemColors.ButtonShadow;
-            this.addAPIButton.Location = new System.Drawing.Point(57, 51);
+            this.addAPIButton.Location = new System.Drawing.Point(9, 51);
             this.addAPIButton.Name = "addAPIButton";
             this.addAPIButton.Size = new System.Drawing.Size(58, 28);
             this.addAPIButton.TabIndex = 16;
@@ -497,6 +490,26 @@
             this.buttonInviteToChat.Visible = false;
             this.buttonInviteToChat.Click += new System.EventHandler(this.buttonInviteToChat_Click);
             // 
+            // playerStatisticsButton
+            // 
+            this.playerStatisticsButton.BackColor = System.Drawing.SystemColors.ButtonShadow;
+            this.playerStatisticsButton.Location = new System.Drawing.Point(121, 51);
+            this.playerStatisticsButton.Name = "playerStatisticsButton";
+            this.playerStatisticsButton.Size = new System.Drawing.Size(58, 28);
+            this.playerStatisticsButton.TabIndex = 19;
+            this.playerStatisticsButton.Text = "Statistics";
+            this.playerStatisticsButton.UseVisualStyleBackColor = false;
+            this.playerStatisticsButton.Click += new System.EventHandler(this.playerStatisticsButton_Click);
+            // 
+            // gameAPIListView
+            // 
+            this.gameAPIListView.HideSelection = false;
+            this.gameAPIListView.Location = new System.Drawing.Point(9, 85);
+            this.gameAPIListView.Name = "gameAPIListView";
+            this.gameAPIListView.Size = new System.Drawing.Size(170, 176);
+            this.gameAPIListView.TabIndex = 20;
+            this.gameAPIListView.UseCompatibleStateImageBehavior = false;
+            // 
             // MainWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -580,7 +593,8 @@
         private System.Windows.Forms.Button buttonCreateChat;
         private System.Windows.Forms.Button buttonLeaveChat;
         private System.Windows.Forms.Button buttonInviteToChat;
-        public System.Windows.Forms.ListBox gameAPIList;
+        private System.Windows.Forms.Button playerStatisticsButton;
+        public System.Windows.Forms.ListView gameAPIListView;
     }
 }
 

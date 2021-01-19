@@ -18,12 +18,12 @@ namespace TalkaTIPClientV2
         {
             httpClient = new HttpClient();
             //httpClient.BaseAddress = new Uri(apiAddress);
-            httpClient.BaseAddress = new Uri("https://localhost:5001/api/");
+            httpClient.BaseAddress = new Uri(apiAddress);//"https://localhost:5001/api/");
             httpClient.DefaultRequestHeaders.Accept.Clear();
             httpClient.DefaultRequestHeaders.Accept.Add(
                 new MediaTypeWithQualityHeaderValue("application/json"));
             this.apiAddress = apiAddress;
-            string result = ApiPOST().GetAwaiter().GetResult();
+            /*string result = ApiPOST().GetAwaiter().GetResult();
 
             if(result != null)
             {
@@ -57,7 +57,7 @@ namespace TalkaTIPClientV2
                         System.Windows.Forms.MessageBox.Show("Adding API failed. Try again.", "Error");
                     }
                 });
-            }
+            }*/
         }
 
         // TODO: Figure out what is returned and act accordingly
@@ -86,7 +86,7 @@ namespace TalkaTIPClientV2
             return result;
         }
 
-        public async Task<string> ApiGETData()
+        public async Task<string> ApiGETUserStatistics()
         {
             string result;
             try
@@ -111,7 +111,7 @@ namespace TalkaTIPClientV2
             return result;
         }
 
-        public async Task<string> ApiGETPlayerInfo()
+        public async Task<string> ApiGETMatchmaking()
         {
             string result = null;
             try

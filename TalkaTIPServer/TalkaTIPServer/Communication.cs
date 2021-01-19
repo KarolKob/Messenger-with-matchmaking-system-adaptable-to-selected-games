@@ -23,8 +23,8 @@ namespace TalkaTIPSerwer
             communiqueDictionary[0] = new Func<List<string>, string>(Register);
             communiqueDictionary[1] = new Func<List<string>, byte[], Socket, string>(LogIn);
             communiqueDictionary[2] = new Func<List<string>, string>(LogOut);
-            communiqueDictionary[3] = new Func<List<string>, string>(AccDel);
-            communiqueDictionary[4] = new Func<List<string>, string>(PassChng);
+            //communiqueDictionary[3] = new Func<List<string>, string>(DeleteAccount);
+            communiqueDictionary[4] = new Func<List<string>, string>(ChangePassword);
             communiqueDictionary[8] = new Func<List<string>, string>(AddFriend);
             communiqueDictionary[9] = new Func<List<string>, string>(DelFriend);
             communiqueDictionary[11] = new Func<List<string>, string>(CallState);
@@ -189,90 +189,7 @@ namespace TalkaTIPSerwer
             return OK();
         }
 
-        public static string AccDel(List<string> param)
-        {
-            string login = param[0];
-            string password = Utilities.hashBytePassHex(param[1] + login);
-            using (var ctx = new TalkaTipDB())
-            {
-                var userToDelete = ctx.Users.Where(x => x.Login == login && x.Password == password).FirstOrDefault();
-                if (userToDelete != null)
-                {
-                    try
-                    {
-                        // 1. set, in history, id to null, it can be first or second
-                        IQueryable<Histories> userHistory = ctx.Histories.Where(x => x.UserReceiverID == userToDelete.UserID);//first
-                        foreach (Histories item in userHistory)
-                        {
-                            item.UserReceiverID = null;
-                            ctx.Entry(item).State = System.Data.Entity.EntityState.Modified;
-                        }
-
-                        userHistory = ctx.Histories.Where(x => x.UserSenderID == userToDelete.UserID);//second
-                        foreach (Histories item in userHistory)
-                        {
-                            item.UserSenderID = null;
-                            ctx.Entry(item).State = System.Data.Entity.EntityState.Modified;
-                        }
-
-                        // 2. delete acquaintances in both directions
-                        IQueryable<Friends> userAcquaintances = ctx.Friends.Where(x => x.UserID1 == userToDelete.UserID);//first
-                        foreach (Friends item in userAcquaintances)
-                        {
-                            ctx.Entry(item).State = System.Data.Entity.EntityState.Deleted;
-                        }
-
-                        userAcquaintances = ctx.Friends.Where(x => x.UserID2 == userToDelete.UserID);
-                        foreach (Friends item in userAcquaintances)
-                        {
-                            ctx.Entry(item).State = System.Data.Entity.EntityState.Deleted;
-                        }
-
-                        // 3. delete blocked users in both directions
-                        IQueryable<Blocked> blockedUsers = ctx.Blocked.Where(x => x.UserID1 == userToDelete.UserID);//first
-                        foreach (Blocked item in blockedUsers)
-                        {
-                            ctx.Entry(item).State = System.Data.Entity.EntityState.Deleted;
-                        }
-
-                        blockedUsers = ctx.Blocked.Where(x => x.UserID2 == userToDelete.UserID);
-                        foreach (Blocked item in blockedUsers)
-                        {
-                            ctx.Entry(item).State = System.Data.Entity.EntityState.Deleted;
-                        }
-
-                        // 4. delete messages sent in both directions
-                        IQueryable<Messages> messages = ctx.Messages.Where(x => x.UserSenderID == userToDelete.UserID);
-                        foreach (Messages item in messages)
-                        {
-                            ctx.Entry(item).State = System.Data.Entity.EntityState.Deleted;
-                        }
-
-                        messages = ctx.Messages.Where(x => x.UserReceiverID == userToDelete.UserID);
-                        foreach (Messages item in messages)
-                        {
-                            ctx.Entry(item).State = System.Data.Entity.EntityState.Deleted;
-                        }
-
-                        // 5. delete user
-                        ctx.Entry(userToDelete).State = System.Data.Entity.EntityState.Deleted;
-
-                        ctx.SaveChanges();
-                    }
-                    catch (DbUpdateConcurrencyException)
-                    {
-                        return Fail();
-                    }
-                }
-                else
-                {
-                    return Fail();
-                }
-            }
-            return OK();
-        }
-
-        public static string PassChng(List<string> param)
+        public static string ChangePassword(List<string> param)
         {
             string login = param[0];
             string password1 = Utilities.hashBytePassHex(param[1] + login);
@@ -589,7 +506,7 @@ namespace TalkaTIPSerwer
                     if (Program.onlineUsers.ContainsKey(user.UserID))
                     {
                         Program.onlineUsers[user.UserID].iAM = DateTime.Now;
-                        return StateChng(user.UserID);
+                        return StateChange(user.UserID);
                     }
                 }
             }
@@ -781,40 +698,47 @@ namespace TalkaTIPSerwer
         {
             string chatName = param[0];
             string userToAdd = param[1];
+            int isApiControlled = int.Parse(param[3]);
 
             using (TalkaTipDB ctx = new TalkaTipDB())
             {
                 long userID = ctx.Users.Where(x => x.Login == userToAdd).Select(x => x.UserID).FirstOrDefault();
                 GroupChat chat = ctx.GroupChat.Where(x => x.GroupChatName == chatName).FirstOrDefault();
-
-                if (userID != 0 && chat.GroupChatID != 0 && chat.IsApiControlled == 0)
+                if (chat.IsApiControlled == isApiControlled)
                 {
-                    // Check if the user is already inside
-                    int isInChat = ctx.GroupChatUsers.Where(x => x.UserInChatID == userID && x.JoinedGroupChatID == chat.GroupChatID).Count();
-
-                    if(isInChat == 0)
+                    if (userID != 0 && chat.GroupChatID != 0 && chat.IsApiControlled == 0)
                     {
-                        GroupChatUsers joiningUser = new GroupChatUsers();
-                        joiningUser.JoinTime = DateTime.ParseExact(param[2], "yyyy-MM-dd-HH:mm:ss", CultureInfo.InvariantCulture);
-                        joiningUser.JoinedGroupChatID = chat.GroupChatID;
-                        joiningUser.UserInChatID = userID;
+                        // Check if the user is already inside
+                        int isInChat = ctx.GroupChatUsers.Where(x => x.UserInChatID == userID && x.JoinedGroupChatID == chat.GroupChatID).Count();
 
-                        try
+                        if (isInChat == 0)
                         {
-                            ctx.GroupChatUsers.Add(joiningUser);
-                            ctx.SaveChanges();
-                            return OK();
+                            GroupChatUsers joiningUser = new GroupChatUsers();
+                            joiningUser.JoinTime = DateTime.ParseExact(param[2], "yyyy-MM-dd-HH:mm:ss", CultureInfo.InvariantCulture);
+                            joiningUser.JoinedGroupChatID = chat.GroupChatID;
+                            joiningUser.UserInChatID = userID;
+
+                            try
+                            {
+                                ctx.GroupChatUsers.Add(joiningUser);
+                                ctx.SaveChanges();
+                                return OK();
+                            }
+                            catch (DbUpdateConcurrencyException)
+                            {
+                                return Fail();
+                            }
                         }
-                        catch (DbUpdateConcurrencyException)
+                        else
                         {
                             return Fail();
                         }
+
                     }
                     else
                     {
                         return Fail();
                     }
-
                 }
                 else
                 {
@@ -1243,7 +1167,7 @@ namespace TalkaTIPSerwer
             return message;
         }
 
-        public static string StateChng(long userID)
+        public static string StateChange(long userID)
         {
             string message = string.Empty;
             foreach (var item in Program.onlineUsers[userID].friendWithStateDict)
@@ -1292,7 +1216,7 @@ namespace TalkaTIPSerwer
             string decryptedMessage = Program.security.DecryptMessage(message.Substring(2, message.Length - 8), sessKey);
 
             // Take 8 bits to recognize the communique
-            int bits8 = (int)message[0];    // Decimal value
+            int bits8 = (int)message[0];
 
             // Parameters to send
             string[] sParameters = decryptedMessage.Split(' ');
