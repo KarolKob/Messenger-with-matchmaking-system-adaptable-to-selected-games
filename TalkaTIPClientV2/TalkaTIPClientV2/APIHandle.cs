@@ -63,7 +63,7 @@ namespace TalkaTIPClientV2
         // TODO: Figure out what is returned and act accordingly
         public async Task<string> ApiPOST()
         {
-            string result;
+            Player player;
             try
             {
                 var my_jsondata = new
@@ -76,19 +76,20 @@ namespace TalkaTIPClientV2
                 HttpResponseMessage response = await httpClient.PostAsync("Matching", stringContent)
                     .ConfigureAwait(continueOnCapturedContext: false);
                 response.EnsureSuccessStatusCode();
-                result = await response.Content.ReadAsStringAsync();
+                var objekt = await response.Content.ReadAsStringAsync();
+                player = JsonConvert.DeserializeObject<Player>(objekt);
             }
             catch (Exception)
             {
                 return null;
             }
 
-            return result;
+            return player.ApiName;
         }
 
         public async Task<string> ApiGETUserStatistics()
         {
-            string result;
+            Player player;
             try
             {
                 /*var my_jsondata = new
@@ -101,50 +102,60 @@ namespace TalkaTIPClientV2
                 HttpResponseMessage response = await httpClient.GetAsync("Matching/" + Program.userLogin)
                     .ConfigureAwait(continueOnCapturedContext: false);
                 response.EnsureSuccessStatusCode();
-                result = await response.Content.ReadAsStringAsync();
+                var objekt = await response.Content.ReadAsStringAsync();
+                player = JsonConvert.DeserializeObject<Player>(objekt);
             }
             catch (Exception)
             {
                 return null;
             }
              
-            return result;
+            return player.ToString();
         }
 
         public async Task<string> ApiGETMatchmaking()
         {
-            string result = null;
+            Server server;
             try
             {
-                var my_jsondata = new
-                {
-                    NickName = Program.userLogin
-                };
-                string json = JsonConvert.SerializeObject(my_jsondata);
-                var request = new HttpRequestMessage
-                {
-                    Method = HttpMethod.Get,
-                    RequestUri = new Uri("https://localhost:5001/api/Matching"),
-                    Content = new StringContent(json, Encoding.UTF8, "application/json"),
-
-                    //setRequestProperty("Content-Type", "application/json; charset=utf8")
-
-                };
-                //var stringContent = new StringContent(json, Encoding.UTF8, "application/json");
-                //var response = await httpClient.PostAsync("http://www.sample.com/write", stringContent);  new StringContent(Program.userLogin)
-                /*HttpResponseMessage response = await httpClient.Get("Matching", stringContent).ConfigureAwait(continueOnCapturedContext: false);
+                HttpResponseMessage response = await httpClient.GetAsync("https://localhost:5001/api/Matching/Match/" + Program.userLogin);
                 response.EnsureSuccessStatusCode();
-                name = await response.Content.ReadAsStringAsync();*/
-                HttpResponseMessage response = await httpClient.SendAsync(request).ConfigureAwait(continueOnCapturedContext: false);
-                response.EnsureSuccessStatusCode();
-                var name = await response.Content.ReadAsStringAsync();
+                var objekt = await response.Content.ReadAsStringAsync();
+                server = JsonConvert.DeserializeObject<Server>(objekt);
             }
             catch (Exception)
             {
                 return null;
             }
 
-            return result;
+            return server.lobby_ID;
+        }
+
+        public class Server
+        {
+            public string adress { get; set; }
+            public int port { get; set; }
+            public string lobby_ID { get; set; }
+            public int max_size { get; set; }
+        }
+
+        public class Player
+        {
+            public string Nickname { get; set; }
+            public double SkillRating { get; set; }
+            public int GamesPlayed { get; set; }
+            public int GamesWon { get; set; }
+            public int GamesTied { get; set; }
+            public int GamesLost { get; set; }
+            public double WinRate { get; set; }
+            public string Rank { get; set; }
+            public string ApiName { get; set; }
+
+            public string ToString()
+            {
+                string ret = string.Empty;
+                return ret;
+            }
         }
     }
 }

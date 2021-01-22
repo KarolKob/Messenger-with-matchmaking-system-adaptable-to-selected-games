@@ -68,6 +68,12 @@
     <Compile Include="CallHandler.cs" />
     <Compile Include="Client.cs" />
     <Compile Include="Communication.cs" />
+    <Compile Include="Form1.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form1.Designer.cs">
+      <DependentUpon>Form1.cs</DependentUpon>
+    </Compile>
     <Compile Include="LoginWindow.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -95,6 +101,9 @@
     <Compile Include="TextDialog.Designer.cs">
       <DependentUpon>TextDialog.cs</DependentUpon>
     </Compile>
+    <EmbeddedResource Include="Form1.resx">
+      <DependentUpon>Form1.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="LoginWindow.resx">
       <DependentUpon>LoginWindow.cs</DependentUpon>
     </EmbeddedResource>
@@ -136,6 +145,39 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Ringing_Phone-Mike_Koenig-1503628110.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\bground.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\multnoshadow.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\multshadow.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\panelback.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\player1.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\player2.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\singnoshadow.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\singshadow.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\tictactoemultiplayer.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\tictactoepic.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="tic.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

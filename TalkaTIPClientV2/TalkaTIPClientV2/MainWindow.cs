@@ -853,19 +853,34 @@ namespace TalkaTIPClientV2
                 string apiName = gameAPIListView.SelectedItems[0].Text;
                 if (!Program.apiNameAndHandle.ContainsKey(apiName))
                 {
-                    string data = Program.apiNameAndHandle[apiName].ApiGETMatchmaking().GetAwaiter().GetResult();
-
-                    // TODO: Extract chat name and replace "data" string
-
-                    // Create/join the proper chat
-                    if (Communication.CreateAPIGroupChatAndAddUser(data, Program.userLogin))
+                    if (apiName == "Tic Tac Toe")
                     {
-                        string str = "Select chat: " + data + "from your group chat list.";
-                        MessageBox.Show(str, "Success.");
+                        // Initialize the game in a second window
+                        Thread myThread = new Thread((ThreadStart)delegate { Application.Run(new game(Program.userLogin)); });
+                        //myThread.TrySetApartmentState(ApartmentState.STA); //If you receive errors, comment this out; use this when doing interop with STA COM objects.
+                        myThread.Start(); //Start the thread; Run the form
                     }
                     else
                     {
-                        MessageBox.Show("Joining or creating chat failed.", "Error");
+                        string chatName = Program.apiNameAndHandle[apiName].ApiGETMatchmaking().GetAwaiter().GetResult();
+
+                        // Create/join the proper chat
+                        if (Communication.CreateAPIGroupChatAndAddUser(chatName, Program.userLogin))
+                        {
+                            string str = "Select chat: " + chatName + " from your group chat list.";
+                            MessageBox.Show(str, "Success.");
+
+                            // Add the chat to group chats list
+                            string[] chatDetails = new string[2];
+                            chatDetails[0] = chatName;
+                            chatDetails[1] = "1";
+
+                            Program.mainWindow.listViewGroups.Items.Insert(0, new ListViewItem(chatDetails));
+                        }
+                        else
+                        {
+                            MessageBox.Show("Joining or creating chat failed.", "Error");
+                        }
                     }
                 }
                 else

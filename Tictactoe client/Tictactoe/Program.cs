@@ -37,7 +37,7 @@ namespace Tictactoe
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
            
-            Application.Run(new game("Karol tu trzeba przekazać nick gracza po zalogowaniu"));
+            Application.Run(new game("Henry"));
         }
     }
 
