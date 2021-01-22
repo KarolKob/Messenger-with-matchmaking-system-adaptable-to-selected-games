@@ -24,7 +24,13 @@ namespace DevelopApp
 
         private void LogOutButton_Click(object sender, EventArgs e)
         {
-
+            Program.client = new Client(Program.serverAddress);
+            Communication.LogOut(Program.userLogin);
+            Program.client.Disconnect();
+            this.Hide();
+            var form2 = new LogonForm();
+            form2.Closed += (s, args) => this.Close();
+            form2.Show();
         }
 
         private void Button1_Click(object sender, EventArgs e)
@@ -64,6 +70,54 @@ namespace DevelopApp
             }
 
             MessageBox.Show("Gra została poprawnie utworzona!");
+
+            nameBox.Text = String.Empty;
+            descBox.Text = String.Empty;
+            mPlayersBox.Text = String.Empty;
+            serverBox.Text = String.Empty;
+            tieCheck.Checked = false;
+            avgTime.Text = String.Empty;
+
+            KvalueBar.Value = 21;
+            pRatioCheck.Checked = false;
+            matchmakBar.Value = 160;
+            SratingBar.Value = 375;
+
+            if (EliteCheck.Checked)
+            {
+                EliteCheck.Checked = false;
+                eliteMinBox.Text = String.Empty;
+                eliteMaxBox.Text = String.Empty;
+                DiamondCheck.Enabled = true;
+                elitePanel.Enabled = false;
+                RemoveRank();
+            }
+
+            if (DiamondCheck.Checked)
+            {
+                DiamondCheck.Checked = false;
+                diamondMinBox.Text = String.Empty;
+                diamondMaxBox.Text = String.Empty;
+                EliteCheck.Enabled = false;
+                diamondPanel.Enabled = false;
+                PlatinCheck.Enabled = true;
+                RemoveRank();
+            }
+
+            if (PlatinCheck.Checked)
+            {
+                PlatinCheck.Checked = false;
+                DiamondCheck.Enabled = false;
+                platinMinBox.Text = String.Empty;
+                PlatinMaxBox.Text = String.Empty;
+                platinPanel.Enabled = false;
+                RemoveRank();
+            }
+
+            tabControl1.Enabled = true;
+            button1.Enabled = false;
+            button5.Enabled = false;
+            button2.Enabled = true;
         }
 
         private void AddRank(string name)
@@ -232,6 +286,7 @@ namespace DevelopApp
 
             if (correct)
             {
+                button2.Enabled = false;
                 button1.Enabled = true;
                 button5.Enabled = true;
                 MessageBox.Show("Dane poprawne. Możesz utworzyć grę.");
@@ -269,6 +324,7 @@ namespace DevelopApp
             tabControl1.Enabled = true;
             button1.Enabled = false;
             button5.Enabled = false;
+            button2.Enabled = true;
         }
     }
 }

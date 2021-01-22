@@ -8,15 +8,18 @@ namespace DevelopApp
 {
     static class Program
     {
-        /// <summary>
-        /// Główny punkt wejścia dla aplikacji.
-        /// </summary>
+        public static Client client;
+        public static Security security = new Security();
+        public static string userLogin;
+        public static string serverAddress;
+        public static byte[] sessionKeyWithServer = null;
+
         [STAThread]
         static void Main()
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new Form1());
+            Application.Run(new LogonForm());
         }
     }
 }
