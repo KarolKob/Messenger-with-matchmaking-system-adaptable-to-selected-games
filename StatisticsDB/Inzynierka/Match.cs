@@ -12,12 +12,15 @@ namespace Inzynierka
     {
         [Key]
         public int GameId { get; set; }
+        [Required]
         public string Teams { get; set; }
+        [Required]
         public bool RankedGame { get; set; }
         [Required]
         public DateTime GameDate { get; set; }
         [Required]
         public string Scores { get; set; }
+        [Required]
         public bool Finished { get; set; }
 
         public void Add_Result(List<int> scores)
@@ -32,12 +35,20 @@ namespace Inzynierka
             return result;
         }
 
-        public double Count_Skills(int K, double result, double skillrival, double skill)
+        public double Count_Skills(int K, double result, double skillrival, double skill, int pkt_ratio)
         {
-            return K * (result - Count_Probablity(skillrival, skill));
+            double Kval;
+            if (pkt_ratio == 1 || pkt_ratio == 0) Kval = K;
+            else if (pkt_ratio == 2) Kval = 1.5;
+            else
+            {
+                Kval = (11 + pkt_ratio) / 16; 
+            }
+
+            return Kval * (result - Count_Probablity(skillrival, skill));
         }
 
-        public List<double> CountRanking(List<int> scores, List<double> rankings, int K)
+        public List<double> CountRanking(List<int> scores, List<double> rankings, int K, bool pkt_ratio)
         {
             List<double>new_rankings = new List<double>();
             for (int i = 0; i < scores.Count; i++)
@@ -47,9 +58,17 @@ namespace Inzynierka
                 {
                     if (j!= i)
                     {
-                        if (scores[i] > scores[j]) new_skill += Count_Skills(K, 1, rankings[j], rankings[i]);
-                        if (scores[i] < scores[j]) new_skill += Count_Skills(K, 0, rankings[j], rankings[i]);
-                        else new_skill += Count_Skills(K, 0.5, rankings[j], rankings[i]);
+                        if (pkt_ratio) {
+                            if (scores[i] > scores[j]) new_skill += Count_Skills(K, 1, rankings[j], rankings[i], scores[i]-scores[j]);
+                            else if (scores[i] < scores[j]) new_skill += Count_Skills(K, 0, rankings[j], rankings[i], scores[j] - scores[i]);
+                            else new_skill += Count_Skills(K, 0.5, rankings[j], rankings[i], 0);
+                        }
+                        else
+                        {
+                            if (scores[i] > scores[j]) new_skill += Count_Skills(K, 1, rankings[j], rankings[i], 1);
+                            else if (scores[i] < scores[j]) new_skill += Count_Skills(K, 0, rankings[j], rankings[i], 1);
+                            else new_skill += Count_Skills(K, 0.5, rankings[j], rankings[i], 0);
+                        }
                     }
                 }
                 new_rankings.Add(new_skill / scores.Count);
@@ -62,12 +81,15 @@ namespace Inzynierka
     {
         [Key]
         public int GameId { get; set; }
+        [Required]
         public string Players { get; set; }
+        [Required]
         public bool RankedGame { get; set; }
         [Required]
         public DateTime GameDate { get; set; }
         [Required]
         public string Scores { get; set; }
+        [Required]
         public bool Finished { get; set; }
 
         public void Add_Result(List<int> scores)
@@ -82,12 +104,22 @@ namespace Inzynierka
             return result;
         }
 
-        public double Count_Skills(int K, double result, double skillrival, double skill)
+        public double Count_Skills(int K, double result, double skillrival, double skill, int pkt_ratio)
         {
-            return K * (result - Count_Probablity(skillrival, skill));
+            double Kval;
+            if (pkt_ratio == 1 || pkt_ratio == 0) Kval = 1;
+            else if (pkt_ratio == 2) Kval = 1.5;
+            else
+            {
+                Kval = (double)(11 + pkt_ratio) / 16;
+            }
+
+            Console.WriteLine(K * Kval * (result - Count_Probablity(skillrival, skill)));
+
+            return K * Kval * (result - Count_Probablity(skillrival, skill));
         }
 
-        public List<double> CountRanking(List<int> scores, List<double> rankings, int K)
+        public List<double> CountRanking(List<int> scores, List<double> rankings, int K, bool pkt_ratio)
         {
             List<double> new_rankings = new List<double>();
             for (int i = 0; i < scores.Count; i++)
@@ -97,9 +129,18 @@ namespace Inzynierka
                 {
                     if (j != i)
                     {
-                        if (scores[i] > scores[j]) new_skill += Count_Skills(K, 1, rankings[j], rankings[i]);
-                        if (scores[i] < scores[j]) new_skill += Count_Skills(K, 0, rankings[j], rankings[i]);
-                        else new_skill += Count_Skills(K, 0.5, rankings[j], rankings[i]);
+                        if (pkt_ratio)
+                        {
+                            if (scores[i] > scores[j]) new_skill += Count_Skills(K, 1, rankings[j], rankings[i], scores[i] - scores[j]);
+                            else if (scores[i] < scores[j]) new_skill += Count_Skills(K, 0, rankings[j], rankings[i], scores[j] - scores[i]);
+                            else new_skill += Count_Skills(K, 0.5, rankings[j], rankings[i], 0);
+                        }
+                        else
+                        {
+                            if (scores[i] > scores[j]) new_skill += Count_Skills(K, 1, rankings[j], rankings[i], 1);
+                            else if (scores[i] < scores[j]) new_skill += Count_Skills(K, 0, rankings[j], rankings[i], 1);
+                            else new_skill += Count_Skills(K, 0.5, rankings[j], rankings[i], 0);
+                        }
                     }
                 }
                 new_rankings.Add(new_skill / scores.Count);

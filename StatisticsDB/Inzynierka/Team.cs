@@ -9,6 +9,7 @@ namespace Inzynierka
     {
         [Key]
         public int TeamID { get; }
+        [Required]
         public string PlayersID {get; set;}
     }
 }

@@ -24,7 +24,13 @@ namespace DevelopApp
 
         private void LogOutButton_Click(object sender, EventArgs e)
         {
-
+            Program.client = new Client(Program.serverAddress);
+            Communication.LogOut(Program.userLogin);
+            Program.client.Disconnect();
+            this.Hide();
+            var form2 = new LogonForm();
+            form2.Closed += (s, args) => this.Close();
+            form2.Show();
         }
 
         private void Button1_Click(object sender, EventArgs e)
@@ -51,6 +57,7 @@ namespace DevelopApp
                 StartRating = SratingBar.Value,
                 PktsRatio = pRatioCheck.Checked,
                 MatchmakingLimit = matchmakBar.Value,
+                NumberOfRanks = ranks.Count,
 
                 //ranks
                 RanksLimit = JsonSerializer.Serialize(ranklimits)
@@ -61,6 +68,56 @@ namespace DevelopApp
                 dbContext.games.Add(new_game);
                 dbContext.SaveChanges();
             }
+
+            MessageBox.Show("Gra została poprawnie utworzona!");
+
+            nameBox.Text = String.Empty;
+            descBox.Text = String.Empty;
+            mPlayersBox.Text = String.Empty;
+            serverBox.Text = String.Empty;
+            tieCheck.Checked = false;
+            avgTime.Text = String.Empty;
+
+            KvalueBar.Value = 21;
+            pRatioCheck.Checked = false;
+            matchmakBar.Value = 160;
+            SratingBar.Value = 375;
+
+            if (EliteCheck.Checked)
+            {
+                EliteCheck.Checked = false;
+                eliteMinBox.Text = String.Empty;
+                eliteMaxBox.Text = String.Empty;
+                DiamondCheck.Enabled = true;
+                elitePanel.Enabled = false;
+                RemoveRank();
+            }
+
+            if (DiamondCheck.Checked)
+            {
+                DiamondCheck.Checked = false;
+                diamondMinBox.Text = String.Empty;
+                diamondMaxBox.Text = String.Empty;
+                EliteCheck.Enabled = false;
+                diamondPanel.Enabled = false;
+                PlatinCheck.Enabled = true;
+                RemoveRank();
+            }
+
+            if (PlatinCheck.Checked)
+            {
+                PlatinCheck.Checked = false;
+                DiamondCheck.Enabled = false;
+                platinMinBox.Text = String.Empty;
+                PlatinMaxBox.Text = String.Empty;
+                platinPanel.Enabled = false;
+                RemoveRank();
+            }
+
+            tabControl1.Enabled = true;
+            button1.Enabled = false;
+            button5.Enabled = false;
+            button2.Enabled = true;
         }
 
         private void AddRank(string name)
@@ -100,7 +157,7 @@ namespace DevelopApp
                     if (rank.MaxRating < 0) diamondMaxBox.Text = "MAX";
                     else diamondMaxBox.Text = rank.MaxRating.ToString();
                 }
-                else if (rank.Name=="platin")
+                else if (rank.Name=="elite")
                 {
                     eliteMinBox.Text = rank.MinRating.ToString();
                     if (rank.MaxRating < 0) eliteMaxBox.Text = "MAX";
@@ -191,6 +248,83 @@ namespace DevelopApp
                 dbContext.Database.EnsureCreated();
                 dbContext.SaveChanges();
             }
+        }
+
+        private void button2_Click_1(object sender, EventArgs e)
+        {
+            bool correct = true;
+            string error_message = "";
+
+            if(nameBox.Text == String.Empty)
+            {
+                correct = false;
+                nameBox.BackColor = System.Drawing.Color.Red;
+                error_message += "Podaj nazwę gry!\n";
+            }
+            else
+            {
+                nameBox.BackColor = System.Drawing.Color.White;
+            }
+
+            string server = serverBox.Text;
+
+            try
+            {
+                string[] s = server.Split(':');
+                string ip = s[0];
+                string port = s[1];
+                System.Net.IPAddress IP = System.Net.IPAddress.Parse(ip);
+                int PortNum = Int32.Parse(port);
+                serverBox.BackColor = System.Drawing.Color.White;
+            }
+            catch
+            {
+                correct = false;
+                serverBox.BackColor = System.Drawing.Color.Red;
+                error_message += "Błędny adres serwera gry!\n";
+            }
+
+            if (correct)
+            {
+                button2.Enabled = false;
+                button1.Enabled = true;
+                button5.Enabled = true;
+                MessageBox.Show("Dane poprawne. Możesz utworzyć grę.");
+                tabControl1.Enabled = false;
+            }
+            else
+            {
+                MessageBox.Show(error_message);
+            }
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show("Dane opisowe do gry:\n" +
+                "+ Name (wymagana) - nazwa gry,\n" +
+                "+ Description (opcjonalny) - zasady gry,\n" +
+                "+ Server (wymagany) - adres serwera gry oraz port,\n" +
+                "+ Max players (opcjonalny) - maksymalna liczba graczy,\n" +
+                "+ Tie results (wymagany) - czy możliwe remisy,\n" +
+                "+ Avg Match Time (opcjonalny) - średni czas rozgrywki w minutach.");
+        }
+
+        private void button4_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show("Opcje dotyczące rankingu:\n" +
+                "+ Ranks - jakie rangi mają być użyte w systemie,\n" +
+                "+ K value - stała wyznaczająca dynamikę rankingu (im wyższa tym większa zdobycz/strata po rozgrywce),\n" +
+                "+ Points ratio - czy brać pod uwagę stosunek zdobytych punktów po rozgrywce,\n" +
+                "+ Start rating - początkowy skill rating nowego gracza,\n" +
+                "+ Opponent limit - rama wyszukiwania przeciwnika (im wyższa tym możliwe wyszukanie przeciwnika z większą różnicą punktową).");
+        }
+
+        private void button5_Click(object sender, EventArgs e)
+        {
+            tabControl1.Enabled = true;
+            button1.Enabled = false;
+            button5.Enabled = false;
+            button2.Enabled = true;
         }
     }
 }
