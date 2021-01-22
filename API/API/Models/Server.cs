@@ -10,13 +10,17 @@ namespace API.Models
 {
     public class Server
     {
-        public string adress { get; set; } = "127.0.0.1";
+        public string adress { get; set; }// = "127.0.0.1";
+        public int port { get; set; }
         public string lobby_ID { get; set; }
         public int max_size { get; set; }
-        public Server(string lobby_id,int lobby_size)
+        public Server(string lobby_id,GameConfigs config)
         {
             lobby_ID = lobby_id;
-            max_size = lobby_size;
+            max_size = config.NumberOfPlayers;
+            string[] subs = config.Server.Split(':');
+            adress = subs[0];
+            port = Int32.Parse(subs[1]);
         }
     }
 }

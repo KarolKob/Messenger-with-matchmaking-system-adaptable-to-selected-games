@@ -21,6 +21,7 @@ namespace API
     {
         public Startup(IConfiguration configuration)
         {
+            //ensure that data base exists
             Configuration = configuration;
             using (var db = new SQLiteContext())
             {
@@ -35,27 +36,18 @@ namespace API
         // here we add services for later use in our API.
         public void ConfigureServices(IServiceCollection services)
         {
-            //services.AddDbContext<Context>(opt => opt.UseSqlServer
-            //(Configuration.GetConnectionString("APIconnection")));
             services.AddScoped<IPoczekalnia, SerwisPoczekalni>();
             services.AddDbContext<SQLiteContext>();
             services.AddDbContext<ConfigContext>();
-            //services.AddDbContext<SQLiteContext>(opt => opt.UseSqlite
-            //("Data Source=SQLitePlayerBase.db"));
-
-            //($"Data Source={Configuration. .ApplicationBasePath}/data.db"));
-
             services.AddControllers().AddNewtonsoftJson
                 (s => s.SerializerSettings.ContractResolver =
                 new CamelCasePropertyNamesContractResolver());
 
             services.AddAutoMapper
                 (AppDomain.CurrentDomain.GetAssemblies());
-            
-            //services.AddScoped<Ireposit, SQLrepositorium>();
             services.AddScoped<ILiteRepo, SQLiteRepo>();
+            services.AddScoped<IConfig, ConfigRepo>();
             services.AddRazorPages();
-            //services.AddHttpContextAccessor();
         }
 
         // Use this method to configure the HTTP request pipeline.
@@ -66,12 +58,6 @@ namespace API
             {
                 app.UseDeveloperExceptionPage();
             }
-            //dataContext.Database.Migrate();
-          //  app.UseForwardedHeaders(new ForwardedHeadersOptions
-          //  {
-          //      ForwardedHeaders = ForwardedHeaders.XForwardedFor |
-          //ForwardedHeaders.XForwardedProto
-          //  });
             
             app.UseStaticFiles();
 

@@ -15,7 +15,6 @@ namespace API.Models
         public string Server { get; set; }
         public int NumberOfPlayers { get; set; }
         public int AvgTime { get; set; }
-       // public bool TeamPlays { get; set; }
         public bool TieGames { get; set; }
         public int NumberOfRanks { get; set; }
         public int KValue { get; set; }

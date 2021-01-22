@@ -8,16 +8,13 @@ using System.Threading.Tasks;
 
 namespace API.Models
 {
+    //context to access data base inside API
     public class SQLiteContext : DbContext
     {
         public DbSet<Player> PlayersDB { get; set; }
         public DbSet<MatchTeam> TeamGamesDB { get; set; }
         public DbSet<Team> Teams { get; set; }
         public DbSet<MatchSolo> SoloGamesDB { get; set; }
-        //public SQLiteContext(DbContextOptions<SQLiteContext> opt) : base(opt)
-        //{
-
-        //}
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             optionsBuilder.UseSqlite("Filename=SQLiteMatchmakingDataBase.db", options =>

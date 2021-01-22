@@ -18,7 +18,6 @@ namespace API.Models
         {
             lobby_ID = id;
             max_size = size;
-            //queue = new List<Player>();
             queue=new List<Player> { player };
             AvgSkill = skill;
         }

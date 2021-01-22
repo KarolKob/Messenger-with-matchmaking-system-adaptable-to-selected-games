@@ -23,36 +23,42 @@ namespace API.Controllers
         private readonly IMapper _mapper;
         private readonly ILiteRepo _repository;
         private readonly IPoczekalnia _poczekalnia;
-        //private readonly IHttpContextAccessor _httpContextAccessor;
-
-
-        //konstruktor jest potrzebny by móc używać dependecy
-        //injection
-        public matching(ILiteRepo repo, IMapper mapper, IPoczekalnia poczekalnia)
+        private readonly IConfig _config;
+        private readonly int configID=1;
+        public matching(ILiteRepo repo, IMapper mapper, IPoczekalnia poczekalnia, IConfig config)
         {
             _mapper = mapper;
             _repository = repo;
             _poczekalnia = poczekalnia;
-           //_httpContextAccessor = httpContextAccessor;
-            //poczekalnia = new List<Lobby>();
-            
+            _config = config;
+
         }
 
         //GET api/Matching
+        [Route("Match/{NickName}")]
         [HttpGet]
-        public async Task<ActionResult<Server>> GetMatch(PlayerMatch p) //zwraca dane serwera do gry  [FromBody] string nick
+        public async Task<ActionResult<Server>> GetMatch(string NickName) //PlayerMatch p   //zwraca dane serwera do gry  [FromBody] string nick
         {
             //var players = _repository.MatchPlayers();//To Be Done
             //return Ok(_mapper.Map<IEnumerable<CommandReadDTO>>(commanditems));
             //return Ok(_mapper.Map<IEnumerable<PlayerReadDTO>>(players));
 
-            //'get player rating'
-            var player = await _repository.GetPlayerInfo(p.NickName);
-            //'find him a place in queue'
-            //'add him to queue'
-            Lobby lobby=_poczekalnia.find_lobby(player,200);
-            //'send him server adress and lobby id'
-            return (new Server(lobby.lobby_ID,lobby.max_size));
+            GameConfigs gameConfig = await _config.GetConfig(configID);
+            var player = await _repository.GetPlayerInfo(NickName); // p.NickName
+            if (player == null)
+            {
+                return NotFound();
+            }
+            else
+            {
+                //'find him a place in queue'
+                //'add him to queue'
+                Lobby lobby = _poczekalnia.find_lobby(player, gameConfig);
+                //'send him server adress and lobby id'
+
+                return (new Server(lobby.lobby_ID, gameConfig));
+            }
+
         }
         //GET api/Matching/{nick}
         [HttpGet("{nick}", Name = "GetPlayerInfo")]
@@ -83,7 +89,7 @@ namespace API.Controllers
             var playerModel = _mapper.Map<Player>(playerCreate);
             try
             {
-                response = await _repository.AddPlayer(playerModel,1);
+                response = await _repository.AddPlayer(playerModel, configID);
             }
             catch (Exception ex)
             {
@@ -109,7 +115,7 @@ namespace API.Controllers
             return NoContent();//standard zwracany przez put
         }
         //PATH api/Matching/{nick}
-        [HttpPatch("{nick}")] //update części
+        [HttpPatch("{nick}")] //update nicku
         public ActionResult PatchCommand(string nick, JsonPatchDocument<PlayerUpdateDTO> patch)
         {
             //var commandModel = _repository.GetcommandbyID(id);
@@ -133,15 +139,16 @@ namespace API.Controllers
         [HttpDelete("{nick}")] //usuwanie
         public ActionResult CancelMatchmaking(string nick,[FromBody]string lobby_id)
         {
-            //var commandModel = _repository.GetcommandbyID(id);
-            //if (commandModel == null)
-            //{
-            //    return NotFound();
-            //}
-            //_repository.DeleteCommand(commandModel);
-            //_repository.SaveChanges();
-            _poczekalnia.remove_player_from_lobby(nick, lobby_id);
-            return NoContent();
+            bool result=_poczekalnia.remove_player_from_lobby(nick, lobby_id);
+            if (result==true)
+            {
+                return Ok();
+            }
+            else
+            {
+                return NoContent();
+            }
+            
         }
 
 

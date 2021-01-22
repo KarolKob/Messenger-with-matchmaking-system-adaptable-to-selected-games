@@ -22,11 +22,6 @@ namespace API.Models
         public int GamesWon { get; set; }
         public int GamesTied { get; set; }
         public int GamesLost { get; set; }
-
-        //[Required]
-        //public int PointsScored { get; set; }
-        //[Required]
-        //public int PointsLost { get; set; }
         [Required]
         public double WinRate { get; set; }
         public string Rank { get; set; }
@@ -41,7 +36,8 @@ namespace API.Models
         public void Update_Stats(double newrtaing, int result)
         {
             GamesPlayed++;
-            SkillRating += newrtaing;
+            SkillRating += Math.Round(newrtaing, 1);
+            if (SkillRating < 0) SkillRating = 0;
             if (result == 2) GamesLost++;
             else if (result == 0) GamesTied++;
             else GamesWon++;

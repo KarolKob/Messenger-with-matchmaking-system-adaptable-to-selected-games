@@ -15,20 +15,18 @@ namespace API.Data
         //List<Lobby> poczekalnia = new List<Lobby>();
 
         List<Lobby> poczekalnia = LobbyCache.Instance.Lobbies;
-        private readonly int lobby_size;
         //dostęp do kolejki pokoi poprzez dependency injection
         public SerwisPoczekalni()
         {
-            lobby_size = 2;
         }
-        public Lobby find_lobby(Player player, int skilllimit)
+        public Lobby find_lobby(Player player, GameConfigs config)
         {
-            Lobby temp = poczekalnia.Find(lobby=>lobby.queue.Count<lobby.max_size& Math.Abs(lobby.AvgSkill - player.SkillRating) < skilllimit);
+            Lobby temp = poczekalnia.Find(lobby=>lobby.queue.Count<lobby.max_size& Math.Abs(lobby.AvgSkill - player.SkillRating) < config.MatchmakingLimit);
             if (temp!=null)
             {
                 foreach (var r in poczekalnia)
                 {
-                    if (Math.Abs(r.AvgSkill - player.SkillRating) < skilllimit & r.queue.Count < r.max_size)
+                    if (Math.Abs(r.AvgSkill - player.SkillRating) < config.MatchmakingLimit & r.queue.Count < r.max_size)
                     {
                         if (Math.Abs(r.AvgSkill - player.SkillRating) < Math.Abs(temp.AvgSkill - player.SkillRating))
                         {
@@ -42,7 +40,7 @@ namespace API.Data
             }
             else
             {
-                Lobby temp2 = new Lobby(player, player.NickName, lobby_size, player.SkillRating);
+                Lobby temp2 = new Lobby(player, player.NickName, config.NumberOfPlayers, player.SkillRating);
                 poczekalnia.Add(temp2);
                 return temp2;
             }
@@ -72,15 +70,24 @@ namespace API.Data
             //}
             
         }
-        public void remove_player_from_lobby(string nick,string lobby_id)
+        public bool remove_player_from_lobby(string nick,string lobby_id)
         {
             
             var lobby=poczekalnia.Find(lobby => lobby.lobby_ID == lobby_id);
-            lobby.queue.Remove(lobby.queue.Find(player=>player.NickName==nick));
-            if (lobby.queue.Count() < 1)
+            if (lobby != null)
             {
-                poczekalnia.Remove(lobby);
+                lobby.queue.Remove(lobby.queue.Find(player => player.NickName == nick));
+                if (lobby.queue.Count() < 1)
+                {
+                    poczekalnia.Remove(lobby);
+                }
+                return true;
             }
+            else
+            {
+                return false;
+            }
+
         }
         public void add_lobby_to_pool(Lobby lobby)
         {

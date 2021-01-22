@@ -20,114 +20,79 @@ namespace API.Controllers
         private readonly IMapper _mapper;
         private readonly ILiteRepo _repository;
         private readonly IPoczekalnia _poczekalnia;
+        private readonly IConfig _config;
+        private readonly int configID = 1;
 
-
-        //konstruktor jest potrzebny by móc używać dependecy
-        //injection
-        public matches(ILiteRepo repo,IMapper mapper, IPoczekalnia poczekalnia)
+        public matches(ILiteRepo repo,IMapper mapper, IPoczekalnia poczekalnia, IConfig config)
         {
             _mapper = mapper;
             _repository = repo;
             _poczekalnia = poczekalnia;
+            _config = config;
         }
 
         //GET api/Matching
         [HttpGet]
-        public string test([FromBody] string nick) //zwraca dane serwera do gry
+        public ActionResult test([FromBody] string nick) //zwraca dane serwera do gry
         {
-            //var players = _repository.MatchPlayers();//To Be Done
-            //return Ok(_mapper.Map<IEnumerable<CommandReadDTO>>(commanditems));
-            //return Ok(_mapper.Map<IEnumerable<PlayerReadDTO>>(players));
-
-            //'get player rating'
-            //var player = await _repository.GetPlayerInfo(nick);
-            //'find him a place in queue'
-            //'add him to queue'
-            //Lobby lobby=_poczekalnia.find_lobby(player);
-            //'send him server adress and lobby id'
-            return ("ola");
+            return NoContent();
         }
 
-
-        //GET api/Matching/{nick}
-        //[HttpGet("{nick}", Name = "GetPlayerInfo")]
-        //public async Task<ActionResult<PlayerReadDTO>> GetPlayerInfo(string nick) //funkcja do testów
-        //{
-        //    //var playerinfo = await _repository.GetPlayerInfo(nick);
-        //    //var ip = _httpContextAccessor.HttpContext.Connection.RemoteIpAddress;
-
-
-
-        //    //if (playerinfo != null)
-        //    //{
-        //        //bez if zwraca 204 no content w przypadku braku wyniku
-        //        //return Ok(_mapper.Map<CommandReadDTO>(commanditem));
-        //    //    return Ok(_mapper.Map<PlayerReadDTO>(playerinfo));
-        //    //}
-        //    //zwraca 404 not found
-        //    //return NotFound();
-
-
-        //    //return Ok(nick);
-        //}
         //POST api/Matching
+        [Route("solo")]
         [HttpPost]//tworzenie
-        public async Task<ActionResult> CreateMatch(MatchSoloCreate matchsolo) //zapisanie informacji o rozpoczętym meczu
+        public async Task<int> CreateMatchSolo(MatchSoloCreate matchsolo) //zapisanie informacji o rozpoczętym meczu
         {
-            //async Task<ActionResult<PlayerReadDTO>>
             int matchID = await _repository.Add_Game_Solo(matchsolo.players,matchsolo.ranked);
             _poczekalnia.remove_lobby_from_pool(matchsolo.lobby_id);
-            return Ok();
+            return matchID;
+            //return CreatedAtRoute(nameof(GetPlayerInfo), new { nick = playerReadModel.Nickname }, playerReadModel);
+        }
+        [Route("team")]
+        [HttpPost]//tworzenie
+        public async Task<int> CreateMatchTeam(MatchTeamCreate matchteam) //zapisanie informacji o rozpoczętym meczu
+        {
+            //async Task<ActionResult<PlayerReadDTO>>
+            int matchID = await _repository.Add_Game_Team(matchteam.teams, matchteam.ranked);
+            _poczekalnia.remove_lobby_from_pool(matchteam.lobby_id);
+            return matchID;
             //zapisz mecz do bazy danych i uaktualnij statystyki graczy
             //return CreatedAtRoute(nameof(GetPlayerInfo), new { nick = playerReadModel.Nickname }, playerReadModel);
         }
-        //PUT api/Matching/{id}
-        [HttpPut("{lobby_id}")] //update całości
-        public ActionResult LobbyRefill(string lobby_id, [FromBody]Lobby NotFullLobby)
+        [HttpPost("{lobby_id}")]
+        public ActionResult LobbyRefill(string lobby_id, [FromBody] Lobby NotFullLobby)
         {
-            //var commandModel = _repository.GetcommandbyID(id);
-            //if (commandModel == null)
-            //{
-            //    return NotFound();
-            //}
-            //_mapper.Map(update, commandModel);
-            //_repository.UpdateCommand(commandModel);
-            //_repository.SaveChanges();
-            _poczekalnia.add_lobby_to_pool(NotFullLobby);//ulepsz gdy dodajemy lobby i gdy aktualizujemy lobby bo ktoś jeszcze wyszedł
-            return NoContent();//standard zwracany przez put
+            //async Task<ActionResult<PlayerReadDTO>>
+
+            _poczekalnia.add_lobby_to_pool(NotFullLobby);
+            return Ok();
+            //return CreatedAtRoute(nameof(GetPlayerInfo), new { nick = playerReadModel.Nickname }, playerReadModel);
+        }
+        //PUT api/Matching/{id}
+        [Route("solo")]
+        [HttpPut]//tworzenie
+        public async Task<ActionResult> FinishMatchSolo(SoloScoresDTO soloScores)
+        {
+            var x = await _repository.Add_Result_Solo(soloScores.match_id, soloScores.scores,configID);
+            return Ok();
+        }
+        [Route("team")]
+        [HttpPut]//tworzenie
+        public async Task<ActionResult> FinishMatchTeam(TeamScoresDTO teamScores)
+        {
+            var x = await _repository.Add_Result_Team(teamScores.match_id, teamScores.scores, configID);
+            return Ok();
         }
         //PATH api/Matching/{nick}
         [HttpPatch("{nick}")] //update części
         public ActionResult PatchCommand(string nick, JsonPatchDocument<PlayerUpdateDTO> patch)
         {
-            //var commandModel = _repository.GetcommandbyID(id);
-            //if (commandModel == null)
-            //{
-            //    return NotFound();
-            //}
-            //var commandPatch = _mapper.Map<CommandUpdateDTO>(commandModel);
-            //patch.ApplyTo(commandPatch, ModelState);
-            //if (!TryValidateModel(commandPatch))
-            //{
-            //    return ValidationProblem(ModelState);
-            //}
-            ////spowrotem na model
-            //_mapper.Map(commandPatch, commandModel);
-            //_repository.UpdateCommand(commandModel);
-            //_repository.SaveChanges();
             return NoContent();
         }
         //DELETE api/Matching/{nick}
-        [HttpDelete("{nick}")] //usuwanie
-        public ActionResult DeleteCommand(string nick)
+        [HttpDelete("{matchID}")] //usuwanie
+        public ActionResult DeleteCommand(int matchID)
         {
-            //var commandModel = _repository.GetcommandbyID(id);
-            //if (commandModel == null)
-            //{
-            //    return NotFound();
-            //}
-            //_repository.DeleteCommand(commandModel);
-            //_repository.SaveChanges();
             return NoContent();
         }
 
