@@ -94,6 +94,10 @@
             this.bronzeMinBox = new System.Windows.Forms.TextBox();
             this.label16 = new System.Windows.Forms.Label();
             this.button1 = new System.Windows.Forms.Button();
+            this.button2 = new System.Windows.Forms.Button();
+            this.button3 = new System.Windows.Forms.Button();
+            this.button4 = new System.Windows.Forms.Button();
+            this.button5 = new System.Windows.Forms.Button();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.tabPage2.SuspendLayout();
@@ -112,9 +116,9 @@
             // LogOutButton
             // 
             this.LogOutButton.BackColor = System.Drawing.SystemColors.ButtonShadow;
-            this.LogOutButton.Location = new System.Drawing.Point(12, 395);
+            this.LogOutButton.Location = new System.Drawing.Point(12, 381);
             this.LogOutButton.Name = "LogOutButton";
-            this.LogOutButton.Size = new System.Drawing.Size(188, 50);
+            this.LogOutButton.Size = new System.Drawing.Size(130, 65);
             this.LogOutButton.TabIndex = 11;
             this.LogOutButton.Text = "Log out";
             this.LogOutButton.UseVisualStyleBackColor = false;
@@ -128,11 +132,12 @@
             this.tabControl1.Location = new System.Drawing.Point(12, 12);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(570, 377);
+            this.tabControl1.Size = new System.Drawing.Size(570, 363);
             this.tabControl1.TabIndex = 13;
             // 
             // tabPage1
             // 
+            this.tabPage1.Controls.Add(this.button3);
             this.tabPage1.Controls.Add(this.avgTime);
             this.tabPage1.Controls.Add(this.tieCheck);
             this.tabPage1.Controls.Add(this.mPlayersBox);
@@ -148,16 +153,17 @@
             this.tabPage1.Location = new System.Drawing.Point(4, 22);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(562, 351);
+            this.tabPage1.Size = new System.Drawing.Size(562, 337);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "Genral";
             this.tabPage1.UseVisualStyleBackColor = true;
             // 
             // avgTime
             // 
+            this.avgTime.Font = new System.Drawing.Font("Microsoft Sans Serif", 11F);
             this.avgTime.Location = new System.Drawing.Point(133, 243);
             this.avgTime.Name = "avgTime";
-            this.avgTime.Size = new System.Drawing.Size(62, 20);
+            this.avgTime.Size = new System.Drawing.Size(62, 24);
             this.avgTime.TabIndex = 13;
             // 
             // tieCheck
@@ -172,31 +178,35 @@
             // 
             // mPlayersBox
             // 
+            this.mPlayersBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 11F);
             this.mPlayersBox.Location = new System.Drawing.Point(133, 165);
             this.mPlayersBox.Name = "mPlayersBox";
-            this.mPlayersBox.Size = new System.Drawing.Size(62, 20);
+            this.mPlayersBox.Size = new System.Drawing.Size(62, 24);
             this.mPlayersBox.TabIndex = 10;
             // 
             // serverBox
             // 
+            this.serverBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 11F);
             this.serverBox.Location = new System.Drawing.Point(133, 134);
             this.serverBox.Name = "serverBox";
-            this.serverBox.Size = new System.Drawing.Size(250, 20);
+            this.serverBox.Size = new System.Drawing.Size(250, 24);
             this.serverBox.TabIndex = 9;
             // 
             // descBox
             // 
+            this.descBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 11F);
             this.descBox.Location = new System.Drawing.Point(133, 57);
             this.descBox.Multiline = true;
             this.descBox.Name = "descBox";
-            this.descBox.Size = new System.Drawing.Size(418, 67);
+            this.descBox.Size = new System.Drawing.Size(250, 67);
             this.descBox.TabIndex = 8;
             // 
             // nameBox
             // 
+            this.nameBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F);
             this.nameBox.Location = new System.Drawing.Point(133, 21);
             this.nameBox.Name = "nameBox";
-            this.nameBox.Size = new System.Drawing.Size(250, 20);
+            this.nameBox.Size = new System.Drawing.Size(250, 26);
             this.nameBox.TabIndex = 7;
             // 
             // label7
@@ -255,6 +265,7 @@
             // 
             // tabPage2
             // 
+            this.tabPage2.Controls.Add(this.button4);
             this.tabPage2.Controls.Add(this.MMlabel);
             this.tabPage2.Controls.Add(this.matchmakBar);
             this.tabPage2.Controls.Add(this.startRLabel);
@@ -275,7 +286,7 @@
             this.tabPage2.Controls.Add(this.label8);
             this.tabPage2.Location = new System.Drawing.Point(4, 22);
             this.tabPage2.Name = "tabPage2";
-            this.tabPage2.Size = new System.Drawing.Size(562, 351);
+            this.tabPage2.Size = new System.Drawing.Size(562, 337);
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "Advanced";
             this.tabPage2.UseVisualStyleBackColor = true;
@@ -338,17 +349,17 @@
             this.kvalueLabel.Name = "kvalueLabel";
             this.kvalueLabel.Size = new System.Drawing.Size(19, 13);
             this.kvalueLabel.TabIndex = 12;
-            this.kvalueLabel.Text = "30";
+            this.kvalueLabel.Text = "21";
             // 
             // KvalueBar
             // 
             this.KvalueBar.Location = new System.Drawing.Point(110, 103);
-            this.KvalueBar.Maximum = 50;
+            this.KvalueBar.Maximum = 32;
             this.KvalueBar.Minimum = 10;
             this.KvalueBar.Name = "KvalueBar";
             this.KvalueBar.Size = new System.Drawing.Size(257, 45);
             this.KvalueBar.TabIndex = 11;
-            this.KvalueBar.Value = 30;
+            this.KvalueBar.Value = 21;
             this.KvalueBar.Scroll += new System.EventHandler(this.KvalueBar_Scroll);
             // 
             // EliteCheck
@@ -480,7 +491,7 @@
             this.tabPage3.Controls.Add(this.bronzePanel);
             this.tabPage3.Location = new System.Drawing.Point(4, 22);
             this.tabPage3.Name = "tabPage3";
-            this.tabPage3.Size = new System.Drawing.Size(562, 351);
+            this.tabPage3.Size = new System.Drawing.Size(562, 337);
             this.tabPage3.TabIndex = 2;
             this.tabPage3.Text = "Ranks";
             this.tabPage3.UseVisualStyleBackColor = true;
@@ -772,19 +783,64 @@
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(399, 395);
+            this.button1.Enabled = false;
+            this.button1.Location = new System.Drawing.Point(302, 381);
             this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(179, 43);
+            this.button1.Size = new System.Drawing.Size(130, 65);
             this.button1.TabIndex = 14;
             this.button1.Text = "Create Game";
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.Button1_Click);
+            // 
+            // button2
+            // 
+            this.button2.BackColor = System.Drawing.SystemColors.ActiveBorder;
+            this.button2.Location = new System.Drawing.Point(157, 381);
+            this.button2.Name = "button2";
+            this.button2.Size = new System.Drawing.Size(130, 65);
+            this.button2.TabIndex = 15;
+            this.button2.Text = "Valid data";
+            this.button2.UseVisualStyleBackColor = false;
+            this.button2.Click += new System.EventHandler(this.button2_Click_1);
+            // 
+            // button3
+            // 
+            this.button3.Location = new System.Drawing.Point(475, 15);
+            this.button3.Name = "button3";
+            this.button3.Size = new System.Drawing.Size(75, 23);
+            this.button3.TabIndex = 14;
+            this.button3.Text = "HELP";
+            this.button3.UseVisualStyleBackColor = true;
+            this.button3.Click += new System.EventHandler(this.button3_Click);
+            // 
+            // button4
+            // 
+            this.button4.Location = new System.Drawing.Point(475, 15);
+            this.button4.Name = "button4";
+            this.button4.Size = new System.Drawing.Size(75, 23);
+            this.button4.TabIndex = 18;
+            this.button4.Text = "HELP";
+            this.button4.UseVisualStyleBackColor = true;
+            this.button4.Click += new System.EventHandler(this.button4_Click);
+            // 
+            // button5
+            // 
+            this.button5.Enabled = false;
+            this.button5.Location = new System.Drawing.Point(447, 381);
+            this.button5.Name = "button5";
+            this.button5.Size = new System.Drawing.Size(131, 65);
+            this.button5.TabIndex = 16;
+            this.button5.Text = "Edit Game";
+            this.button5.UseVisualStyleBackColor = true;
+            this.button5.Click += new System.EventHandler(this.button5_Click);
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(589, 450);
+            this.Controls.Add(this.button5);
+            this.Controls.Add(this.button2);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.tabControl1);
             this.Controls.Add(this.LogOutButton);
@@ -883,6 +939,10 @@
         private System.Windows.Forms.TextBox bronzeMinBox;
         private System.Windows.Forms.Label label16;
         private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button button2;
+        private System.Windows.Forms.Button button3;
+        private System.Windows.Forms.Button button4;
+        private System.Windows.Forms.Button button5;
     }
 }
 

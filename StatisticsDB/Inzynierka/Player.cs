@@ -20,13 +20,12 @@ namespace Inzynierka
         [Required]
         public int GamesWon { get; set; }
         public int GamesTied { get; set; }
+        [Required]
         public int GamesLost { get; set; }
         [Required]
-        public int PointsLost { get; set; }
-        [Required]
         public double WinRate { get; set; }
-
-        public string Rank;
+        [Required]
+        public string Rank {get; set;}
 
         private void CountWinRate()
         {
@@ -42,6 +41,21 @@ namespace Inzynierka
             else if (result == 0) GamesTied++;
             else GamesWon++;
             CountWinRate();
+        }
+
+        public void Update_Rank(List<int> ranks)
+        {
+            List<string> temp_ranks = new List<string>(new string[] { "Bronze", "Silver", "Gold", "Platin", "Diamond", "Elite" });
+
+            int new_rank = 0;
+
+            foreach (var r in ranks)
+            {
+                if (SkillRating > r) new_rank++;
+                else break;
+            }
+
+            Rank = temp_ranks[new_rank];
         }
     }
 }
