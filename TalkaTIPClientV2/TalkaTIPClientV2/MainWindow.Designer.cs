@@ -45,6 +45,8 @@
             this.tabPage2 = new System.Windows.Forms.TabPage();
             this.listView2 = new System.Windows.Forms.ListView();
             this.tabPage3 = new System.Windows.Forms.TabPage();
+            this.gameAPIListView = new System.Windows.Forms.ListView();
+            this.playerStatisticsButton = new System.Windows.Forms.Button();
             this.searchOpponentButton = new System.Windows.Forms.Button();
             this.addAPIButton = new System.Windows.Forms.Button();
             this.serverAddressLabel = new System.Windows.Forms.Label();
@@ -67,8 +69,6 @@
             this.buttonCreateChat = new System.Windows.Forms.Button();
             this.buttonLeaveChat = new System.Windows.Forms.Button();
             this.buttonInviteToChat = new System.Windows.Forms.Button();
-            this.playerStatisticsButton = new System.Windows.Forms.Button();
-            this.gameAPIListView = new System.Windows.Forms.ListView();
             this.Groups.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.tabPage2.SuspendLayout();
@@ -98,6 +98,7 @@
             this.InsertMessageText.Size = new System.Drawing.Size(595, 69);
             this.InsertMessageText.TabIndex = 2;
             this.InsertMessageText.KeyDown += new System.Windows.Forms.KeyEventHandler(this.InsertMessageText_KeyDown);
+            this.InsertMessageText.KeyUp += new System.Windows.Forms.KeyEventHandler(this.InsertMessageText_KeyUp);
             // 
             // SendButton
             // 
@@ -251,6 +252,26 @@
             this.tabPage3.Size = new System.Drawing.Size(187, 301);
             this.tabPage3.TabIndex = 2;
             this.tabPage3.Text = "Games";
+            // 
+            // gameAPIListView
+            // 
+            this.gameAPIListView.HideSelection = false;
+            this.gameAPIListView.Location = new System.Drawing.Point(9, 85);
+            this.gameAPIListView.Name = "gameAPIListView";
+            this.gameAPIListView.Size = new System.Drawing.Size(170, 176);
+            this.gameAPIListView.TabIndex = 20;
+            this.gameAPIListView.UseCompatibleStateImageBehavior = false;
+            // 
+            // playerStatisticsButton
+            // 
+            this.playerStatisticsButton.BackColor = System.Drawing.SystemColors.ButtonShadow;
+            this.playerStatisticsButton.Location = new System.Drawing.Point(121, 51);
+            this.playerStatisticsButton.Name = "playerStatisticsButton";
+            this.playerStatisticsButton.Size = new System.Drawing.Size(58, 28);
+            this.playerStatisticsButton.TabIndex = 19;
+            this.playerStatisticsButton.Text = "Statistics";
+            this.playerStatisticsButton.UseVisualStyleBackColor = false;
+            this.playerStatisticsButton.Click += new System.EventHandler(this.playerStatisticsButton_Click);
             // 
             // searchOpponentButton
             // 
@@ -489,26 +510,6 @@
             this.buttonInviteToChat.UseVisualStyleBackColor = false;
             this.buttonInviteToChat.Visible = false;
             this.buttonInviteToChat.Click += new System.EventHandler(this.buttonInviteToChat_Click);
-            // 
-            // playerStatisticsButton
-            // 
-            this.playerStatisticsButton.BackColor = System.Drawing.SystemColors.ButtonShadow;
-            this.playerStatisticsButton.Location = new System.Drawing.Point(121, 51);
-            this.playerStatisticsButton.Name = "playerStatisticsButton";
-            this.playerStatisticsButton.Size = new System.Drawing.Size(58, 28);
-            this.playerStatisticsButton.TabIndex = 19;
-            this.playerStatisticsButton.Text = "Statistics";
-            this.playerStatisticsButton.UseVisualStyleBackColor = false;
-            this.playerStatisticsButton.Click += new System.EventHandler(this.playerStatisticsButton_Click);
-            // 
-            // gameAPIListView
-            // 
-            this.gameAPIListView.HideSelection = false;
-            this.gameAPIListView.Location = new System.Drawing.Point(9, 85);
-            this.gameAPIListView.Name = "gameAPIListView";
-            this.gameAPIListView.Size = new System.Drawing.Size(170, 176);
-            this.gameAPIListView.TabIndex = 20;
-            this.gameAPIListView.UseCompatibleStateImageBehavior = false;
             // 
             // MainWindow
             // 

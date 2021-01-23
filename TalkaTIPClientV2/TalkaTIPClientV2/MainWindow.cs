@@ -183,6 +183,8 @@ namespace TalkaTIPClientV2
         private void LogOutButton_Click(object sender, EventArgs e)
         {
             Program.loginAndMessage.Clear();
+            Program.apiNameAndHandle.Clear();
+            Program.chatNameAndMessage.Clear();
             DialogResult = DialogResult.No;
             Close();
         }
@@ -889,6 +891,14 @@ namespace TalkaTIPClientV2
                 {
                     MessageBox.Show("API not in the main class variable.", "Error");
                 }
+            }
+        }
+
+        private void InsertMessageText_KeyUp(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+            {
+                InsertMessageText.Text = string.Empty;
             }
         }
     }
