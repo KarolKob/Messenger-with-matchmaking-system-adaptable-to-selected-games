@@ -653,9 +653,9 @@ namespace TalkaTIPClientV2
 
                     ContactName.Text = listViewGroups.SelectedItems[0].Text;
                 }
-                catch (Exception)
+                catch (Exception err)
                 {
-                    MessageBox.Show("Server connection error.", "Error");
+                    MessageBox.Show("Server connection error.\n" + err, "Error");
                 }
             }
         }
@@ -685,6 +685,7 @@ namespace TalkaTIPClientV2
                                 ListViewItem chat = new ListViewItem(f.textContent.Text, 0);
                                 Program.mainWindow.listViewGroups.Items.Add(chat);
                                 listViewGroups.Refresh();
+                                //f.Dispose();
                             }
                             Program.client.Disconnect();
                         }
@@ -752,11 +753,12 @@ namespace TalkaTIPClientV2
                                 {
                                     MessageBox.Show("Task failed.", "Error");
                                     f.Dispose();
-                                    buttonCreateChat.PerformClick();
+                                    buttonInviteToChat.PerformClick();
                                 }
                                 else
                                 {
                                     MessageBox.Show("User added successfully.", "Success");
+                                    //f.Dispose();
                                 }
                                 Program.client.Disconnect();
                             }
@@ -770,7 +772,7 @@ namespace TalkaTIPClientV2
                         {
                             MessageBox.Show("User name can't be empty.", "Error");
                             f.Dispose();
-                            buttonCreateChat.PerformClick();
+                            buttonInviteToChat.PerformClick();
                         }
                     }
                 }

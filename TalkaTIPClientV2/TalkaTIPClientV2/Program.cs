@@ -36,7 +36,7 @@ namespace TalkaTIPClientV2
         {
             string thisprocessname = Process.GetCurrentProcess().ProcessName;
 
-            if (Process.GetProcesses().Count(p => p.ProcessName == thisprocessname) > 1)
+            if (Process.GetProcesses().Count(p => p.ProcessName == thisprocessname) > 2)
             {
                 return;
             }
