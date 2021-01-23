@@ -26,7 +26,8 @@ namespace TalkaTIPClientV2
         public static bool Register(string login, string password, byte[] key)
         {
             char comm = (char)0;
-            string message = comm + " " + Program.security.EncryptMessage(key, login + " " + password) + " <EOF>";
+            string message = comm + " " + Program.security.EncryptMessage(key, login + " " +
+                Security.hashPassword(password + login)) + " <EOF>";
 
             Program.client.Send(message);
             return Response(Program.client.Receive()[0]);
@@ -35,7 +36,8 @@ namespace TalkaTIPClientV2
         public static bool LogIn(string login, string password, byte[] key)
         {
             char comm = (char)1;
-            string message = comm + " " + Program.security.EncryptMessage(key, login + " " + password) + " <EOF>";
+            string message = comm + " " + Program.security.EncryptMessage(key, login + " " +
+                Security.hashPassword(password + login)) + " <EOF>";
 
             Program.client.Send(message);
 
@@ -51,20 +53,12 @@ namespace TalkaTIPClientV2
             return;
         }
 
-        public static bool AccDel(string login, string password)
-        {
-            char comm = (char)3;
-            string message = comm + " " + Program.security.EncryptMessage(Program.sessionKeyWithServer,
-                login + " " + password) + " <EOF>";
-            Program.client.Send(message);
-            return Response(Program.client.Receive()[0]);
-        }
-
-        public static bool PassChng(string login, string oldPassword, string newPassword)
+        public static bool ChangePassword(string login, string oldPassword, string newPassword)
         {
             char comm = (char)4;
             string message = comm + " " + Program.security.EncryptMessage(Program.sessionKeyWithServer,
-                login + " " + oldPassword + " " + newPassword) + " <EOF>";
+                login + " " + Security.hashPassword(oldPassword + login) + " " +
+                Security.hashPassword(newPassword + login)) + " <EOF>";
             Program.client.Send(message);
             var ans = Program.client.Receive();
             return Response(ans[0]);
@@ -404,7 +398,7 @@ namespace TalkaTIPClientV2
             });
         }
 
-        // TODO: Recieving messages in real time
+        // Recieving messages in real time
         private static void RecieveGroupChatMessage(string chatMessage)
         {
             string[] param = chatMessage.Split(' ');

@@ -81,5 +81,21 @@ namespace TalkaTIPClientV2
                 }
             }
         }
+
+        /// <summary>
+        /// The argument is password + login. Returns 256-bit hexadecimal hash.
+        /// </summary>
+        /// <param name="password"></param>
+        /// <returns></returns>
+        public static string hashPassword(string password)
+        {
+            byte[] bytePasswd = Encoding.Default.GetBytes(password);
+            using (var sha256 = SHA256.Create())
+            {
+                byte[] hashBytePasswd = sha256.ComputeHash(bytePasswd);
+                string hashedPassword = BitConverter.ToString(hashBytePasswd).Replace("-", string.Empty);
+                return hashedPassword;
+            }
+        }
     }
 }

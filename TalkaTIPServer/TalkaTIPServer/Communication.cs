@@ -56,7 +56,7 @@ namespace TalkaTIPSerwer
                 if (loginUnique == 0)
                 {
                     newUser.Login = login;
-                    newUser.Password = Utilities.hashBytePassHex(param[1] + login); // 256 bit hash password          
+                    newUser.Password = param[1];         
                     newUser.LastLogoutDate = DateTime.Now;
                     newUser.RegistrationDate = DateTime.Now;
 
@@ -82,7 +82,7 @@ namespace TalkaTIPSerwer
         {
             string login = param[0];
 
-            string password = Utilities.hashBytePassHex(param[1] + login);
+            string password = param[1];
 
             // users -> online
             using (var ctx = new TalkaTipDB())
@@ -192,13 +192,13 @@ namespace TalkaTIPSerwer
         public static string ChangePassword(List<string> param)
         {
             string login = param[0];
-            string password1 = Utilities.hashBytePassHex(param[1] + login);
+            string password1 = param[1];
             using (var ctx = new TalkaTipDB())
             {
                 var userToChngPasswd = ctx.Users.Where(x => x.Login == login && x.Password == password1).FirstOrDefault();
                 if (userToChngPasswd != null)
                 {
-                    userToChngPasswd.Password = Utilities.hashBytePassHex(param[2] + login);
+                    userToChngPasswd.Password = param[2];
                     try
                     {
                         ctx.Entry(userToChngPasswd).State = System.Data.Entity.EntityState.Modified;
@@ -1188,9 +1188,9 @@ namespace TalkaTIPSerwer
         public static string ChooseCommunique(string message, byte[] sessionKey, Socket client)
         {
             byte[] sessKey;
-            long userID = 0;
-            string result = string.Empty;
-            char mess = message[0];
+            long userID;
+            string result;
+            //char mess = message[0];
 
             if (message[0] == (char)1 || message[0] == (char)0)
             {
@@ -1200,7 +1200,7 @@ namespace TalkaTIPSerwer
             else
             {
                 // Session key is in the onlineUsers dictionary
-                userID = getUserIDHavingAdressIP(((IPEndPoint)client.RemoteEndPoint).Address.ToString());
+                userID = getUserIDByIPAddress(((IPEndPoint)client.RemoteEndPoint).Address.ToString());
                 if (userID > 0)
                 {
                     sessKey = Program.onlineUsers[userID].sessionKey;
@@ -1213,33 +1213,35 @@ namespace TalkaTIPSerwer
             }
 
             // Decipher   
-            string decryptedMessage = Program.security.DecryptMessage(message.Substring(2, message.Length - 8), sessKey);
+            string decipheredMessage = Program.security.DecryptMessage(message.Substring(2, message.Length - 8), sessKey);
 
-            // Take 8 bits to recognize the communique
-            int bits8 = (int)message[0];
+            Console.WriteLine("Header: {0}, Deciphered content: {1}", message[0], decipheredMessage);
+
+            // Take 1 byte to get the header
+            int header = message[0];
 
             // Parameters to send
-            string[] sParameters = decryptedMessage.Split(' ');
+            string[] sendParameters = decipheredMessage.Split(' ');
             List<string> parameters = new List<string>();
-            for (int i = 0; i < sParameters.Length; i++)
+            for (int i = 0; i < sendParameters.Length; i++)
             {
-                parameters.Add(sParameters[i]);
+                parameters.Add(sendParameters[i]);
             }
 
-            if (bits8 != 1) // If it isn't login
+            // Login requires 3 parameters, in other case use one
+            if (header != 1) 
             {
-                // Use the dictionary of methods to choose a proper response
-                // http://stackoverflow.com/a/4233539
-                result = (string)communiqueDictionary[bits8].DynamicInvoke(parameters);
+                // Use the dictionary of delegates to choose the proper method to respond
+                result = (string)communiqueDictionary[header].DynamicInvoke(parameters);
             }
             else
             {
-                result = (string)communiqueDictionary[bits8].DynamicInvoke(parameters, sessionKey, client);
+                result = (string)communiqueDictionary[header].DynamicInvoke(parameters, sessionKey, client);
             }
             return result;
         }
 
-        public static long getUserIDHavingAdressIP(string addressIP)
+        public static long getUserIDByIPAddress(string addressIP)
         {
             long userID = -1;
 

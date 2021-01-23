@@ -811,7 +811,7 @@ namespace TalkaTIPClientV2
                     {
                         if (!Program.apiNameAndHandle.ContainsKey(result))
                         {
-                            // TODO: Extract the API name from JSON
+                            // Extract the API name from JSON
                             Program.apiNameAndHandle.Add(result, aPIHandle);
                             MessageBox.Show(result, "OK");
                         }
@@ -834,9 +834,6 @@ namespace TalkaTIPClientV2
                 if (!Program.apiNameAndHandle.ContainsKey(apiName))
                 {
                     string stats = Program.apiNameAndHandle[apiName].ApiGETUserStatistics().GetAwaiter().GetResult();
-
-                    // TODO: Extract the data from JSON and convert to acceptable form for display
-
 
                     // Display statistics on the main screen
                     UpdateChatText(stats);
@@ -899,6 +896,65 @@ namespace TalkaTIPClientV2
             if (e.KeyCode == Keys.Enter)
             {
                 InsertMessageText.Text = string.Empty;
+            }
+        }
+
+        private void changePasswordButton_Click(object sender, EventArgs e)
+        {
+            using (TextDialog f = new TextDialog())
+            {
+                f.labelDesc.Text = "Type in your old password:";
+                f.textContent.UseSystemPasswordChar = true;
+
+                if (f.ShowDialog() == DialogResult.OK)
+                {
+                    if (f.textContent.Text != string.Empty)
+                    {
+                        string oldPassword = f.textContent.Text;
+                        f.Dispose();
+                        using (TextDialog f2 = new TextDialog())
+                        {
+
+                            f2.labelDesc.Text = "Type in your new password:";
+                            f2.textContent.UseSystemPasswordChar = true;
+                            if (f2.ShowDialog() == DialogResult.OK)
+                            {
+                                if (f2.textContent.Text != string.Empty)
+                                {
+                                    try
+                                    {
+                                        Program.client = new Client(Program.serverAddress);
+                                        if (!Communication.ChangePassword(Program.userLogin, oldPassword, f2.textContent.Text))
+                                        {
+                                            MessageBox.Show("Task failed.", "Error");
+                                            f2.Dispose();
+                                            changePasswordButton.PerformClick();
+                                        }
+                                        else
+                                        {
+                                            MessageBox.Show("Password change successful.", "Success");
+                                            //f.Dispose();
+                                        }
+                                        Program.client.Disconnect();
+                                    }
+                                    catch (Exception)
+                                    {
+                                        MessageBox.Show("Server connection error.", "Error");
+                                        f2.textContent.UseSystemPasswordChar = false;
+                                        f2.Dispose();
+                                    }
+                                }
+                            }
+                        } 
+                    }
+                    else
+                    {
+                        MessageBox.Show("User name can't be empty.", "Error");
+                        f.Dispose();
+                        changePasswordButton.PerformClick();
+                    }
+                }
+                f.textContent.UseSystemPasswordChar = false;
             }
         }
     }

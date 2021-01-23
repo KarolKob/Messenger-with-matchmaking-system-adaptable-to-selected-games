@@ -69,6 +69,7 @@
             this.buttonCreateChat = new System.Windows.Forms.Button();
             this.buttonLeaveChat = new System.Windows.Forms.Button();
             this.buttonInviteToChat = new System.Windows.Forms.Button();
+            this.changePasswordButton = new System.Windows.Forms.Button();
             this.Groups.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.tabPage2.SuspendLayout();
@@ -511,11 +512,23 @@
             this.buttonInviteToChat.Visible = false;
             this.buttonInviteToChat.Click += new System.EventHandler(this.buttonInviteToChat_Click);
             // 
+            // changePasswordButton
+            // 
+            this.changePasswordButton.BackColor = System.Drawing.SystemColors.ButtonShadow;
+            this.changePasswordButton.Location = new System.Drawing.Point(137, 38);
+            this.changePasswordButton.Name = "changePasswordButton";
+            this.changePasswordButton.Size = new System.Drawing.Size(66, 28);
+            this.changePasswordButton.TabIndex = 19;
+            this.changePasswordButton.Text = "Password";
+            this.changePasswordButton.UseVisualStyleBackColor = false;
+            this.changePasswordButton.Click += new System.EventHandler(this.changePasswordButton_Click);
+            // 
             // MainWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(822, 491);
+            this.Controls.Add(this.changePasswordButton);
             this.Controls.Add(this.buttonInviteToChat);
             this.Controls.Add(this.buttonLeaveChat);
             this.Controls.Add(this.buttonCreateChat);
@@ -596,6 +609,7 @@
         private System.Windows.Forms.Button buttonInviteToChat;
         private System.Windows.Forms.Button playerStatisticsButton;
         public System.Windows.Forms.ListView gameAPIListView;
+        private System.Windows.Forms.Button changePasswordButton;
     }
 }
 

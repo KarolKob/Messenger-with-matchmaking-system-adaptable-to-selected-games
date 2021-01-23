@@ -22,7 +22,7 @@ namespace TalkaTIPSerwer
         private static void SetTimer()
         {
             // Create a timer with a 61 seconds interval
-            serverTimer = new System.Timers.Timer(61000);
+            serverTimer = new System.Timers.Timer(62000);
 
             // Hook up the Elapsed event for the timer 
             serverTimer.Elapsed += OnTimedEvent;
@@ -33,15 +33,17 @@ namespace TalkaTIPSerwer
         private static void OnTimedEvent(object source, ElapsedEventArgs e)
         {
             DateTime time = DateTime.Now;
-            List<long> usersIDToRemove = new List<long>();
+            List<long> userIDsToRemove = new List<long>();
+
             foreach (var item in Program.onlineUsers)
             {
                 if ((time - item.Value.iAM).TotalSeconds > 60)
                 {
-                    usersIDToRemove.Add(item.Key);
+                    userIDsToRemove.Add(item.Key);
                 }
             }
-            foreach (var item in usersIDToRemove)
+
+            foreach (var item in userIDsToRemove)
             {
                 Program.onlineUsers.Remove(item);
             }
@@ -57,7 +59,7 @@ namespace TalkaTIPSerwer
             IPHostEntry ipHostInfo = Dns.Resolve(Dns.GetHostName());
             int i = 0;
   
-            Console.WriteLine("Choose the server IPv4 address:");
+            Console.WriteLine("Choose IPv4 address by typing a correct number:");
 
             foreach (var item in ipHostInfo.AddressList)
             {
@@ -71,7 +73,7 @@ namespace TalkaTIPSerwer
             do
             {
                 Console.Write("Type: ");
-                i = (int)(Console.ReadKey().KeyChar) - 48;
+                i = Console.ReadKey().KeyChar - 48;
                 Console.WriteLine();
             } while (i < 0 || i >= ipHostInfo.AddressList.Count() + 1);
             
@@ -100,7 +102,7 @@ namespace TalkaTIPSerwer
                 listener.Bind(localEndPoint);
                 listener.Listen(100);
 
-                Console.WriteLine("Server is running (" + ipAddress + ")");
+                Console.WriteLine("Server is running. Address used: " + ipAddress);
                 SetTimer();
                 while (true)
                 {
@@ -168,8 +170,8 @@ namespace TalkaTIPSerwer
                 {
                     // All the data has been read from the client
                     // Display it on the console
-                    Console.WriteLine("Read {0} bytes from socket. \nData : {1}", content.Length, content);
-                    string messageBits = Utilities.getBinaryMessage(content);
+                    Console.WriteLine("Read {0} bytes from socket.\n", content.Length);
+                    string messageBits = getBinaryMessage(content);
 
                     // Take 8 bits to recognize the communique
                     int bits8 = Convert.ToInt32(messageBits.Substring(0, 8), 2);    // Decimal value
@@ -177,6 +179,7 @@ namespace TalkaTIPSerwer
                     if (bits8 == 17)
                     {
                         sessionKey = Program.security.SetSessionKey(Convert.FromBase64String(content.Substring(2, content.Length - 8)));
+                        Console.WriteLine("Session key: {0}", sessionKey);
                         state.sessionKey = sessionKey;
                         Send(handler, (char)17 + " " + Convert.ToBase64String(Program.security.GetOwnerPublicKey().ToByteArray()) + " <EOF>");
                         state.buffer = new byte[1024];
@@ -198,7 +201,7 @@ namespace TalkaTIPSerwer
                         {
 
                             string userAddressIP = ((IPEndPoint)handler.RemoteEndPoint).Address.ToString();
-                            long userID = Communication.getUserIDHavingAdressIP(userAddressIP);
+                            long userID = Communication.getUserIDByIPAddress(userAddressIP);
                             if (userID == -1)
                             {
                                 Send(handler, Communication.Fail());
@@ -289,6 +292,16 @@ namespace TalkaTIPSerwer
             {
                 
             }
+        }
+
+        static string getBinaryMessage(string message)
+        {
+            string binMessage = string.Empty;
+            foreach (char ch in message)
+            {
+                binMessage += Convert.ToString(ch, 2).PadLeft(8, '0');
+            }
+            return binMessage;
         }
     }
 
