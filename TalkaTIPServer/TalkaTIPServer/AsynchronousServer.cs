@@ -226,7 +226,6 @@ namespace TalkaTIPSerwer
 
                         }
                     }
-
                 }
                 else
                 {

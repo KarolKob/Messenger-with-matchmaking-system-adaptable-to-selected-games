@@ -811,7 +811,13 @@ namespace TalkaTIPClientV2
                     {
                         if (!Program.apiNameAndHandle.ContainsKey(result))
                         {
-                            // Extract the API name from JSON
+                            Communication.AddApiToUser(Program.userLogin, promptValue, result);
+
+                            string[] apiDetails = new string[2];
+                            apiDetails[0] = result;
+                            apiDetails[1] = promptValue;
+                            gameAPIListView.Items.Insert(0, new ListViewItem(apiDetails));
+
                             Program.apiNameAndHandle.Add(result, aPIHandle);
                             MessageBox.Show(result, "OK");
                         }
