@@ -36,7 +36,9 @@ namespace TalkaTIPClientV2
             {
                 // Password must contain:
                 // Minimum eight characters, at least one uppercase letter, one lowercase letter, one number and one special character
-                Regex regex = new Regex(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[$@$!%*?&])[A-Za-z\d$@$!%*?&]{8,}$");
+
+                //Regex regex = new Regex(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[$@$!%*?&])[A-Za-z\d$@$!%*?&]{8,}$");
+                Regex regex = new Regex(@".*");
 
                 Match match = regex.Match(PasswordText.Text);
                 if (match.Success)

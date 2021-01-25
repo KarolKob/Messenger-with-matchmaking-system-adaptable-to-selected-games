@@ -809,8 +809,9 @@ namespace TalkaTIPClientV2
 
                     if (result != null)
                     {
-                        if (!Program.apiNameAndHandle.ContainsKey(result))
+                        try
                         {
+                            Program.client = new Client(Program.serverAddress);
                             Communication.AddApiToUser(Program.userLogin, promptValue, result);
 
                             string[] apiDetails = new string[2];
@@ -820,10 +821,11 @@ namespace TalkaTIPClientV2
 
                             Program.apiNameAndHandle.Add(result, aPIHandle);
                             MessageBox.Show(result, "OK");
+                            Program.client.Disconnect();
                         }
-                        else
+                        catch (Exception)
                         {
-                            MessageBox.Show("API connection failed. Try again later.", "Error");
+                            MessageBox.Show("Server connection error.", "Error");
                         }
                     }
                 }
@@ -837,7 +839,7 @@ namespace TalkaTIPClientV2
             else
             {
                 string apiName = gameAPIListView.SelectedItems[0].Text;
-                if (!Program.apiNameAndHandle.ContainsKey(apiName))
+                if (Program.apiNameAndHandle.ContainsKey(apiName))
                 {
                     string stats = Program.apiNameAndHandle[apiName].ApiGETUserStatistics().GetAwaiter().GetResult();
 
@@ -858,9 +860,9 @@ namespace TalkaTIPClientV2
             else
             {
                 string apiName = gameAPIListView.SelectedItems[0].Text;
-                if (!Program.apiNameAndHandle.ContainsKey(apiName))
+                if (Program.apiNameAndHandle.ContainsKey(apiName))
                 {
-                    if (apiName == "Tic Tac Toe")
+                    if (apiName == "Tic-Tac-Toe")
                     {
                         // Initialize the game in a second window
                         Thread myThread = new Thread((ThreadStart)delegate { Application.Run(new game(Program.userLogin)); });

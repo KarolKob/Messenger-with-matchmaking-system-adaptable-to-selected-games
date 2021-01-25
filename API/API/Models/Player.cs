@@ -16,14 +16,16 @@ namespace API.Models
         public string NickName { get; set; }
         [Required]
         public double SkillRating { get; set; }
-
         [Required]
         public int GamesPlayed { get; set; }
+        [Required]
         public int GamesWon { get; set; }
         public int GamesTied { get; set; }
+        [Required]
         public int GamesLost { get; set; }
         [Required]
         public double WinRate { get; set; }
+        [Required]
         public string Rank { get; set; }
 
 
@@ -42,6 +44,20 @@ namespace API.Models
             else if (result == 0) GamesTied++;
             else GamesWon++;
             CountWinRate();
+        }
+        public void Update_Rank(List<int> ranks)
+        {
+            List<string> temp_ranks = new List<string>(new string[] { "Bronze", "Silver", "Gold", "Platin", "Diamond", "Elite" });
+
+            int new_rank = 0;
+
+            foreach (var r in ranks)
+            {
+                if (SkillRating > r) new_rank++;
+                else break;
+            }
+
+            Rank = temp_ranks[new_rank];
         }
     }
 }

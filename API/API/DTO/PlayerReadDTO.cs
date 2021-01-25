@@ -1,4 +1,5 @@
-﻿using System;
+﻿using API.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -17,6 +18,6 @@ namespace API.DTO
         public int GamesLost { get; set; }
         public double WinRate { get; set; }
         public string Rank { get; set; }
-        public string ApiName = "Tic Tac Toe"; //tu pobrać z config
+        public string ApiName { get; set; }
     }
 }

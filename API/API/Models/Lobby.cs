@@ -16,7 +16,7 @@ namespace API.Models
         public List<Player> queue { get; set; }
         public Lobby(Player player, string id,int size,double skill)
         {
-            lobby_ID = id;
+            lobby_ID = id+ DateTime.Now;
             max_size = size;
             queue=new List<Player> { player };
             AvgSkill = skill;

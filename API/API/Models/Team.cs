@@ -10,6 +10,7 @@ namespace API.Models
     {
         [Key]
         public int TeamID { get; }
+        [Required]
         public string PlayersID { get; set; }
     }
 }

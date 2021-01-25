@@ -28,12 +28,12 @@ namespace API.Data
             var game = config.games.First(g => g.ConfigId == game_id);
             if (game.TieGames)
             {
-                p = new Player { NickName = player.NickName, Rank = "", SkillRating = game.StartRating, GamesPlayed = 0, GamesWon = 0, GamesLost = 0, GamesTied = 0, WinRate = 0.0 };
+                p = new Player { NickName = player.NickName, Rank = "Bronze", SkillRating = game.StartRating, GamesPlayed = 0, GamesWon = 0, GamesLost = 0, GamesTied = 0, WinRate = 0.0 };
                 await _context.PlayersDB.AddAsync(p);
             }
             else
             {
-                p = new Player { NickName = player.NickName, Rank = "", SkillRating = game.StartRating, GamesPlayed = 0, GamesWon = 0, GamesLost = 0, WinRate = 0.0 };
+                p = new Player { NickName = player.NickName, Rank = "Bronze", SkillRating = game.StartRating, GamesPlayed = 0, GamesWon = 0, GamesLost = 0, WinRate = 0.0 };
                 await _context.PlayersDB.AddAsync(p);
             }
             
@@ -74,12 +74,12 @@ namespace API.Data
             return m.TeamID;
         }
 
-        public async Task<int> Add_Result_Team(int game_id, List<int> scores, int config_id) //Scores to wyniki poszczególnych graczy?
+        public async Task<int> Add_Result_Team(int game_id, List<int> scores, int config_id)
         {
-                var game = await _context.TeamGamesDB.FirstAsync(g => g.GameId == game_id);
-                game.Add_Result(scores);
-                if (game.RankedGame)
-                {
+             var game = await _context.TeamGamesDB.FirstAsync(g => g.GameId == game_id);
+             game.Add_Result(scores);
+             if (game.RankedGame)
+             {
                     List<double> skills = new List<double>();
                     List<int> tids = JsonSerializer.Deserialize<List<int>>(game.Teams);
                     //fill skills list
@@ -97,12 +97,18 @@ namespace API.Data
                         avg_skills = avg_skills / team_players.Count;
                         skills.Add(avg_skills);
                     }
+
+                    bool ties = false;
+
                     List<double> ranking_updates = new List<double>();
+                    List<int> ranks = new List<int>();
 
                     var game_config = config.games.First(g => g.ConfigId == config_id);
-                    ranking_updates = game.CountRanking(scores, skills, game_config.KValue);
+                    ranking_updates = game.CountRanking(scores, skills, game_config.KValue, game_config.PktsRatio);
+                    ranks = JsonSerializer.Deserialize<List<int>>(game_config.RanksLimit);
+                    if (game_config.TieGames) ties = true;
 
-                    //count new skills
+                //count new skills
 
                     int i = 0;
                     List<int> highest = new List<int>();
@@ -124,13 +130,25 @@ namespace API.Data
                     {
                         var team = await _context.Teams.FirstAsync(t => t.TeamID == tid);
                         List<string> team_players = JsonSerializer.Deserialize<List<string>>(team.PlayersID);
-
-                        if (highest.Contains(i))
+                    if (ties)
+                    {
+                        if (highest.Contains(i) & highest.Count < 2)
                         {
                             foreach (var pid in team_players)
                             {
                                 var player = await _context.PlayersDB.FirstAsync(p => p.NickName == pid);
                                 player.Update_Stats(ranking_updates[i], 1);
+                                player.Update_Rank(ranks);
+                            }
+                            i++;
+                        }
+                        else if (highest.Contains(i) & highest.Count > 1)
+                        {
+                            foreach (var pid in team_players)
+                            {
+                                var player = await _context.PlayersDB.FirstAsync(p => p.NickName == pid);
+                                player.Update_Stats(ranking_updates[i], 0);
+                                player.Update_Rank(ranks);
                             }
                             i++;
                         }
@@ -140,11 +158,37 @@ namespace API.Data
                             {
                                 var player = await _context.PlayersDB.FirstAsync(p => p.NickName == pid);
                                 player.Update_Stats(ranking_updates[i], 2);
+                                player.Update_Rank(ranks);
                             }
                             i++;
                         }
                     }
-                }
+                    else
+                    {
+                        if (highest.Contains(i))
+                        {
+                            foreach (var pid in team_players)
+                            {
+                                var player = await _context.PlayersDB.FirstAsync(p => p.NickName == pid);
+                                player.Update_Stats(ranking_updates[i], 1);
+                                player.Update_Rank(ranks);
+                            }
+                            i++;
+                        }
+                        else
+                        {
+                            foreach (var pid in team_players)
+                            {
+                                var player = await _context.PlayersDB.FirstAsync(p => p.NickName == pid);
+                                player.Update_Stats(ranking_updates[i], 2);
+                                player.Update_Rank(ranks);
+                            }
+                            i++;
+                        }
+                    }
+                        
+                    }
+             }
             var result=await _context.SaveChangesAsync();
             if (result > 0)
             {
@@ -172,12 +216,16 @@ namespace API.Data
                         skills.Add(player.SkillRating);
                     }
                     List<double> ranking_updates = new List<double>();
+                    bool ties = false;
+                    List<int> ranks = new List<int>();
 
-                        var game_config = config.games.First(g => g.ConfigId == config_id);
-                        ranking_updates = game.CountRanking(scores, skills, game_config.KValue);
+                    var game_config = config.games.First(g => g.ConfigId == config_id);
+                    ranking_updates = game.CountRanking(scores, skills, game_config.KValue, game_config.PktsRatio);
+                    ranks = JsonSerializer.Deserialize<List<int>>(game_config.RanksLimit);
+                    if (game_config.TieGames) ties = true;
 
-                    //count new skills
-                    int i = 0;
+                //count new skills
+                int i = 0;
 
                     //update ratings and stats
                     List<int> highest = new List<int>();
@@ -203,11 +251,13 @@ namespace API.Data
                             if (highest.Contains(i) & highest.Count < 2) player.Update_Stats(ranking_updates[i++], 1);
                             else if (highest.Contains(i) & highest.Count > 1) player.Update_Stats(ranking_updates[i++], 0);
                             else player.Update_Stats(ranking_updates[i++], 2);
+                            player.Update_Rank(ranks);
                         }
                         else
                         {
                             if (highest.Contains(i)) player.Update_Stats(ranking_updates[i++], 1);
                             else player.Update_Stats(ranking_updates[i++], 2);
+                            player.Update_Rank(ranks);
                         }
 
                     }

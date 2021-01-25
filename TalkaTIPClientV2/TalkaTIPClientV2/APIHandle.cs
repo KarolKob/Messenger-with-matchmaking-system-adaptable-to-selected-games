@@ -78,7 +78,7 @@ namespace TalkaTIPClientV2
             Server server;
             try
             {
-                HttpResponseMessage response = await httpClient.GetAsync(apiAddress + "Matching/Match/" + Program.userLogin);
+                HttpResponseMessage response = await httpClient.GetAsync("Matching/Match/" + Program.userLogin);
                 response.EnsureSuccessStatusCode();
                 var objekt = await response.Content.ReadAsStringAsync();
                 server = JsonConvert.DeserializeObject<Server>(objekt);

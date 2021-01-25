@@ -66,14 +66,16 @@ namespace API.Controllers
         {
             var playerinfo = await _repository.GetPlayerInfo(nick);
             //var ip = _httpContextAccessor.HttpContext.Connection.RemoteIpAddress;
-
+            GameConfigs gameConfig = await _config.GetConfig(configID);
 
 
             if (playerinfo != null)
             {
                 //bez if zwraca 204 no content w przypadku braku wyniku
                 //return Ok(_mapper.Map<CommandReadDTO>(commanditem));
-                return Ok(_mapper.Map<PlayerReadDTO>(playerinfo));
+                var player=_mapper.Map<PlayerReadDTO>(playerinfo);
+                player.ApiName = gameConfig.Name;
+                return player;
             }
             //zwraca 404 not found
             return NotFound();
@@ -86,6 +88,7 @@ namespace API.Controllers
         public async Task<ActionResult<PlayerReadDTO>> CreatePlayer(PlayerCreateDTO playerCreate) //dodawanie gracza to bazy danych
         {
             Player response;
+            GameConfigs gameConfig = await _config.GetConfig(configID);
             var playerModel = _mapper.Map<Player>(playerCreate);
             try
             {
@@ -96,6 +99,7 @@ namespace API.Controllers
                 return BadRequest("Nick jest już zajęty");
             }
             var playerReadModel = _mapper.Map<PlayerReadDTO>(response);
+            playerReadModel.ApiName = gameConfig.Name;
             //return Ok(_mapper.Map<PlayerReadDTO>(playerModel)); 
             return CreatedAtRoute(nameof(GetPlayerInfo), new { nick = playerReadModel.Nickname }, playerReadModel);
             //return NoContent();
