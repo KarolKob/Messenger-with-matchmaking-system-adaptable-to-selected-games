@@ -328,15 +328,35 @@ namespace TalkaTIPSerwer
                     if (user1Friend.UserID != 0)
                     {
                         var friend = ctx.Friends.Where(x => x.UserID1 == userLoggedInID1 && x.UserID2 == user1Friend.UserID).FirstOrDefault();
-                        ctx.Entry(friend).State = System.Data.Entity.EntityState.Deleted;
-                        try
+                        if (friend != null)
                         {
-                            ctx.SaveChanges();
-                            Program.onlineUsers[userLoggedInID1].friendWithStateDict.Remove(user1Friend.Login);
+                            ctx.Entry(friend).State = System.Data.Entity.EntityState.Deleted;
+                            try
+                            {
+                                ctx.SaveChanges();
+                                Program.onlineUsers[userLoggedInID1].friendWithStateDict.Remove(user1Friend.Login);
+                            }
+                            catch (DbUpdateConcurrencyException)
+                            {
+                                return Fail();
+                            }
                         }
-                        catch (DbUpdateConcurrencyException)
+                        else
                         {
-                            return Fail();
+                            friend = ctx.Friends.Where(x => x.UserID1 == user1Friend.UserID && x.UserID2 == userLoggedInID1).FirstOrDefault();
+                            if (friend != null)
+                            {
+                                ctx.Entry(friend).State = System.Data.Entity.EntityState.Deleted;
+                                try
+                                {
+                                    ctx.SaveChanges();
+                                    Program.onlineUsers[userLoggedInID1].friendWithStateDict.Remove(user1Friend.Login);
+                                }
+                                catch (DbUpdateConcurrencyException)
+                                {
+                                    return Fail();
+                                }
+                            }
                         }
                     }
                     else
@@ -606,34 +626,48 @@ namespace TalkaTIPSerwer
                     long User2ID = ctx.Users.Where(x => x.Login == loginTo).Select(x => x.UserID).FirstOrDefault();
                     if (User2ID != 0)
                     {
-                        var selectedRows = ctx.Messages
-                            .Where(x => (x.UserReceiverID == User1ID && x.UserSenderID == User2ID)
-                            || (x.UserReceiverID == User2ID && x.UserSenderID == User1ID)).Select(x => x);
-
-                        if(selectedRows != null)
+                        var block = ctx.Blocked.Where(x => x.UserID1 == User1ID && x.UserID2 == User2ID).FirstOrDefault();
+                        if (block == null)
                         {
-                            foreach(Messages msg in selectedRows)
-                            {
-                                if (msg.UserSenderID == User1ID)
-                                {
-                                    allChatMessages = allChatMessages + "\n" + loginFrom + " " + msg.SendTime.ToString() + "\n" + msg.Message + "\n";
-                                }
-                                else
-                                {
-                                    allChatMessages = allChatMessages + "\n" + loginTo + " " + msg.SendTime.ToString() + "\n" + msg.Message + "\n";
-                                }
-                            }
+                            var selectedRows = ctx.Messages
+                                .Where(x => (x.UserReceiverID == User1ID && x.UserSenderID == User2ID)
+                                || (x.UserReceiverID == User2ID && x.UserSenderID == User1ID)).Select(x => x);
 
+                            if (selectedRows != null)
+                            {
+                                foreach (Messages msg in selectedRows)
+                                {
+                                    if (msg.UserSenderID == User1ID)
+                                    {
+                                        allChatMessages = allChatMessages + "\n" + loginFrom + " " + msg.SendTime.ToString() + "\n" + msg.Message + "\n";
+                                    }
+                                    else
+                                    {
+                                        allChatMessages = allChatMessages + "\n" + loginTo + " " + msg.SendTime.ToString() + "\n" + msg.Message + "\n";
+                                    }
+                                }
+
+                                allChatMessages = Program.security.EncryptMessage(
+                                    Program.onlineUsers[User1ID].sessionKey, allChatMessages);
+                                allChatMessages = ((char)25).ToString() + ' ' + allChatMessages;
+                                allChatMessages += " <EOF>";
+
+                                return allChatMessages;
+                            }
+                            else
+                            {
+                                return Fail();
+                            }
+                        }
+                        else
+                        {
+                            allChatMessages = "Blocked chat.";
                             allChatMessages = Program.security.EncryptMessage(
-                                Program.onlineUsers[User1ID].sessionKey, allChatMessages);
+                                    Program.onlineUsers[User1ID].sessionKey, allChatMessages);
                             allChatMessages = ((char)25).ToString() + ' ' + allChatMessages;
                             allChatMessages += " <EOF>";
 
                             return allChatMessages;
-                        }
-                        else
-                        {
-                            return Fail();
                         }
                     }
                     else
@@ -1063,16 +1097,19 @@ namespace TalkaTIPSerwer
                         {
                             if (friendLogin != null)
                             {
-                                message += friendLogin + " ";
-                                if (Program.onlineUsers.ContainsKey(item.UserID1))
+                                if (!message.Contains(friendLogin)) // Skip if the user added both sides
                                 {
-                                    message += "1 ";
-                                    message += Program.onlineUsers[item.UserID1].addressIP + " ";
-                                }
-                                else
-                                {
-                                    message += "0 ";
-                                    message += "0 ";
+                                    message += friendLogin + " ";
+                                    if (Program.onlineUsers.ContainsKey(item.UserID1))
+                                    {
+                                        message += "1 ";
+                                        message += Program.onlineUsers[item.UserID1].addressIP + " ";
+                                    }
+                                    else
+                                    {
+                                        message += "0 ";
+                                        message += "0 ";
+                                    }
                                 }
                             }
                             else
