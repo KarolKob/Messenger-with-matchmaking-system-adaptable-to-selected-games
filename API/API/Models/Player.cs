@@ -32,7 +32,7 @@ namespace API.Models
 
         private void CountWinRate()
         {
-            WinRate = (GamesWon / GamesPlayed) * 100;
+            WinRate = ((double)GamesWon / (double)GamesPlayed) * 100;
         }
 
         public void Update_Stats(double newrtaing, int result)

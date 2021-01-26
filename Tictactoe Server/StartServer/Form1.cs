@@ -188,8 +188,7 @@ namespace StartServer
 
                                 for (int i = 0; i < templobby.Players.Count; i++)
                                 {
-                                    if (templobby.Players[i].network == source)
-                                    {
+
                                         if (templobby.Players[i].order == "first")
                                         {
                                             templobby.Players[i].score = 1;
@@ -198,7 +197,7 @@ namespace StartServer
                                         {
                                             templobby.Players[i].score = 0;
                                         }
-                                    }
+
                                 }
 
                                 //await ApiPUT(templobby);
@@ -207,17 +206,25 @@ namespace StartServer
                             {
                                 for (int i = 0; i < templobby.Players.Count; i++)
                                 {
-                                    if (templobby.Players[i].network == source)
+                                    if (templobby.Players[i].order == "first")
                                     {
-                                        if (templobby.Players[i].order == "first")
-                                        {
-                                            templobby.Players[i].score = 0;
-                                        }
-                                        else
-                                        {
-                                            templobby.Players[i].score = 1;
-                                        }
+                                        templobby.Players[i].score = 0;
                                     }
+                                    else
+                                    {
+                                        templobby.Players[i].score = 1;
+                                    }
+                                    //if (templobby.Players[i].network == source)
+                                    //{
+                                    //    if (templobby.Players[i].order == "first")
+                                    //    {
+                                    //        templobby.Players[i].score = 0;
+                                    //    }
+                                    //    else
+                                    //    {
+                                    //        templobby.Players[i].score = 1;
+                                    //    }
+                                    //}
                                 }
                                 //await ApiPUT(templobby);
                             }
@@ -239,7 +246,12 @@ namespace StartServer
                                 }
                                 //
                             }
-                            await ApiPUT(templobby);
+                            if (!templobby.sent)
+                            {
+                                await ApiPUT(templobby);
+                                templobby.sent = true;
+                            }
+                            
                         }
                         if (RecivedCommand == "pl")
                         {
@@ -332,6 +344,7 @@ namespace StartServer
         private void Listening()
         {
             Invoke((MethodInvoker)(() => label3.Text = "ON"));
+            
             IPHostEntry ipHostInfo = Dns.Resolve(Dns.GetHostName());
             IPAddress ipAddress = IPAddress.Parse("127.0.0.1");
             const int PORT_NO = 12000;
@@ -362,6 +375,7 @@ namespace StartServer
 
         private void button1_Click(object sender, EventArgs e)
         {
+            button1.Enabled = false;
             t = new Thread(() => Listening());
             t.Start();
         }
@@ -369,7 +383,9 @@ namespace StartServer
         private void button2_Click(object sender, EventArgs e)
         {
             label3.Text = "OFF";
+            button1.Enabled = true;
             listener.Stop();
+            
             t.Abort();
         }
 
@@ -398,11 +414,12 @@ namespace StartServer
         public string lobbyName { get; set; }
         public List<Player> Players = new List<Player>();
         public List<string> Nicknames = new List<string>();
-        
+        public bool sent;
         public int maxSize;
         public string matchID;
         public Lobby(string name, string maxsize, Player player)
         {
+            sent = false;
             lobbyName = name;
             Players.Add(player);
             Nicknames.Add(player.Nickname);

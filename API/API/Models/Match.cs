@@ -101,7 +101,7 @@ namespace API.Models
 
         private double Count_Probablity(double rival_skill, double skill)
         {
-            double result = 1.0 / (1.0 + Math.Pow(10, (skill - rival_skill) / 400));
+            double result = 1.0 / (1.0 + Math.Pow(10, (rival_skill-skill) / 400));
             return result;
         }
 
