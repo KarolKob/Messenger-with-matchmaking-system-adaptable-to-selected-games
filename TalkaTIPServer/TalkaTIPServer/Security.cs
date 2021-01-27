@@ -49,7 +49,11 @@ namespace TalkaTIPSerwer
                     cs.Write(plaintextMessage, 0, plaintextMessage.Length);
                     cs.Close();
                     byte[] encryptedMessage = ciphertext.ToArray();
-                    return Convert.ToBase64String(encryptedMessage);
+                    string encryptedMessageStr = Convert.ToBase64String(encryptedMessage);
+
+                    Console.WriteLine("Endcrypted message: {0}", encryptedMessageStr);
+
+                    return encryptedMessageStr;
                 }
             }
         }

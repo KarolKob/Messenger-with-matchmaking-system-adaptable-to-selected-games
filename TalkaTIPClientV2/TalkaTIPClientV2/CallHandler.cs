@@ -168,10 +168,12 @@ namespace TalkaTIPClientV2
                 EndPoint receivedFromEP = new IPEndPoint(IPAddress.Any, 0);
 
                 // Get the IP from where we got a message
-                clientSocket.EndReceiveFrom(ar, ref receivedFromEP);
+                int bytesRec = clientSocket.EndReceiveFrom(ar, ref receivedFromEP);
 
                 // Convert the bytes received into an object of type Data
-                string message = Encoding.ASCII.GetString(byteData);
+                string message = Encoding.ASCII.GetString(byteData, 0, bytesRec);
+
+
 
                 // Real time communication handling messages from server
                 if (message[0] == (char)24 || message[0] == (char)27)
@@ -290,7 +292,7 @@ namespace TalkaTIPClientV2
             }
             catch (Exception)
             {
-                //MessageBox.Show("Packet recieving error!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                //MessageBox.Show(err.ToString(), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 

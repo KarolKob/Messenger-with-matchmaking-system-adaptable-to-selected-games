@@ -10,6 +10,7 @@ using System.Globalization;
 using TalkaTIPServer;
 using System.Security.Cryptography.X509Certificates;
 using System.Windows.Forms;
+using System.Threading;
 
 namespace TalkaTIPSerwer
 {
@@ -577,20 +578,27 @@ namespace TalkaTIPSerwer
                             // Send the message to reciever
                             if(Program.onlineUsers.ContainsKey(ReceiverID))
                             {
-                                EndPoint endPoint = new IPEndPoint(IPAddress.Parse(Program.onlineUsers[ReceiverID].addressIP), 14450);
-                                builder = new StringBuilder();
-                                for (int i = 0; i < param.Count; i++)
-                                {
-                                    // Append each string to the StringBuilder overload.
-                                    builder.Append(param[i]).Append(" ");
-                                }
-                                message = builder.ToString();
+                                ThreadStart work = delegate {
+                                    IPEndPoint endPoint = new IPEndPoint(IPAddress.Parse(Program.onlineUsers[ReceiverID].addressIP), 14450);
+                                    builder = new StringBuilder();
+                                    for (int i = 0; i < param.Count; i++)
+                                    {
+                                        // Append each string to the StringBuilder overload.
+                                        builder.Append(param[i]).Append(" ");
+                                    }
+                                    message = builder.ToString();
 
-                                message = Program.security.EncryptMessage(Program.onlineUsers[SenderID].sessionKey, message);
-                                message = ((char)24).ToString() + ' ' + message;
-                                message += " <EOF>";
+                                    Console.WriteLine("SEND MESSAGE: {0}", message);
 
-                                AsynchronousServer.SendMessage(message, endPoint);
+                                    message = Program.security.EncryptMessage(Program.onlineUsers[SenderID].sessionKey, message);
+                                    message = ((char)24).ToString() + ' ' + message;
+                                    message += " <EOF>";
+
+                                    Thread.Sleep(200);
+                                    AsynchronousServer.SendMessage(message, endPoint);
+                                };
+                                new Thread(work).Start();
+                                
                             }
                             return OK();
                         }
@@ -881,7 +889,7 @@ namespace TalkaTIPSerwer
                             {
                                 try
                                 {
-                                    EndPoint endPoint = new IPEndPoint(IPAddress.Parse(Program.onlineUsers[user.UserInChatID].addressIP), 14450);
+                                    IPEndPoint endPoint = new IPEndPoint(IPAddress.Parse(Program.onlineUsers[user.UserInChatID].addressIP), 14450);
                                     builder = new StringBuilder();
                                     for (int i = 0; i < param.Count; i++)
                                     {

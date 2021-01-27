@@ -555,7 +555,7 @@ namespace TalkaTIPClientV2
 
         public void UpdateChatText(string updatedText)
         {
-            AllMessages.Text = updatedText.Replace("\n", Environment.NewLine); ;
+            AllMessages.Text = updatedText.Replace("\n", Environment.NewLine);
         }
 
         private void listView1_SelectedIndexChanged(object sender, EventArgs e)

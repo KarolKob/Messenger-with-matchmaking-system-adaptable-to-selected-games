@@ -253,8 +253,18 @@ namespace TalkaTIPClientV2
         {
             // Decipher the message
             int comm = (int)messageFromServer[0];
-            string message = Program.security.DecryptMessage(messageFromServer.Substring(2), Program.sessionKeyWithServer);
-           
+            string message;
+
+            if (comm == 24 || comm == 27)
+            {
+                message = Program.security.DecryptMessage(messageFromServer.Substring(2,
+                    messageFromServer.Length - 8), Program.sessionKeyWithServer);
+            }
+            else
+            {
+                message = Program.security.DecryptMessage(messageFromServer.Substring(2), Program.sessionKeyWithServer);
+            }
+
             switch (comm)
             {
                 case 7:
@@ -335,7 +345,8 @@ namespace TalkaTIPClientV2
                 // Saving messages to memory
                 if (Program.loginAndMessage.ContainsKey(loginFrom))
                 {
-                    Program.loginAndMessage[loginFrom] += message;
+                    string temp = Program.loginAndMessage[loginFrom] + message;
+                    Program.loginAndMessage[loginFrom] = temp;
                 }
                 else
                 {
@@ -348,7 +359,7 @@ namespace TalkaTIPClientV2
                     if (!(Program.mainWindow.listView1.SelectedItems.Count == 0 || Program.mainWindow.listView1.SelectedItems.Count > 1)
                         && Program.mainWindow.listView1.SelectedItems[0].Text == loginFrom)
                     {
-                            Program.mainWindow.AllMessages.Text += message;
+                            Program.mainWindow.AllMessages.Text += message.Replace("\n", Environment.NewLine);
                     }
                     else
                     {
@@ -405,64 +416,68 @@ namespace TalkaTIPClientV2
 
             string loginFrom = param[0];
             string chatName = param[1];
-            
-            DateTime msgSentTime = DateTime.ParseExact(param[2], "yyyy-MM-dd-HH:mm:ss", CultureInfo.InvariantCulture);
 
-            StringBuilder builder = new StringBuilder();
-            for (int i = 3; i < param.Length - 1; i++)  // Ignore the <EOF>
+            if (loginFrom != Program.userLogin)
             {
-                // Append each string to the StringBuilder overload
-                builder.Append(param[i]).Append(" ");
-            }
+                DateTime msgSentTime = DateTime.ParseExact(param[2], "yyyy-MM-dd-HH:mm:ss", CultureInfo.InvariantCulture);
 
-            // Preparing the display format
-            string message = builder.ToString();
-            message = "\n" + loginFrom + " " + msgSentTime.ToString() + "\n" + message + "\n";
-
-            // Saving messages to memory
-            if (Program.chatNameAndMessage.ContainsKey(chatName))
-            {
-                Program.chatNameAndMessage[chatName] += message;
-            }
-            else
-            {
-                Program.chatNameAndMessage.Add(chatName, message);
-            }
-
-            // Display the messages or inform user
-            Program.mainWindow.Invoke((MethodInvoker)delegate
-            {
-                if (!(Program.mainWindow.listViewGroups.SelectedItems.Count == 0 || Program.mainWindow.listViewGroups.SelectedItems.Count > 1)
-                    && Program.mainWindow.listViewGroups.SelectedItems[0].Text == chatName)
+                StringBuilder builder = new StringBuilder();
+                for (int i = 3; i < param.Length - 1; i++)  // Ignore the <EOF>
                 {
-                    Program.mainWindow.AllMessages.Text += message;
+                    // Append each string to the StringBuilder overload
+                    builder.Append(param[i]).Append(" ");
+                }
+
+                // Preparing the display format
+                string message = builder.ToString();
+                message = "\n" + loginFrom + " " + msgSentTime.ToString() + "\n" + message + "\n";
+
+                // Saving messages to memory
+                if (Program.chatNameAndMessage.ContainsKey(chatName))
+                {
+                    string temp = Program.chatNameAndMessage[loginFrom] + message;
+                    Program.chatNameAndMessage[loginFrom] = temp;
                 }
                 else
                 {
-                    bool found = false;
-                    int index = 0;
-                    foreach (ListViewItem item in Program.mainWindow.listViewGroups.Items)
-                    {
-                        if (item.Text == chatName)
-                        {
-                            item.ForeColor = Color.Red;
-                            found = true;
-                            Program.mainWindow.listViewGroups.Refresh();
-                            break;
-                        }
-                        index++;
-                    }
-
-                    if (!found)
-                    {
-                        string[] chatDetails = { chatName, "0" };
-                        ListViewItem chat = new ListViewItem(chatDetails, 0);
-                        chat.ForeColor = Color.Red;
-                        Program.mainWindow.listViewGroups.Items.Add(chat);
-                        Program.mainWindow.listViewGroups.Refresh();
-                    }
+                    Program.chatNameAndMessage.Add(chatName, message);
                 }
-            });
+
+                // Display the messages or inform user
+                Program.mainWindow.Invoke((MethodInvoker)delegate
+                {
+                    if (!(Program.mainWindow.listViewGroups.SelectedItems.Count == 0 || Program.mainWindow.listViewGroups.SelectedItems.Count > 1)
+                        && Program.mainWindow.listViewGroups.SelectedItems[0].Text == chatName)
+                    {
+                        Program.mainWindow.AllMessages.Text += message.Replace("\n", Environment.NewLine); ;
+                    }
+                    else
+                    {
+                        bool found = false;
+                        int index = 0;
+                        foreach (ListViewItem item in Program.mainWindow.listViewGroups.Items)
+                        {
+                            if (item.Text == chatName)
+                            {
+                                item.ForeColor = Color.Red;
+                                found = true;
+                                Program.mainWindow.listViewGroups.Refresh();
+                                break;
+                            }
+                            index++;
+                        }
+
+                        if (!found)
+                        {
+                            string[] chatDetails = { chatName, "0" };
+                            ListViewItem chat = new ListViewItem(chatDetails, 0);
+                            chat.ForeColor = Color.Red;
+                            Program.mainWindow.listViewGroups.Items.Add(chat);
+                            Program.mainWindow.listViewGroups.Refresh();
+                        }
+                    }
+                });
+            }
         }
 
         private static void LogIP(string messageFromServer)

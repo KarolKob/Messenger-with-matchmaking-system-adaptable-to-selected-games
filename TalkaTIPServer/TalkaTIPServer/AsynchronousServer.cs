@@ -13,8 +13,7 @@ namespace TalkaTIPSerwer
     class AsynchronousServer
     {
         private static System.Timers.Timer serverTimer;
-        private static Socket messageSocket = new Socket(AddressFamily.InterNetwork,
-                SocketType.Stream, ProtocolType.Tcp);
+        private static Socket messageSocket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
 
         // Thread signal
         public static ManualResetEvent allDone = new ManualResetEvent(false);
@@ -174,9 +173,9 @@ namespace TalkaTIPSerwer
                     string messageBits = getBinaryMessage(content);
 
                     // Take 8 bits to recognize the communique
-                    int bits8 = Convert.ToInt32(messageBits.Substring(0, 8), 2);    // Decimal value
+                    int header = Convert.ToInt32(messageBits.Substring(0, 8), 2);    // Decimal value
 
-                    if (bits8 == 17)
+                    if (header == 17)
                     {
                         sessionKey = Program.security.SetSessionKey(Convert.FromBase64String(content.Substring(2, content.Length - 8)));
                         Console.WriteLine("Session key: {0}", sessionKey);
@@ -192,12 +191,12 @@ namespace TalkaTIPSerwer
                         content = Communication.ChooseCommunique(content, state.sessionKey, handler);
 
                         // Echo the data back to the client
-                        if (bits8 != 2 && bits8 != 11)
+                        if (header != 2 && header != 11)
                         {
                             Send(handler, content);
                         }
 
-                        if (bits8 == 1 && content == ((char)5).ToString() + " <EOF>") // logIn
+                        if (header == 1 && content == ((char)5).ToString() + " <EOF>") // logIn
                         {
 
                             string userAddressIP = ((IPEndPoint)handler.RemoteEndPoint).Address.ToString();
@@ -221,7 +220,7 @@ namespace TalkaTIPSerwer
                         handler.Shutdown(SocketShutdown.Both);
                         handler.Close();
 
-                        if (bits8 == 0)
+                        if (header == 0)
                         {
 
                         }
@@ -265,19 +264,19 @@ namespace TalkaTIPSerwer
             }
         }
 
-        public static void SendMessage(string message, EndPoint sendToEP)
+        public static void SendMessage(string message, IPEndPoint sendToEP)
         {
             // TODO: Send message to a client available on the online list in ClientClass
             try
             {
                 byte[] msg = Encoding.ASCII.GetBytes(message);
-
+                Console.WriteLine("Sent {0} bytes to client on port {1}.", msg.Length, sendToEP.Port);
                 // Send the message asynchronously
                 messageSocket.BeginSendTo(msg, 0, message.Length, SocketFlags.None, sendToEP, new AsyncCallback(OnSend), null);
             }
-            catch (Exception)
+            catch (Exception err)
             {
-                
+                Console.WriteLine("ERROR SEND MESSAGE! {0}", err);
             }
         }
 
@@ -289,7 +288,7 @@ namespace TalkaTIPSerwer
             }
             catch (Exception)
             {
-                
+                Console.WriteLine("ERROR ON SEND!");
             }
         }
 
