@@ -889,20 +889,24 @@ namespace TalkaTIPSerwer
                             {
                                 try
                                 {
-                                    IPEndPoint endPoint = new IPEndPoint(IPAddress.Parse(Program.onlineUsers[user.UserInChatID].addressIP), 14450);
-                                    builder = new StringBuilder();
-                                    for (int i = 0; i < param.Count; i++)
-                                    {
-                                        // Append each string to the StringBuilder overload.
-                                        builder.Append(param[i]).Append(" ");
-                                    }
-                                    message = chatName + " " + builder.ToString();
+                                    ThreadStart work = delegate {
+                                        IPEndPoint endPoint = new IPEndPoint(IPAddress.Parse(Program.onlineUsers[user.UserInChatID].addressIP), 14450);
+                                        builder = new StringBuilder();
+                                        for (int i = 0; i < param.Count; i++)
+                                        {
+                                            // Append each string to the StringBuilder overload.
+                                            builder.Append(param[i]).Append(" ");
+                                        }
+                                        message = chatName + " " + builder.ToString();
 
-                                    message = Program.security.EncryptMessage(Program.onlineUsers[senderID].sessionKey, message);
-                                    message = ((char)27).ToString() + ' ' + message;
-                                    message += " <EOF>";
+                                        message = Program.security.EncryptMessage(Program.onlineUsers[senderID].sessionKey, message);
+                                        message = ((char)27).ToString() + ' ' + message;
+                                        message += " <EOF>";
 
-                                    AsynchronousServer.SendMessage(message, endPoint);
+                                        Thread.Sleep(200);
+                                        AsynchronousServer.SendMessage(message, endPoint);
+                                    };
+                                    new Thread(work).Start();
                                 }
                                 catch(Exception)
                                 {
