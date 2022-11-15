@@ -29,6 +29,7 @@ Main app window:
 This server is responsible for all communicator functions like forwarding messages if a user isn't blocked or creating chat rooms. It also has main user database management.
 
 ## Matchmaking configuration application
-
+It's used to configure the matchmaking to suit a game's needs. The picked options are then stored inside a database referenced by the WebAPI.
 
 ## WebAPI
+Communicates with clients using REST. It's responsible for matching opponents and sending information about chat rooms that need to be created to the communicator's server.
